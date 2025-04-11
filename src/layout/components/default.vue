@@ -1,0 +1,137 @@
+<template>
+  <a-layout>
+    <a-layout-header class="header">
+      <div class="logo" />
+      <a-menu v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }">
+        <a-menu-item v-for="(menu, index) in menuList" :key="menu.key">{{ menu.label }}</a-menu-item>
+      </a-menu>
+    </a-layout-header>
+    <a-layout>
+      <a-layout-sider width="200" style="background: #fff">
+        <a-menu v-model:selectedKeys="selectedKeys2" v-model:openKeys="openKeys"
+          :items="menuList[selectedKeys1[0]].children" mode="inline" :style="{ height: '100%', borderRight: 0 }">
+        </a-menu>
+      </a-layout-sider>
+      <a-layout style="padding: 0 24px 24px">
+        <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
+          <router-view></router-view>
+        </a-layout-content>
+      </a-layout>
+    </a-layout>
+  </a-layout>
+</template>
+<script lang="ts" setup>
+import { watch, h, ref } from 'vue';
+import { useRouter, useRoute } from 'vue-router'
+import {
+  MailOutlined,
+  CalendarOutlined,
+  AppstoreOutlined,
+  SettingOutlined,
+} from '@ant-design/icons-vue';
+
+const router = useRouter()
+const selectedKeys1 = ref<number[]>([0]);
+const selectedKeys2 = ref<string[]>(['Q_Test']);
+let openKeys = ref<string[]>(['Q_Result']);
+const menuList = ref([
+  {
+    key: '0',
+    label: '测评管理',
+    title: '测评管理',
+    children: [{
+      key: 'Q_Test',
+      icon: () => h(MailOutlined),
+      label: '测评',
+      title: '测评',
+    },
+    {
+      key: 'Q_Result',
+      icon: () => h(CalendarOutlined),
+      label: '测评结果',
+      title: '测评结果',
+      children: [
+        {
+          key: 'Q_Query',
+          label: '测评结果查询',
+          title: '测评结果查询',
+        },
+        {
+          key: 'Q_Import',
+          label: '测评结果导入',
+          title: '测评结果导入',
+        }
+      ],
+    },
+    {
+      key: 'Q_Standard',
+      icon: () => h(AppstoreOutlined),
+      label: '测评标准',
+      title: '测评标准',
+    }
+    ]
+  },
+  {
+    key: '1',
+    label: '设置',
+    title: '设置',
+    children: [{
+      key: 'S_User',
+      icon: () => h(MailOutlined),
+      label: '用户管理',
+      title: '用户管理',
+    },
+    {
+      key: 'S_Test',
+      icon: () => h(CalendarOutlined),
+      label: '测评管理',
+      title: '测评管理',
+      children: [
+        {
+          key: 'S_Questionnaire',
+          label: '测评试卷管理',
+          title: '测评试卷管理',
+        },
+        {
+          key: 'S_Standard',
+          label: '测评标准管理',
+          title: '测评标准管理',
+        }
+      ],
+    }
+    ]
+  }
+]);
+
+watch(selectedKeys1, async (newValue, oldValue) => {
+  console.log(newValue[0])
+  if (newValue[0] == 0) {
+    openKeys.value = ['Q_Result']
+  } else {
+    openKeys.value = ['S_Test']
+  }
+})
+
+watch(selectedKeys2, async (newValue, oldValue) => {
+  console.log(newValue[0])
+  router.push({ name: newValue[0], params: {} })
+})
+</script>
+<style scoped>
+#components-layout-demo-top-side-2 .logo {
+  float: left;
+  width: 120px;
+  height: 31px;
+  margin: 16px 24px 16px 0;
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.ant-row-rtl #components-layout-demo-top-side-2 .logo {
+  float: right;
+  margin: 16px 0 16px 24px;
+}
+
+.site-layout-background {
+  background: #fff;
+}
+</style>
