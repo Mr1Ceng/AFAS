@@ -22,7 +22,8 @@
 </template>
 <script lang="ts" setup>
 import { watch, h, ref } from 'vue';
-import { useRouter, useRoute } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router';
+import { useMenuStore } from '@/stores/menuStore';
 import {
   MailOutlined,
   CalendarOutlined,
@@ -31,12 +32,16 @@ import {
 } from '@ant-design/icons-vue';
 
 const router = useRouter()
-const selectedKeys1 = ref<number[]>([0]);
-const selectedKeys2 = ref<string[]>(['Q_Test']);
-let openKeys = ref<string[]>(['Q_Result']);
+const store = useMenuStore()
+
+const selectedKeys1 = ref<number[]>([store._selectedKeys1]);
+const selectedKeys2 = ref<string[]>(store.getSelectedKeys2());
+let openKeys = ref<string[]>(store.getOpenKeys());
+
+//菜单对象
 const menuList = ref([
   {
-    key: '0',
+    key: 0,
     label: '测评管理',
     title: '测评管理',
     children: [{
@@ -69,10 +74,10 @@ const menuList = ref([
       label: '测评标准',
       title: '测评标准',
     }
-    ]
+    ],
   },
   {
-    key: '1',
+    key: 1,
     label: '设置',
     title: '设置',
     children: [{
@@ -104,18 +109,20 @@ const menuList = ref([
 ]);
 
 watch(selectedKeys1, async (newValue, oldValue) => {
-  console.log(newValue[0])
-  if (newValue[0] == 0) {
-    openKeys.value = ['Q_Result']
-  } else {
-    openKeys.value = ['S_Test']
-  }
+  selectedKeys2.value = store.getSelectedKeys2(newValue[0])
+  openKeys.value = store.getOpenKeys(newValue[0])
+  store.setter(newValue[0], selectedKeys2.value, openKeys.value)
 })
 
 watch(selectedKeys2, async (newValue, oldValue) => {
-  console.log(newValue[0])
+  store.setter(selectedKeys1.value[0], newValue, openKeys.value)
   router.push({ name: newValue[0], params: {} })
 })
+
+watch(openKeys, async (newValue, oldValue) => {
+  store.setter(selectedKeys1.value[0], selectedKeys2.value, newValue)
+})
+
 </script>
 <style scoped>
 #components-layout-demo-top-side-2 .logo {
