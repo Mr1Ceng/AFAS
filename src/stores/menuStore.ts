@@ -16,13 +16,13 @@ export const useMenuStore = defineStore('menu', {
     getter() {
       return (this._selectedKeys1, this._selectedKeys2[this._selectedKeys1], this._openKeys[this._selectedKeys1])
     },
-    getSelectedKeys2(selectedKeys1:number){
+    getSelectedKeys2(selectedKeys1?:number){
       if(selectedKeys1 == undefined){
         selectedKeys1 = this._selectedKeys1
       }
       return this._selectedKeys2[selectedKeys1]
     },
-    getOpenKeys(selectedKeys1:number){
+    getOpenKeys(selectedKeys1?:number){
       if(selectedKeys1 == undefined){
         selectedKeys1 = this._selectedKeys1
       }
