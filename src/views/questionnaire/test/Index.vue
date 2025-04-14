@@ -1,13 +1,13 @@
 <template>
-  <div class="QuestionnaireTest">
+  <div class="h-full w-full">
     <a-tabs v-model:activeKey="selectedQuestion">
       <a-tab-pane v-for="(question, index) in questionList" :key="question.questionId" :tab="question.questionName">
         <!-- 动态加载组件 -->
-      <component :is="GetComponent(question.questionCode)" :questionId="question.questionId" />
+        <component :is="GetComponent(question.questionCode)" :questionId="question.questionId" />
       </a-tab-pane>
       <template #leftExtra>
         <a-button class="tabs-extra-demo-button">{{questionnaireList.find(x => x.questionnaireId ==
-          selectedQuestionnaire)?.questionnaireName }}</a-button>
+          selectedQuestionnaire)?.questionnaireName}}</a-button>
       </template>
     </a-tabs>
   </div>
@@ -25,14 +25,14 @@
 import { watch, reactive, h, ref } from 'vue';
 import { MailOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons-vue';
 import { type MenuProps, message } from 'ant-design-vue';
-import QuestionS1 from '@/components/QuestionS1.vue'
-import QuestionS2 from '@/components/QuestionS2.vue'
-import QuestionS3 from '@/components/QuestionS3.vue'
-import QuestionS4 from '@/components/QuestionS4.vue'
-import QuestionS5 from '@/components/QuestionS5.vue'
-import QuestionT1 from '@/components/QuestionT1.vue'
-import QuestionT2 from '@/components/QuestionT2.vue'
-import QuestionT3 from '@/components/QuestionT3.vue'
+import QuestionS1 from '@/components/questionnaire/QuestionS1.vue'
+import QuestionS2 from '@/components/questionnaire/QuestionS2.vue'
+import QuestionS3 from '@/components/questionnaire/QuestionS3.vue'
+import QuestionS4 from '@/components/questionnaire/QuestionS4.vue'
+import QuestionS5 from '@/components/questionnaire/QuestionS5.vue'
+import QuestionT1 from '@/components/questionnaire/QuestionT1.vue'
+import QuestionT2 from '@/components/questionnaire/QuestionT2.vue'
+import QuestionT3 from '@/components/questionnaire/QuestionT3.vue'
 
 //弹框
 const modalVisible = ref<boolean>(false);
@@ -94,24 +94,24 @@ const GetQuestionList = async () => {
 
 GetQuestionnaireList()
 
-const GetComponent = (questionCode:string) => {
-      switch (questionCode) {
-        case 'S1': return QuestionS1
-        case 'S2': return QuestionS2
-        case 'S3': return QuestionS3
-        case 'S4': return QuestionS4
-        case 'S5': return QuestionS5
-        case 'T1': return QuestionT1
-        case 'T2': return QuestionT2
-        case 'T3': return QuestionT3
-        default:
-          return null 
-      }
-    }
+const GetComponent = (questionCode: string) => {
+  switch (questionCode) {
+    case 'S1': return QuestionS1
+    case 'S2': return QuestionS2
+    case 'S3': return QuestionS3
+    case 'S4': return QuestionS4
+    case 'S5': return QuestionS5
+    case 'T1': return QuestionT1
+    case 'T2': return QuestionT2
+    case 'T3': return QuestionT3
+    default:
+      return null
+  }
+}
 </script>
 
 <style scoped>
-  .tabs-extra-demo-button {
-    margin-right: 16px;
-  }
+.tabs-extra-demo-button {
+  margin-right: 16px;
+}
 </style>
