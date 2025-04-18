@@ -12,8 +12,8 @@
           :items="menuList[selectedKeys1[0]].children" mode="inline" :style="{ height: '100%', borderRight: 0 }">
         </a-menu>
       </a-layout-sider>
-      <a-layout style="padding: 0 24px 24px">
-        <a-layout-content :style="{ background: '#fff', padding: '24px', margin: 0, minHeight: '280px' }">
+      <a-layout>
+        <a-layout-content :style="{ background: '#fff', padding: '12px 24px 0', margin: 0, minHeight: '280px' }">
           <router-view></router-view>
         </a-layout-content>
       </a-layout>

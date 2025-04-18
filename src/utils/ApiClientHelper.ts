@@ -4,7 +4,7 @@ import { message } from 'ant-design-vue';
 // 创建 axios 实例
 const apiClient: AxiosInstance = axios.create({
   baseURL: 'http://localhost:5165',
-  timeout: 10000,
+  timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
   },
