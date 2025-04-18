@@ -43,13 +43,6 @@ const GetQuestionS2 = async () => {
               })
           };
         });
-
-
-        // _.groupBy(questionList.value.map((item: { gridRow: string | number; }) => {
-        //   return {
-        //     rowId: item.gridRow, rowName: nzhcn.encodeS(item.gridRow)
-        //   }
-        // }), "rowId")
       }
     } else {
       message.error(`获取题目信息失败，请联系工作人员！`);
@@ -66,8 +59,8 @@ const SaveAnswerS2 = async () => {
     forEach(rowList.value, (row) => {
       forEach(row.columns, (column) => {
         list.push({
-          rowId: row.rowId,
-          columnId: column.columnId,
+          GridRow: row.rowId,
+          GridColumn: column.columnId,
           selected: column.selected
         })
       })
@@ -84,13 +77,13 @@ const SaveAnswerS2 = async () => {
       answerList: list
     }
     console.log(data)
-    // const response = await apiClient.post('/Questionnaire/SaveAnswerS2/' + "User_Mr1Ceng", data)
-    // console.log('响应:', response)
-    // if (response.status == 1 && response.data != "") {
-    //   answerStore.setAnswerId(response.data);
-    // } else {
-    //   message.error(`保存题目信息失败，请联系工作人员！`);
-    // }
+    const response = await apiClient.post('/Questionnaire/SaveAnswerS2/' + "User_Mr1Ceng", data)
+    console.log('响应:', response)
+    if (response.status == 1 && response.data != "") {
+      answerStore.setAnswerId(response.data);
+    } else {
+      message.error(`保存题目信息失败，请联系工作人员！`);
+    }
   } catch (error) {
     console.error('请求失败:', error)
   }
