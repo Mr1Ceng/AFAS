@@ -1,0 +1,72 @@
+{
+  "id": "4304832",
+  "name": "AFAS",
+  "font_family": "iconfont",
+  "css_prefix_text": "icon-",
+  "description": "过渡编辑项目",
+  "glyphs": [
+    {
+      "icon_id": "44081141",
+      "name": "square",
+      "font_class": "square",
+      "unicode": "e86e",
+      "unicode_decimal": 59502
+    },
+    {
+      "icon_id": "44081143",
+      "name": "triangle",
+      "font_class": "triangle",
+      "unicode": "e86f",
+      "unicode_decimal": 59503
+    },
+    {
+      "icon_id": "44081146",
+      "name": "rhombus",
+      "font_class": "rhombus",
+      "unicode": "e870",
+      "unicode_decimal": 59504
+    },
+    {
+      "icon_id": "44081152",
+      "name": "cross",
+      "font_class": "cross",
+      "unicode": "e871",
+      "unicode_decimal": 59505
+    },
+    {
+      "icon_id": "44081154",
+      "name": "equals",
+      "font_class": "equals",
+      "unicode": "e872",
+      "unicode_decimal": 59506
+    },
+    {
+      "icon_id": "44081133",
+      "name": "trapezoid",
+      "font_class": "trapezoid",
+      "unicode": "e86a",
+      "unicode_decimal": 59498
+    },
+    {
+      "icon_id": "44081135",
+      "name": "star",
+      "font_class": "star",
+      "unicode": "e86b",
+      "unicode_decimal": 59499
+    },
+    {
+      "icon_id": "44081136",
+      "name": "circle",
+      "font_class": "circle",
+      "unicode": "e86c",
+      "unicode_decimal": 59500
+    },
+    {
+      "icon_id": "44081139",
+      "name": "ban",
+      "font_class": "ban",
+      "unicode": "e86d",
+      "unicode_decimal": 59501
+    }
+  ]
+}

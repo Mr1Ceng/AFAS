@@ -1,8 +1,8 @@
 <script setup lang="ts">
 
-import { computed, watch, reactive, h, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { message } from 'ant-design-vue';
-import { formattedText, getProperty } from '@/utils/CommonHelper'
+import { formattedText } from '@/utils/CommonHelper'
 import Nzh from "nzh";
 import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
@@ -81,6 +81,7 @@ const SaveAnswerS2 = async () => {
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
+      message.success(`保存成功`);
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -124,8 +125,9 @@ const errorRate = computed(() => {
     })
   })
 
-  return _.ceil(errorCount.value / count, 2);
+  return count == 0 ? 0 : _.ceil(errorCount.value / count, 2);
 })
+
 // #endregion
 
 // #region 答题结果
@@ -135,7 +137,7 @@ const crossCount = ref<number>(0);
 const remark = ref<string>("");
 const timeConsume = ref<number>(0);
 const result = computed(() => {
-  return 160;
+  return _.floor(160 / (160 + (160 - successCount.value)) / timeConsume.value * 360);
 })
 
 // #endregion
@@ -150,6 +152,7 @@ const startTimer = (): void => {
     timer = window.setInterval(() => {
       seconds.value--;
       if (seconds.value == 0) {
+        stopTimer();
         console.log("时间到");
         message.error("时间到");
       }
@@ -201,15 +204,16 @@ const ClickGrid = (rowId: number, column: any) => {
       currentColumn = _.findLastIndex(rowList.value[rowIndex].columns, (item: any) => item.selected);
     }
   }
-  console.log(rowList)
 }
 
 const Completed = () => {
   timeConsume.value = _.ceil(maxMin - seconds.value / 60);
   console.log(timeConsume.value)
-  remark.value = "跨行数：" + crossCount.value + "遗漏数：" + missingCount.value;
+  remark.value = "跨行数：" + crossCount.value + "；遗漏数：" + missingCount.value;
   stopTimer();
+  setModalVisible(true);
 }
+
 // #endregion
 
 // #region 指导语弹框
@@ -226,7 +230,9 @@ const setModalVisible = (open: boolean) => {
 setModalVisible(true);
 
 const modalOkClick = () => {
-  startTimer();
+  if(stepIndex.value == 0){
+    startTimer();
+  }
   stepIndex.value++;
   setModalVisible(false);
 }
@@ -242,25 +248,25 @@ const modalOkClick = () => {
       <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'flex-start'">
         <a-flex class="w-full" :justify="'center'" :align="'flex-start'">
           <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
-            行
+            <span class="text-xl">行</span>
           </a-flex>
           <a-flex class="h-8 flex-auto border-1" :justify="'center'" :align="'center'">
-            题目
+            <span class="text-xl">题目</span>
           </a-flex>
           <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
-            个数
+            <span class="text-xl">个数</span>
           </a-flex>
         </a-flex>
         <a-flex class="w-full h-8" v-for="row in rowList" :key="row.rowId" :justify="'center'" :align="'flex-start'">
           <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
-            {{ row.rowName }}
+            <span class="text-xl">{{ row.rowName }}</span>
           </a-flex>
-          <a-flex class="h-8 flex-auto border-1" :justify="'center'" :align="'center'">
-            <div class="w-6 flex justify-center" v-for="column in row.columns" @click="ClickGrid(row.rowId, column)"
-              :class="column.selected ? (column.isTrue ? 'bg-green-500' : 'bg-red-500') : ''">{{ column.value }}</div>
+          <a-flex class="h-8 flex-auto border-1" :justify="'space-around'" :align="'center'">
+            <div class="flex justify-center text-xl" v-for="column in row.columns"  @click="ClickGrid(row.rowId, column)"
+              :class="'w-1/'+row.columns.length + (column.selected ? (column.isTrue ? ' bg-green-500' : ' bg-red-500') : '')">{{ column.value }}</div>
           </a-flex>
           <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
-            {{ row.succussCount ?? 0 }}
+            <span class="text-xl">{{ row.succussCount ?? 0 }}</span>
           </a-flex>
         </a-flex>
       </a-flex>

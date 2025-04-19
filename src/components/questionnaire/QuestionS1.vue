@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, watch, reactive, h, ref } from 'vue';
+import { computed, ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText, getProperty } from '@/utils/CommonHelper'
 
@@ -61,6 +61,7 @@ const SaveAnswerS1 = async () => {
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
+      message.success(`保存成功`);
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -165,7 +166,6 @@ const ClickGrid = (grid: any) => {
       }
     }
   }
-  console.log(grid)
 }
 
 // #endregion
