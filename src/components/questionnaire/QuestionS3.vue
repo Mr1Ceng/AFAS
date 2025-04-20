@@ -312,7 +312,7 @@ const modalOkClick = () => {
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">耗时</span>
-        <a-input-number class="inputWidth" v-model:value="timeConsume" :disabled="true" addon-after="分" size="large"
+        <a-input-number class="inputWidth" v-model:value="timeConsume" :disabled="true" addon-after="秒" size="large"
           :min="0" />
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">

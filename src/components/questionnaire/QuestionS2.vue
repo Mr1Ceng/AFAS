@@ -137,7 +137,7 @@ const crossCount = ref<number>(0);
 const remark = ref<string>("");
 const timeConsume = ref<number>(0);
 const result = computed(() => {
-  return _.floor(160 / (160 + (160 - successCount.value)) / timeConsume.value * 360);
+  return timeConsume.value == 0 ? 0 :_.floor(160 / (160 + (160 - successCount.value)) / timeConsume.value * 360);
 })
 
 // #endregion

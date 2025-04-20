@@ -75,13 +75,13 @@ const SaveAnswerS1 = async () => {
 // #region 计算属性
 
 const smallGridList = computed(() => {
-  return questionList.value.length > 0 ? questionList.value.filter(x => x.gridType == "SMALL") : []
+  return questionList.value.length > 0 ? questionList.value.filter((x: { gridType: string; }) => x.gridType == "SMALL") : []
 })
 const middleGridList = computed(() => {
-  return questionList.value.length > 0 ? questionList.value.filter(x => x.gridType == "MIDDLE") : []
+  return questionList.value.length > 0 ? questionList.value.filter((x: { gridType: string; }) => x.gridType == "MIDDLE") : []
 })
 const largeGridList = computed(() => {
-  return questionList.value.length > 0 ? questionList.value.filter(x => x.gridType == "LARGE") : []
+  return questionList.value.length > 0 ? questionList.value.filter((x: { gridType: string; }) => x.gridType == "LARGE") : []
 })
 
 // #endregion
@@ -128,7 +128,7 @@ const resetTimer = (): void => {
 
 let answer = ref<number[]>([]);
 const ClickGrid = (grid: any) => {
-  var index = questionList.value.findIndex(x => x.gridType == grid.gridType && x.gridSort == grid.gridSort);
+  var index = questionList.value.findIndex((x: { gridType: any; gridSort: any; }) => x.gridType == grid.gridType && x.gridSort == grid.gridSort);
   if (index >= 0) {
     if (questionList.value[index].selected || showGridTypes.value.at(-1) != grid.gridType) {
       console.log("格子已选择或者不是当前格子类型")
@@ -139,7 +139,7 @@ const ClickGrid = (grid: any) => {
           answer.value.push(grid.gridValue);
         }
       } else {
-        var lastNumber: number = answer.value.at(-1);
+        var lastNumber: number = answer.value.at(-1)??0;
         if (grid.gridValue == lastNumber + 1) {
           questionList.value[index].selected = true;
           answer.value.push(grid.gridValue);

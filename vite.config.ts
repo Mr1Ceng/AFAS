@@ -16,8 +16,5 @@ export default defineConfig({
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
     },
-  },
-  build: {
-    target: 'es2022', // 设置编译目标为 ES2022
-  },
+  }
 })
