@@ -156,6 +156,7 @@ const handleCrossUpdate = (newCount: number) => {
 }
 const handleErrorUpdate = (newCount: number) => {
   errorCount.value = newCount;
+  message.error("测试失败，请重试");
 }
 const getQuestionImage = (image: string) => {
   questionImage.value = image;

@@ -1,9 +1,12 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue';
+import { useGlobalStore } from "@/stores/globalStore";
+const globalStore = useGlobalStore();
+const baseURL = globalStore.baseURL;
 
 // 创建 axios 实例
 const apiClient: AxiosInstance = axios.create({
-  baseURL: 'http://localhost:5165',
+  baseURL: baseURL,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
