@@ -139,7 +139,7 @@ const ClickGrid = (grid: any) => {
           answer.value.push(grid.gridValue);
         }
       } else {
-        var lastNumber: number = answer.value.at(-1)??0;
+        var lastNumber: number = answer.value.at(-1) ?? 0;
         if (grid.gridValue == lastNumber + 1) {
           questionList.value[index].selected = true;
           answer.value.push(grid.gridValue);
@@ -217,7 +217,7 @@ const modalOkClick = () => {
         <a-flex class="h-full w-5/12" :vertical="true" :align="'center'">
           <span class="text-2xl text-neutral-600">大图</span>
           <div class="w-full aspect-square place-items-center grid grid-cols-5 p-4">
-            <div class="w-full h-full border-1 border-black place-items-center grid text-5xl"
+            <div class="w-full h-full border-1 border-black place-items-center grid text-5xl cursor-pointer"
               v-for="(grid, index) in largeGridList" @click="ClickGrid(grid)"
               :class="grid.selected ? 'bg-green-500' : ''">{{ (showGridTypes.includes("LARGE") ? grid.gridValue : '*')
               }}
@@ -227,7 +227,7 @@ const modalOkClick = () => {
         <a-flex class="h-full w-4/12" :vertical="true" :align="'center'">
           <span class="text-2xl text-neutral-600">中图</span>
           <div class="w-full aspect-square place-items-center grid grid-cols-5 p-4">
-            <div class="w-full h-full border-1 border-black place-items-center grid text-3xl"
+            <div class="w-full h-full border-1 border-black place-items-center grid text-3xl cursor-pointer"
               v-for="(grid, index) in middleGridList" @click="ClickGrid(grid)"
               :class="grid.selected ? 'bg-green-500' : ''">{{ (showGridTypes.includes("MIDDLE") ?
                 grid.gridValue : '*')
@@ -238,7 +238,7 @@ const modalOkClick = () => {
         <a-flex class="h-full w-3/12" :vertical="true" :align="'center'">
           <span class="text-2xl text-neutral-600">小图</span>
           <div class="w-full aspect-square place-items-center grid grid-cols-5 p-4">
-            <div class="w-full h-full border-1 border-black place-items-center grid text-xl"
+            <div class="w-full h-full border-1 border-black place-items-center grid text-xl cursor-pointer"
               v-for="(grid, index) in smallGridList" @click="ClickGrid(grid)"
               :class="grid.selected ? 'bg-green-500' : ''">
               {{ (showGridTypes.includes("SMALL") ? grid.gridValue : '*') }}

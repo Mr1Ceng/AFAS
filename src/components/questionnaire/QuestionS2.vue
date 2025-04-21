@@ -137,7 +137,7 @@ const crossCount = ref<number>(0);
 const remark = ref<string>("");
 const timeConsume = ref<number>(0);
 const result = computed(() => {
-  return timeConsume.value == 0 ? 0 :_.floor(160 / (160 + (160 - successCount.value)) / timeConsume.value * 360);
+  return timeConsume.value == 0 ? 0 : _.floor(160 / (160 + (160 - successCount.value)) / timeConsume.value * 360);
 })
 
 // #endregion
@@ -230,7 +230,7 @@ const setModalVisible = (open: boolean) => {
 setModalVisible(true);
 
 const modalOkClick = () => {
-  if(stepIndex.value == 0){
+  if (stepIndex.value == 0) {
     startTimer();
   }
   stepIndex.value++;
@@ -247,25 +247,27 @@ const modalOkClick = () => {
       :align="'flex-start'">
       <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'flex-start'">
         <a-flex class="w-full" :justify="'center'" :align="'flex-start'">
-          <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
             <span class="text-xl">行</span>
           </a-flex>
-          <a-flex class="h-8 flex-auto border-1" :justify="'center'" :align="'center'">
+          <a-flex class="h-7 flex-auto border-1" :justify="'center'" :align="'center'">
             <span class="text-xl">题目</span>
           </a-flex>
-          <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
             <span class="text-xl">个数</span>
           </a-flex>
         </a-flex>
-        <a-flex class="w-full h-8" v-for="row in rowList" :key="row.rowId" :justify="'center'" :align="'flex-start'">
-          <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
+        <a-flex class="w-full h-7" v-for="row in rowList" :key="row.rowId" :justify="'center'" :align="'flex-start'">
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
             <span class="text-xl">{{ row.rowName }}</span>
           </a-flex>
-          <a-flex class="h-8 flex-auto border-1" :justify="'space-around'" :align="'center'">
-            <div class="flex justify-center text-xl" v-for="column in row.columns"  @click="ClickGrid(row.rowId, column)"
-              :class="'w-1/'+row.columns.length + (column.selected ? (column.isTrue ? ' bg-green-500' : ' bg-red-500') : '')">{{ column.value }}</div>
+          <a-flex class="h-7 flex-auto border-1" :justify="'space-around'" :align="'center'">
+            <div class="flex justify-center text-xl hover:bg-sky-500 cursor-pointer" v-for="column in row.columns"
+              @click="ClickGrid(row.rowId, column)"
+              :class="'w-1/' + row.columns.length + (column.selected ? (column.isTrue ? ' bg-green-500' : ' bg-red-500') : '')">
+              {{ stepIndex == 0 ? '' : column.value }}</div>
           </a-flex>
-          <a-flex class="h-8 w-20 border-1" :justify="'center'" :align="'center'">
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
             <span class="text-xl">{{ row.succussCount ?? 0 }}</span>
           </a-flex>
         </a-flex>
@@ -287,7 +289,7 @@ const modalOkClick = () => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-9xl">{{ seconds }}</span>
       </div>
-      <div class="w-full h-40 pt-4 flex justify-around items-center">
+      <div class="w-full h-20 pt-4 flex justify-around items-center">
         <span class="text-xl">错误数
           <span class="text-3xl">{{ errorCount }}</span>
         </span>

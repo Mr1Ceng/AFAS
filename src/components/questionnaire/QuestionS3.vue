@@ -273,8 +273,9 @@ const modalOkClick = () => {
           :justify="'center'" :align="'flex-start'">
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1"
-              v-for="(column, columnIndex) in row.columns" :class="'iconfont ' + (iconList[column.value - 1].icon) + (column.answerValue > 0 && !(rowIndex == 0 && columnIndex < 10) ? (column.answerValue == column.value ? ' bg-green-500' : ' bg-red-500') : '') +
-                (rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')"></div>
+              v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? 'iconfont ' + (iconList[column.value - 1].icon) : '')
+                + (column.answerValue > 0 && !(rowIndex == 0 && columnIndex < 10) ? (column.answerValue == column.value ? ' bg-green-500' : ' bg-red-500') : '')
+                + (rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')"></div>
           </a-flex>
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1"
@@ -301,14 +302,6 @@ const modalOkClick = () => {
     <div class="h-full border-l-2 border-gray-300 p-4 flex flex-col" style="width: 400px;">
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-9xl">{{ seconds }}</span>
-      </div>
-      <div class="w-full h-40 pt-4 flex justify-around items-center">
-        <span class="text-xl">正确数
-          <span class="text-3xl">{{ rightCount }}</span>
-        </span>
-        <span class="text-xl">错误数
-          <span class="text-3xl">{{ errorCount }}</span>
-        </span>
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">耗时</span>
@@ -357,5 +350,4 @@ const modalOkClick = () => {
       /* calc(1.75 / 1.125) ≈ 1.5556 */
     );
 }
-
 </style>

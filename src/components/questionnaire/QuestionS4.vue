@@ -149,7 +149,7 @@ const modalOkClick = () => {
 // #endregion
 
 // #region 漩涡
-const spacing = ref(6);
+const spacing = ref(5);
 const perturbation = ref(20);
 const handleCrossUpdate = (newCount: number) => {
   crossCount.value = newCount;
@@ -179,7 +179,7 @@ const finished = (count: number) => {
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
       <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'center'">
-        <SpiralMaze :initialSpacing="spacing" :initialPerturbation="perturbation"
+        <SpiralMaze :initialSpacing="spacing" :initialPerturbation="perturbation" :width="1000" :height="700"
           @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
           @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
       </a-flex>
@@ -194,14 +194,6 @@ const finished = (count: number) => {
     <div class="h-full border-l-2 border-gray-300 p-4 flex flex-col" style="width: 400px;">
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-9xl">{{ seconds }}</span>
-      </div>
-      <div class="w-full h-40 pt-4 flex justify-around items-center">
-        <span class="text-xl">交叉数
-          <span class="text-3xl">{{ crossCount }}</span>
-        </span>
-        <span class="text-xl">断线数
-          <span class="text-3xl">{{ errorCount }}</span>
-        </span>
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">耗时</span>

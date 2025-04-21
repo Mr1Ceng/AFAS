@@ -13,16 +13,7 @@ const pinia = createPinia();
 // 使用持久化插件
 pinia.use(piniaPersistedstate);
 
-import { library } from '@fortawesome/fontawesome-svg-core'
-import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { far } from '@fortawesome/free-regular-svg-icons';
-
-/* add icons to the library */
-library.add(far)
-
 const app = createApp(App)
-
-app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(pinia)
 app.use(router)
 

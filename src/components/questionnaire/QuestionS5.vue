@@ -79,7 +79,7 @@ const shapeCount = ref<number>(0);
 const remark = ref<string>("");
 const timeConsume = ref<number>(0);
 const result = computed(() => {
-  return timeConsume.value == 0?0:_.floor(10*shapeCount.value -10*errorCount.value+10*180/timeConsume.value);
+  return timeConsume.value == 0 ? 0 : _.floor(10 * shapeCount.value - 10 * errorCount.value + 10 * 180 / timeConsume.value);
 })
 
 // #endregion
@@ -124,7 +124,7 @@ const resetTimer = (): void => {
 // #region 答题方法
 
 const StartDraw = () => {
-  if(stepIndex.value != 1){
+  if (stepIndex.value != 1) {
     return;
   }
   stopTimer();
@@ -176,8 +176,8 @@ let mousePath: { x: number; y: number }[] = [];
 
 const resizeCanvas = () => {
   if (containerRef.value && canvasRef.value) {
-    canvasRef.value.width = containerRef.value.clientWidth -50;
-    canvasRef.value.height = containerRef.value.clientHeight-50;
+    canvasRef.value.width = containerRef.value.clientWidth - 50;
+    canvasRef.value.height = containerRef.value.clientHeight - 50;
   }
 };
 
@@ -227,20 +227,19 @@ onUnmounted(() => {
 
 <template>
   <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
-      :align="'flex-start'">
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div ref="containerRef" class="w-full flex flex-auto justify-around items-center">
-        <img v-show="stepIndex == 1" :src="questionImage" class="w-full" height="auto"/>
+        <img v-show="stepIndex == 1" :src="questionImage" class="w-full" height="auto" />
         <canvas v-show="stepIndex == 2" ref="canvasRef"></canvas>
         <!-- :width="1000" :height="600"  -->
-        <img v-show="stepIndex > 2" :src="questionImage" class="w-1/2" height="auto"/>
-        <img v-show="stepIndex > 2" :src="answerImage" class="w-1/2" height="auto"/>
+        <img v-show="stepIndex > 2" :src="questionImage" class="w-1/2" height="auto" />
+        <img v-show="stepIndex > 2" :src="answerImage" class="w-1/2" height="auto" />
       </div>
-      <div class="w-full flex flex-row justify-center items-center" style="height: 40px;">
-        <a-button type="primary" @click="StartDraw()">
+      <div class="w-1/2 flex flex-row justify-around items-center" style="height: 40px;">
+        <a-button v-show="stepIndex == 1" type="primary" @click="StartDraw()">
           开始绘图
         </a-button>
-        <a-button type="primary" @click="Completed()">
+        <a-button v-show="stepIndex == 2" type="primary" @click="Completed()">
           完成
         </a-button>
       </div>
@@ -263,13 +262,11 @@ onUnmounted(() => {
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">画出的图形数</span>
-        <a-input-number class="inputWidth" v-model:value="shapeCount"  addon-after="个" size="large"
-          :min="0" />
+        <a-input-number class="inputWidth" v-model:value="shapeCount" addon-after="个" size="large" :min="0" />
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">位置的错误数</span>
-        <a-input-number class="inputWidth" v-model:value="errorCount"  addon-after="个" size="large"
-          :min="0" />
+        <a-input-number class="inputWidth" v-model:value="errorCount" addon-after="个" size="large" :min="0" />
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">得分</span>
