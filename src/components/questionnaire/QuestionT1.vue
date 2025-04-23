@@ -319,7 +319,7 @@ const openNotification = (message: string) => {
         </div>
         <div class="w-full flex felx-row items-start p-4 border-b-1 border-gray-300">
           <div class="w-[calc(100%-160px)] flex flex-col justify-between">
-            <div class="w-full text-xl flex items-start pb-4" v-for="question in storyQuestion">
+            <div class="w-full text-xl flex items-start pb-2" v-for="question in storyQuestion">
               <div class="h-10 w-80 text-xl flex items-center">
                 {{ `${question.questionSort}: ${question.questionQ}` }}
               </div>
@@ -344,7 +344,7 @@ const openNotification = (message: string) => {
           </div>
         </div>
       </div>
-      <div class="w-1/2 flex flex-row justify-around items-center" style="height: 40px;">
+      <div class="w-1/2 flex flex-row justify-around items-center" style="height: 50px;">
         <a-button type="primary" @click="Completed(); number3Question.timeConsume = seconds; resetTimer();">
           完成
         </a-button>

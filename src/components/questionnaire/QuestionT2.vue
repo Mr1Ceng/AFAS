@@ -100,18 +100,6 @@ const sameRightCount = computed(() => {
 
 // #region 监听器
 
-// watch(() => number1Question.value?.questionA, async (newValue, oldValue) => {
-//   number1Question.value.errorCount = Math.abs(newValue - answerInfo.value.number1)
-// })
-
-// watch(() => number2Question.value?.questionA, async (newValue, oldValue) => {
-//   number2Question.value.errorCount = Math.abs(newValue - answerInfo.value.number2)
-// })
-
-// watch(() => number3Question.value?.questionA, async (newValue, oldValue) => {
-//   number3Question.value.errorCount = Math.abs(newValue - answerInfo.value.number3)
-// })
-
 //#endregion
 
 // #region 答题结果
@@ -251,7 +239,7 @@ const openNotification = (message: string) => {
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div class="w-full flex flex-auto flex-col justify-start items-center">
         <div class="w-full flex flex-col justify-between p-4">
-          <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300">
+          <div class="w-full text-xl flex items-start pb-2 border-b-1 border-gray-300">
             找不同
           </div>
           <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300"

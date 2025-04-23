@@ -286,7 +286,7 @@ const modalOkClick = () => {
           </a-flex>
         </a-flex>
       </a-flex>
-      <div class="w-full flex flex-row justify-around items-center" style="height: 100px;">
+      <div class="w-full flex flex-row justify-around items-center" style="height: 60px;">
         <a-button class="w-16" v-for="icon in iconList" type="primary" size="large" @click="ClickGrid(icon.id)">
           {{ icon.id }}
         </a-button>

@@ -272,7 +272,7 @@ const modalOkClick = () => {
           </a-flex>
         </a-flex>
       </a-flex>
-      <div class="w-full flex flex-row justify-center items-center" style="height: 40px;">
+      <div class="w-full flex flex-row justify-center items-center" style="height: 50px;">
         <a-button type="primary" @click="Completed()">
           完成
         </a-button>

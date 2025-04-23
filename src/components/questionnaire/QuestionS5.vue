@@ -235,7 +235,7 @@ onUnmounted(() => {
         <img v-show="stepIndex > 2" :src="questionImage" class="w-1/2" height="auto" />
         <img v-show="stepIndex > 2" :src="answerImage" class="w-1/2" height="auto" />
       </div>
-      <div class="w-1/2 flex flex-row justify-around items-center" style="height: 40px;">
+      <div class="w-1/2 flex flex-row justify-around items-center" style="height: 50px;">
         <a-button v-show="stepIndex == 1" type="primary" @click="StartDraw()">
           开始绘图
         </a-button>
