@@ -1,10 +1,14 @@
 <template>
   <a-layout>
-    <a-layout-header class="header">
-      <div class="logo" />
-      <a-menu v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal" :style="{ lineHeight: '64px' }">
+    <a-layout-header class="header flex flex-row">
+      <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
+        :style="{ lineHeight: '64px' }">
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key">{{ menu.label }}</a-menu-item>
       </a-menu>
+      <div class="flex items-center justify-end">
+        <a-switch :checked="isDarktheme" :checked-children="true" :un-checked-children="false"
+          @change="() => { globalStore.changeTheme() }" />
+      </div>
     </a-layout-header>
     <a-layout>
       <a-layout-sider width="200" style="background: #fff">
@@ -29,7 +33,9 @@ import {
   CalendarOutlined,
   AppstoreOutlined,
   SettingOutlined,
-} from '@ant-design/icons-vue';
+} from '@ant-design/icons-vue'; import { useGlobalStore } from "@/stores/globalStore";
+const globalStore = useGlobalStore();
+const isDarktheme = ref(globalStore.isDarktheme)
 
 const router = useRouter()
 const store = useMenuStore()

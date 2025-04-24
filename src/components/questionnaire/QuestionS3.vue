@@ -12,44 +12,6 @@ const props = defineProps<{
 }>()
 const answerStore = useAnswerStore();
 console.log(answerStore)
-const iconList = ref<any[]>([
-  {
-    id: 1,
-    icon: 'icon-star'
-  },
-  {
-    id: 2,
-    icon: 'icon-circle'
-  },
-  {
-    id: 3,
-    icon: 'icon-triangle'
-  },
-  {
-    id: 4,
-    icon: 'icon-ban'
-  },
-  {
-    id: 5,
-    icon: 'icon-square'
-  },
-  {
-    id: 6,
-    icon: 'icon-trapezoid'
-  },
-  {
-    id: 7,
-    icon: 'icon-equals'
-  },
-  {
-    id: 8,
-    icon: 'icon-cross'
-  },
-  {
-    id: 9,
-    icon: 'icon-rhombus'
-  }
-]);
 
 // #region 接口
 
@@ -255,13 +217,13 @@ const modalOkClick = () => {
           </a-flex>
           <a-flex class="h-24 w-18/25 border-1" :vertical="true" :justify="'center'" :align="'center'">
             <div class="w-full h-16 flex flex-row justify-around items-center border-b-1">
-              <div class="w-1/9 flex justify-center items-center" v-for="icon in iconList">
-                <span class="iconfont text-4xl" :class="icon.icon"></span>
+              <div class="w-1/9 flex justify-center items-center" v-for="icon in 9">
+                <span class="iconfont text-4xl" :class="`icon-${props.questionId}_${icon}`"></span>
               </div>
             </div>
             <div class="w-full h-8 flex flex-row justify-around items-center">
-              <div class="text-xl" v-for="icon in iconList">
-                {{ icon.id }}
+              <div class="text-xl" v-for="icon in 9">
+                {{ icon }}
               </div>
             </div>
           </a-flex>
@@ -273,7 +235,7 @@ const modalOkClick = () => {
           :justify="'center'" :align="'flex-start'">
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1"
-              v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? 'iconfont ' + (iconList[column.value - 1].icon) : '')
+              v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? `iconfont icon-${props.questionId}_${column.value}` : '')
                 + (column.answerValue > 0 && !(rowIndex == 0 && columnIndex < 10) ? (column.answerValue == column.value ? ' bg-green-500' : ' bg-red-500') : '')
                 + (rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')"></div>
           </a-flex>
@@ -287,8 +249,8 @@ const modalOkClick = () => {
         </a-flex>
       </a-flex>
       <div class="w-full flex flex-row justify-around items-center" style="height: 60px;">
-        <a-button class="w-16" v-for="icon in iconList" type="primary" size="large" @click="ClickGrid(icon.id)">
-          {{ icon.id }}
+        <a-button class="w-16" v-for="icon in 9" type="primary" size="large" @click="ClickGrid(icon)">
+          {{ icon }}
         </a-button>
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">

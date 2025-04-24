@@ -5,9 +5,17 @@
         <!-- 动态加载组件 -->
         <component :is="GetComponent(question.questionCode)" :questionId="question.questionId" />
       </a-tab-pane>
+      <a-tab-pane key="result" tab="查看结果">
+        <!-- 结果组件 -->
+        <QuestionResult></QuestionResult>
+      </a-tab-pane>
       <template #leftExtra>
-        <a-button class="tabs-extra-demo-button">{{questionnaireList.find(x => x.questionnaireId ==
-          selectedQuestionnaire)?.questionnaireName}}</a-button>
+        <a-select class="tabs-extra-button" ref="select" v-model:value="selectedQuestionnaire"
+          @change="() => { GetQuestionList(); }">
+          <a-select-option v-for="(questionnaire, index) in questionnaireList" :value="questionnaire.questionnaireId">{{
+            questionnaire.questionnaireName + "——" +
+            questionnaire.versionName }}</a-select-option>
+        </a-select>
       </template>
     </a-tabs>
   </div>
@@ -33,6 +41,7 @@ import QuestionS5 from '@/components/questionnaire/QuestionS5.vue'
 import QuestionT1 from '@/components/questionnaire/QuestionT1.vue'
 import QuestionT2 from '@/components/questionnaire/QuestionT2.vue'
 import QuestionT3 from '@/components/questionnaire/QuestionT3.vue'
+import QuestionResult from '@/components/questionnaire/QuestionResult.vue'
 
 //弹框
 const modalVisible = ref<boolean>(false);
@@ -111,7 +120,7 @@ const GetComponent = (questionCode: string) => {
 </script>
 
 <style scoped>
-.tabs-extra-demo-button {
+.tabs-extra-button {
   margin-right: 16px;
 }
 </style>

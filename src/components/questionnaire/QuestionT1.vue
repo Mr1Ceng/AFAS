@@ -266,7 +266,8 @@ const openNotification = (message: string) => {
   <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div class="w-full flex flex-auto flex-col justify-start items-center">
-        <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300">
+        <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300 rounded-xl"
+          :class="stepIndex == 1 ? 'bg-blue-100' : ''">
           <div class="h-10 w-80 text-xl flex items-center">
             {{ number1Question.questionSort + ": " + number1Question?.questionQ }}
           </div>
@@ -279,13 +280,14 @@ const openNotification = (message: string) => {
               controls controlsList="nodownload noplaybackrate"></audio>
           </div>
           <div class="h-10 w-40 pl-4">
-            <a-button size="large"
+            <a-button :disabled="stepIndex != 1" size="large"
               @click="() => { if (!canPlay || stepIndex != 1) return; setModalVisible(true); number1Question.timeConsume = seconds; resetTimer(); }">
               下一题
             </a-button>
           </div>
         </div>
-        <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300">
+        <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300 rounded-xl"
+          :class="stepIndex == 2 ? 'bg-blue-100' : ''">
           <div class="h-10 w-80 text-xl flex items-center">
             {{ number2Question.questionSort + ": " + number2Question?.questionQ }}
           </div>
@@ -298,13 +300,13 @@ const openNotification = (message: string) => {
               controls controlsList="nodownload noplaybackrate"></audio>
           </div>
           <div class="h-10 w-40 pl-4">
-            <a-button size="large"
-              @click="() => { if (!canPlay || stepIndex != 2) return; setModalVisible(true); number2Question.timeConsume = seconds; resetTimer(); }">
+            <a-button :disabled="stepIndex != 2" size="large"
+              @click="() => { if (!canPlay) return; setModalVisible(true); number2Question.timeConsume = seconds; resetTimer(); }">
               下一题
             </a-button>
           </div>
         </div>
-        <div class="w-full flex felx-row items-center p-4">
+        <div class="w-full flex felx-row items-center p-4 rounded-t-xl" :class="stepIndex == 3 ? 'bg-blue-100' : ''">
           <div class="h-10 w-80 text-xl flex items-center">
             {{ number3Question.questionSort + ": " + number3Question?.questionQ }}
           </div>
@@ -317,7 +319,8 @@ const openNotification = (message: string) => {
               controls controlsList="nodownload noplaybackrate"></audio>
           </div>
         </div>
-        <div class="w-full flex felx-row items-start p-4 border-b-1 border-gray-300">
+        <div class="w-full flex felx-row items-start p-4 border-b-1 border-gray-300 rounded-b-xl"
+          :class="stepIndex == 3 ? 'bg-blue-100' : ''">
           <div class="w-[calc(100%-160px)] flex flex-col justify-between">
             <div class="w-full text-xl flex items-start pb-2" v-for="question in storyQuestion">
               <div class="h-10 w-80 text-xl flex items-center">
@@ -361,7 +364,7 @@ const openNotification = (message: string) => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-8xl">{{
           `${number1Question.timeConsume ?? 0}/${number2Question.timeConsume ?? 0}/${number3Question.timeConsume ?? 0}`
-          }}</span>
+        }}</span>
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-20">数字题一</span>

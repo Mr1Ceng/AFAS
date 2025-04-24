@@ -6,65 +6,128 @@
   "description": "过渡编辑项目",
   "glyphs": [
     {
+      "icon_id": "44139220",
+      "name": "QS0203_4",
+      "font_class": "QS0203_4",
+      "unicode": "e8b3",
+      "unicode_decimal": 59571
+    },
+    {
+      "icon_id": "44137240",
+      "name": "QS0203_1",
+      "font_class": "QS0203_1",
+      "unicode": "e8aa",
+      "unicode_decimal": 59562
+    },
+    {
+      "icon_id": "44137376",
+      "name": "QS0203_7",
+      "font_class": "QS0203_7",
+      "unicode": "e8b0",
+      "unicode_decimal": 59568
+    },
+    {
+      "icon_id": "44137381",
+      "name": "QS0203_8",
+      "font_class": "QS0203_8",
+      "unicode": "e8b1",
+      "unicode_decimal": 59569
+    },
+    {
+      "icon_id": "44137246",
+      "name": "QS0203_2",
+      "font_class": "QS0203_2",
+      "unicode": "e8ab",
+      "unicode_decimal": 59563
+    },
+    {
+      "icon_id": "44137276",
+      "name": "QS0203_3",
+      "font_class": "QS0203_3",
+      "unicode": "e8ac",
+      "unicode_decimal": 59564
+    },
+    {
       "icon_id": "44081141",
-      "name": "square",
-      "font_class": "square",
+      "name": "QS0103_5",
+      "font_class": "QS0103_5",
       "unicode": "e86e",
       "unicode_decimal": 59502
     },
     {
       "icon_id": "44081143",
-      "name": "triangle",
-      "font_class": "triangle",
+      "name": "QS0103_3",
+      "font_class": "QS0103_3",
       "unicode": "e86f",
       "unicode_decimal": 59503
     },
     {
+      "icon_id": "44137422",
+      "name": "QS0203_9",
+      "font_class": "QS0203_9",
+      "unicode": "e8b2",
+      "unicode_decimal": 59570
+    },
+    {
       "icon_id": "44081146",
-      "name": "rhombus",
-      "font_class": "rhombus",
+      "name": "QS0103_9",
+      "font_class": "QS0103_9",
       "unicode": "e870",
       "unicode_decimal": 59504
     },
     {
       "icon_id": "44081152",
-      "name": "cross",
-      "font_class": "cross",
+      "name": "QS0103_8",
+      "font_class": "QS0103_8",
       "unicode": "e871",
       "unicode_decimal": 59505
     },
     {
       "icon_id": "44081154",
-      "name": "equals",
-      "font_class": "equals",
+      "name": "QS0103_7",
+      "font_class": "QS0103_7",
       "unicode": "e872",
       "unicode_decimal": 59506
     },
     {
+      "icon_id": "44137356",
+      "name": "QS0203_5",
+      "font_class": "QS0203_5",
+      "unicode": "e8ae",
+      "unicode_decimal": 59566
+    },
+    {
+      "icon_id": "44137360",
+      "name": "QS0203_6",
+      "font_class": "QS0203_6",
+      "unicode": "e8af",
+      "unicode_decimal": 59567
+    },
+    {
       "icon_id": "44081133",
-      "name": "trapezoid",
-      "font_class": "trapezoid",
+      "name": "QS0103_6",
+      "font_class": "QS0103_6",
       "unicode": "e86a",
       "unicode_decimal": 59498
     },
     {
       "icon_id": "44081135",
-      "name": "star",
-      "font_class": "star",
+      "name": "QS0103_1",
+      "font_class": "QS0103_1",
       "unicode": "e86b",
       "unicode_decimal": 59499
     },
     {
       "icon_id": "44081136",
-      "name": "circle",
-      "font_class": "circle",
+      "name": "QS0103_2",
+      "font_class": "QS0103_2",
       "unicode": "e86c",
       "unicode_decimal": 59500
     },
     {
       "icon_id": "44081139",
-      "name": "ban",
-      "font_class": "ban",
+      "name": "QS0103_4",
+      "font_class": "QS0103_4",
       "unicode": "e86d",
       "unicode_decimal": 59501
     }

@@ -143,7 +143,7 @@ const ClickGrid = (grid: any) => {
         if (grid.gridValue == lastNumber + 1) {
           questionList.value[index].selected = true;
           answer.value.push(grid.gridValue);
-          if (answer.value.length == 2) {
+          if (answer.value.length == 25) {
             switch (showGridTypes.value.at(-1)) {
               case "LARGE":
                 largeGridTimeConsume.value = seconds.value;

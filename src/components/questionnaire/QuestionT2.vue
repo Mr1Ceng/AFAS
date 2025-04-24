@@ -242,7 +242,8 @@ const openNotification = (message: string) => {
           <div class="w-full text-xl flex items-start pb-2 border-b-1 border-gray-300">
             找不同
           </div>
-          <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300"
+          <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
+            :class="CurrQuestionSort == question.questionSort ? 'bg-blue-100' : ''"
             v-for="(question, questionIndex) in questionDiffList">
             <div class="h-14 w-80 text-xl flex items-center">
               <span class="pr-4">{{ `${question.questionSort}:` }}</span>
@@ -278,7 +279,8 @@ const openNotification = (message: string) => {
           <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300">
             找相同
           </div>
-          <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300"
+          <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300 rounded-xl"
+            :class="CurrQuestionSort == question.questionSort ? 'bg-blue-100' : ''"
             v-for="(question, questionIndex) in questionSameList">
             <div class="h-14 w-80 text-xl flex items-center">
               <span class="pr-4">{{ `${question.questionSort}:` }}</span>

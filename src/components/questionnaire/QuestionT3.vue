@@ -55,29 +55,28 @@ const GetQuestionT3 = async () => {
   }
 }
 const GetAudioUrl = (fileName: string) => {
-  console.log(fileName)
   return `${baseURL}/Static/Audios/${props.questionId}/${fileName}`
 }
 GetQuestionT3();
 
 const SaveAnswerT3 = async () => {
   try {
-    // var list = _.flatten(_.map(bQuestionT3QList.value, item => {
-    //   return _.map(item.questionA, x => {
-    //     return {
-    //       questionSort: item.questionSort,
-    //       answerSort: x
-    //     }
-    //   })
-    // }))
+    var list = _.map(questionList.value, item => {
+      return {
+        questionType: item.questionType,
+        questionSort: item.questionSort,
+        level: item.level,
+        value: item.answer
+      }
+    })
     const data = {
       answerId: answerStore.getAnswerId(),
       questionId: questionInfo.value.questionId,
-      // number1: diffRightCount.value,
-      // number2: sameRightCount.value,
+      level1: ForwardLevelResult.value,
+      level2: BackwardLevelResult.value,
       standardScore: result.value,
       remark: remark.value,
-      // answerList: list
+      answerList: list
     }
     console.log(data)
     const response = await apiClient.post('/Questionnaire/SaveAnswerT3/' + "User_Mr1Ceng", data)
@@ -96,13 +95,13 @@ const SaveAnswerT3 = async () => {
 
 // #region 计算属性
 
-// const diffRightCount = computed(() => {
-//   return _.sumBy(questionDiffList.value, 'rightCount');
-// })
+const ForwardLevelResult = computed(() => {
+  return _.findLast(_.orderBy(questionForwardList.value, "key"), x => x.isPass)?.key ?? 0
+})
 
-// const sameRightCount = computed(() => {
-//   return _.sumBy(questionSameList.value, 'rightCount');
-// })
+const BackwardLevelResult = computed(() => {
+  return _.findLast(_.orderBy(questionBackwardList.value, "key"), x => x.isPass)?.key ?? 0
+})
 
 // #endregion
 
@@ -114,20 +113,8 @@ const SaveAnswerT3 = async () => {
 
 const remark = ref<string>("");
 const result = computed(() => {
-  return 10;
+  return ForwardLevelResult.value * 5 + BackwardLevelResult.value * 10;
 })
-// const changeAnswer = (questionSort: number) => {
-//   var answer = _.find(bQuestionT3QList.value, (x: { questionSort: number; }) => x.questionSort == questionSort);
-//   var answers = answer.questionA
-//   var res = 0;
-//   _.forEach(getAnswerList(questionSort), x => {
-//     if (_.includes(answers, x.answerSort) && x.isTrue) {
-//       res++;
-//     }
-//   })
-//   answer.rightCount = res;
-//   console.log(bQuestionT3QList.value)
-// }
 
 // #endregion
 
@@ -263,6 +250,9 @@ const answerClick = (value: any) => {
 
 const Completed = () => {
   isComplete.value = true;
+  console.log(questionList);
+  console.log(questionForwardList);
+  console.log(questionBackwardList);
 }
 
 // #endregion
@@ -311,7 +301,7 @@ const openNotification = (message: string) => {
   <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div class="w-full flex flex-auto flex-row justify-start items-center">
-        <div class="w-1/2 h-full flex flex-col p-4">
+        <div class="w-1/2 h-full flex flex-col p-4 pt-0">
           <div class="w-full h-14 text-xl flex items-center pb-2 pt-2 border-b-1 border-gray-300">
             <div class="w-20 text-xl flex items-center">
               <span class="">级别</span>
@@ -356,7 +346,7 @@ const openNotification = (message: string) => {
             </div>
           </div>
         </div>
-        <div class="w-1/2 h-full flex flex-col p-4">
+        <div class="w-1/2 h-full flex flex-col p-4 pt-0">
           <div class="w-full h-14 text-xl flex items-center pb-2 pt-2 border-b-1 border-gray-300">
             <div class="w-20 text-xl flex items-center">
               <span class="">级别</span>
@@ -382,7 +372,7 @@ const openNotification = (message: string) => {
                       :src="GetAudioUrl(`${question.questionType ? 'True' : 'False'}_${question.questionSort}_${questionLevel.key}.aac`)"
                       @ended="onAudioEnd(question.questionSort)" controls
                       controlsList="nodownload noplaybackrate"></audio>
-                    <div style="margin-left: -40px!important;z-index: 999;">
+                    <div v-show="!question.played" style="margin-left: -40px!important;z-index: 999;">
                       <PlayCircleOutlined :style="{ fontSize: '20px' }" class="cursor-pointer"
                         @click="playAudio(questionLevelIndex * 2 + questionIndex, currQuestionType); question.played = true;" />
                     </div>
@@ -416,26 +406,19 @@ const openNotification = (message: string) => {
       </div>
     </a-flex>
     <div class="h-full border-l-2 border-gray-300 p-4 flex flex-col" style="width: 400px;">
-      <!-- <div v-show="isComplete" class="w-full flex flex-row justify-start items-center pt-4"
-        v-for="(question, questionIndex) in questionDiffList">
-        <span class="text-lg w-16">题目{{ question.questionSort }}</span>
-        <a-input-number disabled class="inputWidth1" v-model:value="question.rightCount" addon-after="个" size="large"
+
+      <div class="w-full flex flex-row justify-start items-center pt-4">
+        <span class="text-lg w-16">顺背数等级</span>
+        <a-input-number class="inputWidth" :value="ForwardLevelResult" size="large" :disabled="true" addon-after="级"
           :min="0" />
-        <span v-show="isComplete" class="text-lg w-16 pl-3">得分</span>
-        <a-input-number v-show="isComplete" disabled class="inputWidth1" :value="question.rightCount * 5"
-          addon-after="分" size="large" :min="0" />
       </div>
-      <div v-show="isComplete" class="w-full flex flex-row justify-start items-center pt-4"
-        v-for="(question, questionIndex) in questionSameList">
-        <span class="text-lg w-16">题目{{ question.questionSort }}</span>
-        <a-input-number disabled class="inputWidth1" v-model:value="question.rightCount" addon-after="个" size="large"
+      <div class="w-full flex flex-row justify-start items-center pt-4">
+        <span class="text-lg w-16">逆背数等级</span>
+        <a-input-number class="inputWidth" :value="BackwardLevelResult" size="large" :disabled="true" addon-after="级"
           :min="0" />
-        <span v-show="isComplete" class="text-lg w-16 pl-3">得分</span>
-        <a-input-number v-show="isComplete" disabled class="inputWidth1" :value="question.rightCount * 10"
-          addon-after="分" size="large" :min="0" />
-      </div> -->
-      <div v-show="isComplete" class="w-full flex flex-row justify-start items-center pt-4">
-        <span class="text-lg w-16">总得分</span>
+      </div>
+      <div class="w-full flex flex-row justify-start items-center pt-4">
+        <span class="text-lg w-16">得分</span>
         <a-input-number class="inputWidth" v-model:value="result" size="large" :disabled="true" addon-after="分"
           :min="0" />
       </div>
