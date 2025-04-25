@@ -4,8 +4,6 @@ import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import piniaPersistedstate from 'pinia-plugin-persistedstate';
 
-const baseURL = "http://localhost:5165";
-
 import App from './App.vue'
 import router from './router'
 
@@ -17,7 +15,6 @@ const pinia = createPinia();
 pinia.use(piniaPersistedstate);
 
 const app = createApp(App)
-app.config.globalProperties.$baseURL = baseURL;
 app.use(pinia)
 app.use(router)
 

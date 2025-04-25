@@ -8,11 +8,11 @@
 <script lang="ts" setup>
 import { ref } from 'vue';
 
-//评估标准数据
-const evaluationStandardList = ref<any[]>([]);
-
 //接口
 import apiClient from '@/utils/ApiClientHelper'
+
+//评估标准数据
+const evaluationStandardList = ref<any[]>([]);
 
 const GetEvaluationStandardList = async () => {
   try {

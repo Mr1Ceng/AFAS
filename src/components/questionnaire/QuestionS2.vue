@@ -193,7 +193,7 @@ const ClickGrid = (rowId: number, column: any) => {
         console.log("数字错误")
         errorCount.value++;
       }
-      if (rowList.value[currentRow].columns.findIndex(x => !x.selected && x.isTrue) != -1 && (currentRow != rowIndex || (currentRow == rowIndex && currentColumn > columnIndex))) {
+      if (rowList.value[currentRow].columns.findIndex((x: { selected: any; isTrue: any; }) => !x.selected && x.isTrue) != -1 && (currentRow != rowIndex || (currentRow == rowIndex && currentColumn > columnIndex))) {
         console.log("跨行或回头")
         crossCount.value++;
       }
