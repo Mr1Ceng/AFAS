@@ -9,11 +9,19 @@ import 'dayjs/locale/zh-cn';
 
 dayjs.locale('zh-cn');
 const globalStore = useGlobalStore();
-const currentAlgorithm = ref(theme.defaultAlgorithm);
-
+const currentAlgorithm = ref(globalStore.isDarktheme?theme.darkAlgorithm:theme.defaultAlgorithm);
+const setCssVariable = (variable: string, value: string | null) => {
+    document.documentElement.style.setProperty(variable, value);
+};
 watch(() => globalStore.isDarktheme, async (newValue, oldValue) => {
   currentAlgorithm.value = newValue ? theme.darkAlgorithm : theme.defaultAlgorithm;
-})
+  if (newValue) {
+      setCssVariable('--body-bg-color', '#1f1f1f'); // 深色主题
+  } else {
+      setCssVariable('--body-bg-color', '#ffffff'); // 浅色主题
+  }
+},
+{ immediate: true })
 
 </script>
 

@@ -6,18 +6,17 @@
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key">{{ menu.label }}</a-menu-item>
       </a-menu>
       <div class="flex items-center justify-end">
-        <a-switch :checked="isDarktheme" :checked-children="true" :un-checked-children="false"
-          @change="() => { globalStore.changeTheme() }" />
+        <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }" />
       </div>
     </a-layout-header>
     <a-layout>
-      <a-layout-sider width="200" style="background: #fff">
+      <a-layout-sider width="200">
         <a-menu v-model:selectedKeys="selectedKeys2" v-model:openKeys="openKeys"
           :items="menuList[selectedKeys1[0]].children" mode="inline" :style="{ height: '100%', borderRight: 0 }">
         </a-menu>
       </a-layout-sider>
       <a-layout>
-        <a-layout-content :style="{ background: '#fff', padding: '12px 24px 0', margin: 0, minHeight: '280px' }">
+        <a-layout-content :style="{ padding: '12px 24px 0', margin: 0, minHeight: '280px' }">
           <router-view></router-view>
         </a-layout-content>
       </a-layout>
@@ -33,7 +32,8 @@ import {
   CalendarOutlined,
   AppstoreOutlined,
   SettingOutlined,
-} from '@ant-design/icons-vue'; import { useGlobalStore } from "@/stores/globalStore";
+} from '@ant-design/icons-vue'; 
+import { useGlobalStore } from "@/stores/globalStore";
 const globalStore = useGlobalStore();
 const isDarktheme = ref(globalStore.isDarktheme)
 
