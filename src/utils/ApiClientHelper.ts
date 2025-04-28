@@ -13,12 +13,34 @@ const apiClient: AxiosInstance = axios.create({
   },
 })
 
+const apiClientAny: AxiosInstance = axios.create({
+  baseURL: baseURL,
+  timeout: 30000,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+})
+
 // 请求拦截器
 apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig) => {
-    const token = localStorage.getItem('token') // 示例：获取 token
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}` // 添加 Authorization 头
+  async (config: InternalAxiosRequestConfig) => {
+    const token = globalStore.token // 示例：获取 token
+    if (token && token != '') {
+      config.headers.Authorization = token // 添加 Authorization 头
+    }
+    else {
+      try {
+        const response = await apiClientAny.post('/Authorization/GetTerminalAuthorization/AFAS')
+        console.log('响应:', response)
+        if (response.data.status == 1) {
+          config.headers.Authorization = response.data.data.key
+          globalStore.setToken(response.data.data.key)
+        } else {
+          throw "获取终端token失败";
+        }
+      } catch (error) {
+        console.error('请求失败:', error)
+      }
     }
     return config
   },
@@ -31,6 +53,9 @@ apiClient.interceptors.request.use(
 // 响应拦截器
 apiClient.interceptors.response.use(
   response => {
+    if (response.data.status == 0) {
+      message.error(response.data.data.exception.businessMessage);
+    }
     return response.data // 返回数据
   },
   error => {

@@ -15,12 +15,15 @@ if (isRemenber) {
 }
 
 const login = async () => {
-  console.log(account.value+password.value)
-  loginStore.setRemenber(account.value,isRemenber.value)
+  console.log(account.value + password.value)
+  loginStore.setRemenber(account.value, isRemenber.value)
   try {
-    const response = await apiClient.post('/Basic/login')
+    const response = await apiClient.post('/Account/WebAppLoginByPassword', {
+      account: account.value,
+      password: password.value
+    })
     console.log('响应:', response)
-    
+
   } catch (error) {
     console.error('请求失败:', error)
   }
@@ -45,8 +48,7 @@ const login = async () => {
       </div>
       <div class="w-100 h-full p-8">
         <div class="h-10 flex justify-end items-center">
-          <a-switch v-model:checked="isDarktheme"
-          @change="() => { globalStore.changeTheme() }" />
+          <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }" />
         </div>
         <div class="h-30 flex items-center">
           <span class="text-3xl ">
