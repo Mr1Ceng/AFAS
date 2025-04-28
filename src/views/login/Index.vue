@@ -1,29 +1,35 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { EyeTwoTone, EyeInvisibleOutlined, UserOutlined, LockOutlined } from '@ant-design/icons-vue';
-import { useLoginStore } from "@/stores/loginStore";
+import { useAccountStore } from "@/stores/accountStore";
 import { useGlobalStore } from "@/stores/globalStore";
 import apiClient from '@/utils/ApiClientHelper'
+import { getAuthorizationString } from '@/utils/AuthorizationHelper'
+import router from '@/router';
 const globalStore = useGlobalStore();
 const isDarktheme = ref(globalStore.isDarktheme)
-const loginStore = useLoginStore();
+const accountStore = useAccountStore();
 const account = ref<string>("");
 const password = ref<string>("");
-const isRemenber = ref<boolean>(loginStore.isRemenber);
+const isRemenber = ref<boolean>(accountStore.isRemenber);
 if (isRemenber) {
-  account.value = loginStore.account
+  account.value = accountStore.account
 }
 
 const login = async () => {
-  console.log(account.value + password.value)
-  loginStore.setRemenber(account.value, isRemenber.value)
+  accountStore.setRemenber(account.value, isRemenber.value)
   try {
     const response = await apiClient.post('/Account/WebAppLoginByPassword', {
       account: account.value,
       password: password.value
     })
     console.log('响应:', response)
-
+    if (response.status == 1) {
+      accountStore.setToken(getAuthorizationString(response.data.userId, response.data.token.value))
+      accountStore.setUser(response.data.user)
+      //console.log(globalStore.token)
+      router.push({ name: 'Q_Test', params: {} })
+    }
   } catch (error) {
     console.error('请求失败:', error)
   }

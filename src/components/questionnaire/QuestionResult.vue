@@ -3,7 +3,10 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import apiClient from '@/utils/ApiClientHelper'
 import { EnumHelper } from '@/utils/EnumHelper';
 import { SexDescription } from '@/enums/SexEnum';
+import { useAccountStore } from "@/stores/accountStore";
+import _ from "lodash";
 
+const accountStore = useAccountStore();
 const questionnaire = ref<any>({})
 const sexList = EnumHelper.getEnumDescriptions(SexDescription);
 
@@ -38,6 +41,9 @@ const GetTeacherList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/TEACHER')
     console.log('响应:', response)
     teacherList.value = response.data
+    if (_.find(teacherList.value, (x: { userId: string; }) => x.userId == accountStore.user.userId) != null) {
+      questionnaire.value.teacher = accountStore.user.userId;
+    }
   } catch (error) {
     console.error('请求失败:', error)
   }
@@ -47,6 +53,9 @@ const GetStudentList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/STUDENT')
     console.log('响应:', response)
     studentList.value = response.data
+    if (_.find(studentList.value, (x: { userId: string; }) => x.userId == accountStore.user.userId) != null) {
+      questionnaire.value.student = accountStore.user.userId;
+    }
   } catch (error) {
     console.error('请求失败:', error)
   }

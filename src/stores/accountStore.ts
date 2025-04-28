@@ -1,19 +1,30 @@
 import { defineStore } from "pinia";
 
-export const useLoginStore = defineStore("login", {
+export const useAccountStore = defineStore("account", {
   state: () => ({
     account: "",
     isRemenber: false,
+    token: "",
+    user: {
+      userName: '',
+      userId: ''
+    }
   }),
   actions: {
     setRemenber(account: string, isRemenber: boolean) {
       this.isRemenber = isRemenber;
       this.account = isRemenber ? account : '';
     },
+    setToken(value: string) {
+      this.token = value;
+    },
+    setUser(value: any) {
+      this.user = value;
+    },
   },
   persist: {
     // 持久化选项
     storage: window.localStorage, // 使用 localStorage
-    key: 'loginStore', // 自定义键名
+    key: 'accountStore', // 自定义键名
   },
 });

@@ -1,7 +1,12 @@
 import axios, { type AxiosInstance, type InternalAxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue';
 import { useGlobalStore } from "@/stores/globalStore";
+import { useAccountStore } from "@/stores/accountStore";
+import router from '@/router';
+
+import { getAuthorizationString } from '@/utils/AuthorizationHelper'
 const globalStore = useGlobalStore();
+const accountStore = useAccountStore();
 const baseURL = globalStore.baseURL;
 
 // 创建 axios 实例
@@ -24,23 +29,13 @@ const apiClientAny: AxiosInstance = axios.create({
 // 请求拦截器
 apiClient.interceptors.request.use(
   async (config: InternalAxiosRequestConfig) => {
-    const token = globalStore.token // 示例：获取 token
+    const token = accountStore.token // 示例：获取 token
     if (token && token != '') {
       config.headers.Authorization = token // 添加 Authorization 头
     }
     else {
-      try {
-        const response = await apiClientAny.post('/Authorization/GetTerminalAuthorization/AFAS')
-        console.log('响应:', response)
-        if (response.data.status == 1) {
-          config.headers.Authorization = response.data.data.key
-          globalStore.setToken(response.data.data.key)
-        } else {
-          throw "获取终端token失败";
-        }
-      } catch (error) {
-        console.error('请求失败:', error)
-      }
+      config.headers.Authorization = getAuthorizationString()
+      accountStore.setToken(config.headers.Authorization)
     }
     return config
   },
@@ -55,6 +50,9 @@ apiClient.interceptors.response.use(
   response => {
     if (response.data.status == 0) {
       message.error(response.data.data.exception.businessMessage);
+      if (response.data.data.exceptionType == 403) {
+        router.push({ name: 'login', params: {} })
+      }
     }
     return response.data // 返回数据
   },

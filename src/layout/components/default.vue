@@ -6,7 +6,13 @@
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key">{{ menu.label }}</a-menu-item>
       </a-menu>
       <div class="flex items-center justify-end">
-        <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }" />
+        <span class="pr-4 text-white">
+          {{ accountStore.user.userName }}
+        </span>
+        <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }">
+          <template #checkedChildren><check-outlined /></template>
+          <template #unCheckedChildren><close-outlined /></template>
+        </a-switch>
       </div>
     </a-layout-header>
     <a-layout>
@@ -31,10 +37,13 @@ import {
   MailOutlined,
   CalendarOutlined,
   AppstoreOutlined,
-  SettingOutlined,
-} from '@ant-design/icons-vue'; 
+  CheckOutlined,
+  CloseOutlined
+} from '@ant-design/icons-vue';
 import { useGlobalStore } from "@/stores/globalStore";
+import { useAccountStore } from "@/stores/accountStore";
 const globalStore = useGlobalStore();
+const accountStore = useAccountStore();
 const isDarktheme = ref(globalStore.isDarktheme)
 
 const router = useRouter()
