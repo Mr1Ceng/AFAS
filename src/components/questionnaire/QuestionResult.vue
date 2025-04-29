@@ -259,26 +259,29 @@ const CreateRadarMap = () => {
 const CreateTestReport = () => {
   console.log(testResult.value)
   console.log(student.value)
+  
 }
 
 const chartOptions = ref<echarts.EChartsOption>({});
 const sChartOptions = ref<echarts.EChartsOption>({});
 const tChartOptions = ref<echarts.EChartsOption>({});
-
+const GetImageUrl = (image: string, type:string)=>{
+  console.log(type,image)
+}
 </script>
 
 <template>
   <div class="w-full h-full flex flex-row">
     <div class="h-full w-[calc(100%-400px)] pl-4 pr-4 flex">
       <div class="w-3/5 h-full">
-        <EChart :options="chartOptions" />
+        <EChart :options="chartOptions" @get-image-url=" (image: string)=>{GetImageUrl(image,'RadarImage')}"/>
       </div>
       <div class="w-2/5 h-full flex flex-col">
         <div class="w-full h-1/2">
-          <EChart :options="sChartOptions" />
+          <EChart :options="sChartOptions" @get-image-url=" (image: string)=>{GetImageUrl(image,'SImage')}"/>
         </div>
         <div class="w-full h-1/2">
-          <EChart :options="tChartOptions" />
+          <EChart :options="tChartOptions" @get-image-url=" (image: string)=>{GetImageUrl(image,'TImage')}"/>
         </div>
       </div>
     </div>

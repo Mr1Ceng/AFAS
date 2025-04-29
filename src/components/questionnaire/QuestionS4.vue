@@ -179,7 +179,7 @@ const finished = (count: number) => {
   <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'center'">
+      <a-flex class="w-full flex-auto bg-white" :vertical="true" :justify="'center'" :align="'center'">
         <SpiralMaze :initialSpacing="spacing" :initialPerturbation="perturbation" :width="1000" :height="700"
           @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
           @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />

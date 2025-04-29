@@ -3,10 +3,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, defineEmits } from 'vue';
 import { useGlobalStore } from "@/stores/globalStore";
 import * as echarts from 'echarts';
-
+const emit = defineEmits<{
+  (event: 'GetImageUrl', value: string): void;
+}>();
 const globalStore = useGlobalStore();
 
 watch(() => globalStore.isDarktheme, async (newValue, oldValue) => {
@@ -53,6 +55,9 @@ watch(
     if (chartInstance) {
       console.log(newOptions)
       chartInstance.setOption(newOptions); // 更新图表选项
+      // 获取图片数据并传递给父组件
+      const imageData = chartInstance.getDataURL();
+      emit('GetImageUrl', imageData);
     }
   },
   { deep: true }

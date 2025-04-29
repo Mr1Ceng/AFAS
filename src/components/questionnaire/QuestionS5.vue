@@ -228,9 +228,9 @@ onUnmounted(() => {
 <template>
   <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
-      <div ref="containerRef" class="w-full flex flex-auto justify-around items-center">
+      <div ref="containerRef" class="w-full flex flex-auto justify-around items-center bg-white">
         <img v-show="stepIndex == 1" :src="questionImage" class="w-full" height="auto" />
-        <canvas v-show="stepIndex == 2" ref="canvasRef"></canvas>
+        <canvas v-show="stepIndex == 2" ref="canvasRef" class="bg-white"></canvas>
         <!-- :width="1000" :height="600"  -->
         <img v-show="stepIndex > 2" :src="questionImage" class="w-1/2" height="auto" />
         <img v-show="stepIndex > 2" :src="answerImage" class="w-1/2" height="auto" />
