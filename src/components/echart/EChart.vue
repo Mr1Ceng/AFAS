@@ -1,0 +1,69 @@
+<template>
+  <div ref="chartRef" class="w-full h-full"></div>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted, watch } from 'vue';
+import { useGlobalStore } from "@/stores/globalStore";
+import * as echarts from 'echarts';
+
+const globalStore = useGlobalStore();
+
+watch(() => globalStore.isDarktheme, async (newValue, oldValue) => {
+  // 销毁当前实例
+  if (chartInstance) {
+    chartInstance.dispose();
+  }
+  initChart(newValue ? 'dark' : 'default')
+},
+  { immediate: true })
+// 定义 props 类型
+interface ChartProps {
+  options: echarts.EChartsOption;
+}
+
+// 获取 props
+const props = defineProps<ChartProps>();
+
+// 创建 DOM 的 ref
+const chartRef = ref<HTMLDivElement | null>(null);
+
+// 保存 ECharts 实例
+let chartInstance: echarts.ECharts | null = null;
+
+// 初始化图表方法
+const initChart = (theme: string = 'default') => {
+
+  console.log(chartRef.value)
+  if (chartRef.value) {
+    chartInstance = echarts.init(chartRef.value, theme); // 初始化 ECharts 实例
+    chartInstance.setOption(props.options); // 设置图表选项
+
+    // 监听窗口大小变化
+    window.addEventListener('resize', () => {
+      chartInstance?.resize();
+    });
+  }
+};
+
+// 监听 props.options 变化并更新图表
+watch(
+  () => props.options,
+  (newOptions) => {
+    if (chartInstance) {
+      console.log(newOptions)
+      chartInstance.setOption(newOptions); // 更新图表选项
+    }
+  },
+  { deep: true }
+);
+
+// 在组件挂载时初始化图表
+onMounted(() => {
+  initChart(globalStore.isDarktheme ? 'dark' : 'default');
+});
+</script>
+
+<style scoped>
+/* 可选样式 */
+</style>
