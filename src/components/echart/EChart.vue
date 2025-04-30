@@ -11,6 +11,29 @@ const emit = defineEmits<{
 }>();
 const globalStore = useGlobalStore();
 
+
+// 获取 props
+const props = defineProps<ChartProps>();
+
+// 创建 DOM 的 ref
+const chartRef = ref<HTMLDivElement | null>(null);
+
+// 保存 ECharts 实例
+let chartInstance: echarts.ECharts | null = null;
+
+// 初始化图表方法
+const initChart = (theme: string = 'default') => {
+  if (chartRef.value) {
+    chartInstance = echarts.init(chartRef.value, theme); // 初始化 ECharts 实例
+    chartInstance.setOption(props.options); // 设置图表选项
+
+    // 监听窗口大小变化
+    window.addEventListener('resize', () => {
+      chartInstance?.resize();
+    });
+  }
+};
+
 watch(() => globalStore.isDarktheme, async (newValue, oldValue) => {
   // 销毁当前实例
   if (chartInstance) {
@@ -24,30 +47,6 @@ interface ChartProps {
   options: echarts.EChartsOption;
 }
 
-// 获取 props
-const props = defineProps<ChartProps>();
-
-// 创建 DOM 的 ref
-const chartRef = ref<HTMLDivElement | null>(null);
-
-// 保存 ECharts 实例
-let chartInstance: echarts.ECharts | null = null;
-
-// 初始化图表方法
-const initChart = (theme: string = 'default') => {
-
-  console.log(chartRef.value)
-  if (chartRef.value) {
-    chartInstance = echarts.init(chartRef.value, theme); // 初始化 ECharts 实例
-    chartInstance.setOption(props.options); // 设置图表选项
-
-    // 监听窗口大小变化
-    window.addEventListener('resize', () => {
-      chartInstance?.resize();
-    });
-  }
-};
-
 // 监听 props.options 变化并更新图表
 watch(
   () => props.options,
@@ -55,9 +54,13 @@ watch(
     if (chartInstance) {
       console.log(newOptions)
       chartInstance.setOption(newOptions); // 更新图表选项
-      // 获取图片数据并传递给父组件
-      const imageData = chartInstance.getDataURL();
-      emit('GetImageUrl', imageData);
+      setTimeout(() => {
+        if (chartInstance) {
+          // 获取图片数据并传递给父组件
+          const imageData = chartInstance.getDataURL();
+          emit('GetImageUrl', imageData);
+        }
+      }, 1000);
     }
   },
   { deep: true }

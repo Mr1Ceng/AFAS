@@ -5,6 +5,7 @@ import { useAccountStore } from "@/stores/accountStore";
 import router from '@/router';
 
 import { getAuthorizationString } from '@/utils/AuthorizationHelper'
+import { processResponseData } from '@/utils/CommonHelper'
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
 const baseURL = globalStore.baseURL;
@@ -54,7 +55,7 @@ apiClient.interceptors.response.use(
         router.push({ name: 'login', params: {} })
       }
     }
-    return response.data // 返回数据
+    return processResponseData(response.data) // 返回数据
   },
   error => {
     if (error.response) {
@@ -66,5 +67,6 @@ apiClient.interceptors.response.use(
     return Promise.reject(error)
   }
 )
+
 
 export default apiClient
