@@ -11,6 +11,10 @@ const emit = defineEmits<{
 }>();
 const globalStore = useGlobalStore();
 
+// 定义 props 类型
+interface ChartProps {
+  options: any;
+}
 
 // 获取 props
 const props = defineProps<ChartProps>();
@@ -42,10 +46,6 @@ watch(() => globalStore.isDarktheme, async (newValue, oldValue) => {
   initChart(newValue ? 'dark' : 'default')
 },
   { immediate: true })
-// 定义 props 类型
-interface ChartProps {
-  options: echarts.EChartsOption;
-}
 
 // 监听 props.options 变化并更新图表
 watch(

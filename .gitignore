@@ -28,3 +28,7 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# 包含ngnix所有文件
+!ngnix/*
+!ngnix/logs/*
