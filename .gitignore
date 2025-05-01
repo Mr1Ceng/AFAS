@@ -30,5 +30,5 @@ coverage
 *.tsbuildinfo
 
 # 包含ngnix所有文件
-!ngnix/*
-!ngnix/logs/*
+!nginx/*
+!nginx/logs/*
