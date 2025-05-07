@@ -3,11 +3,12 @@
     <a-tabs v-model:activeKey="selectedQuestion">
       <a-tab-pane v-for="(question, index) in questionList" :key="question.questionId" :tab="question.questionName">
         <!-- 动态加载组件 -->
-        <component :is="GetComponent(question.questionCode)" :questionId="question.questionId" />
+        <component :is="GetComponent(question.questionCode)" :questionId="question.questionId"
+          :isCurrent="selectedQuestion == question.questionId" />
       </a-tab-pane>
       <a-tab-pane key="result" tab="查看结果">
         <!-- 结果组件 -->
-        <QuestionResult></QuestionResult>
+        <QuestionResult :isCurrent="selectedQuestion == 'result'"></QuestionResult>
       </a-tab-pane>
       <template #leftExtra>
         <a-select class="tabs-extra-button" ref="select" v-model:value="selectedQuestionnaire"

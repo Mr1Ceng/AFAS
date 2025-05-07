@@ -7,7 +7,8 @@ import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
 const props = defineProps<{
-  questionId: string
+  questionId: string,
+  isCurrent: boolean,
 }>()
 const isComplete = ref(false);
 const answerStore = useAnswerStore();
@@ -99,6 +100,12 @@ const sameRightCount = computed(() => {
 // #endregion
 
 // #region 监听器
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue && stepIndex.value == 0) {
+    setModalVisible(true);
+  }
+})
 
 //#endregion
 
@@ -235,7 +242,69 @@ const openNotification = (message: string) => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <div class="w-full flex flex-col justify-start items-center pb-4">
+      <div class="w-3/4 flex flex-col justify-between p-4">
+        <div class="w-full text-xl flex items-start pb-2 border-b-1 border-gray-300">
+          找不同
+        </div>
+        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
+          v-for="(question, questionIndex) in 2">
+          <div class="h-14 w-80 text-xl flex items-center">
+            <span class="pr-4">{{ `${question}:` }}</span>
+            <audio class="w-66" :src="GetAudioUrl(question + 1 + '.mp3')" controls
+              controlsList="nodownload noplaybackrate"></audio>
+          </div>
+          <div class="h-14 w-160 flex justify-between">
+            <a-checkbox-group button-style="solid">
+              <div class="h-full w-36 text-xl flex items-start" v-for="answer in 4">
+                <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2">
+                  <a-checkbox class="text-xl" :value="answer">
+                    {{ `${answer}: XXXXXXX` }}</a-checkbox>
+                </div>
+              </div>
+            </a-checkbox-group>
+          </div>
+          <div class="h-14 w-40 pl-4 flex items-center">
+            <a-button size="large">
+              下一题
+            </a-button>
+          </div>
+        </div>
+        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300">
+          找相同
+        </div>
+        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
+          v-for="(question, questionIndex) in 2">
+          <div class="h-14 w-80 text-xl flex items-center">
+            <span class="pr-4">{{ `${question}:` }}</span>
+            <audio class="w-66" :src="GetAudioUrl(question + 1 + '.mp3')" controls
+              controlsList="nodownload noplaybackrate"></audio>
+          </div>
+          <div class="h-14 w-160 flex justify-between">
+            <a-checkbox-group button-style="solid">
+              <div class="h-full w-36 text-xl flex items-start" v-for="answer in 4">
+                <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2">
+                  <a-checkbox class="text-xl" :value="answer">
+                    {{ `${answer}: XXXXXXX` }}</a-checkbox>
+                </div>
+              </div>
+            </a-checkbox-group>
+          </div>
+          <div class="h-14 w-40 pl-4 flex items-center">
+            <a-button size="large">
+              下一题
+            </a-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w-1/2" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div class="w-full flex flex-auto flex-col justify-start items-center">
         <div class="w-full flex flex-col justify-between p-4">
@@ -357,8 +426,8 @@ const openNotification = (message: string) => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认" :maskClosable="false"
-    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

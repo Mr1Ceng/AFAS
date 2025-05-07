@@ -1,13 +1,14 @@
 <script setup lang="ts">
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import Nzh from "nzh";
 import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 const props = defineProps<{
-  questionId: string
+  questionId: string,
+  isCurrent: boolean,
 }>()
 const nzhcn = Nzh.cn;
 const answerStore = useAnswerStore();
@@ -130,6 +131,16 @@ const errorRate = computed(() => {
 
 // #endregion
 
+// #region 监听器
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue && stepIndex.value == 0) {
+    setModalVisible(true);
+  }
+})
+
+//#endregion
+
 // #region 答题结果
 
 const errorCount = ref<number>(0);
@@ -242,7 +253,42 @@ const modalOkClick = () => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <a-flex class="w-[calc(100%-400px)] pl-4 pr-4 pb-4" :vertical="true" :justify="'space-between'"
+      :align="'flex-start'">
+      <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'flex-start'">
+        <a-flex class="w-full" :justify="'center'" :align="'flex-start'">
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
+            <span class="text-xl">行</span>
+          </a-flex>
+          <a-flex class="h-7 flex-auto border-1" :justify="'center'" :align="'center'">
+            <span class="text-xl">题目</span>
+          </a-flex>
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
+            <span class="text-xl">个数</span>
+          </a-flex>
+        </a-flex>
+        <a-flex class="w-full h-7" v-for="row in 12" :key="row" :justify="'center'" :align="'flex-start'">
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
+            <span class="text-xl">{{ nzhcn.encodeS(row) }}</span>
+          </a-flex>
+          <a-flex class="h-7 flex-auto border-1" :justify="'space-around'" :align="'center'">
+            <div class="flex justify-center text-xl hover:bg-sky-500 cursor-pointer" v-for="column in 25"
+              :class="'w-1/25'">
+              *</div>
+          </a-flex>
+          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
+            <span class="text-xl">*</span>
+          </a-flex>
+        </a-flex>
+      </a-flex>
+    </a-flex>
+    <div class="w-1/2" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
       <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'flex-start'">
@@ -336,8 +382,8 @@ const modalOkClick = () => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认" :maskClosable="false"
-    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

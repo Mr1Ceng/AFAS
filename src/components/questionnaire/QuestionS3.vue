@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _, { forEach } from "lodash";
@@ -8,9 +8,11 @@ import { useAnswerStore } from '@/stores/answerStore';
 import "@/assets/iconfont/iconfont.css";
 
 const props = defineProps<{
-  questionId: string
+  questionId: string,
+  isCurrent: boolean,
 }>()
 const answerStore = useAnswerStore();
+const randomNumber = ref(Math.floor(Math.random() * 100));
 console.log(answerStore)
 
 // #region 接口
@@ -115,6 +117,16 @@ const errorCount = computed(() => {
 
 // #endregion
 
+// #region 监听器
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue && stepIndex.value == 0) {
+    setModalVisible(true);
+  }
+})
+
+//#endregion
+
 // #region 答题结果
 
 const remark = ref<string>("");
@@ -207,7 +219,57 @@ const modalOkClick = () => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <a-flex class="w-[calc(100%-400px)] pl-4 pr-4 pb-4" :vertical="true" :justify="'space-between'"
+      :align="'flex-start'">
+      <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'flex-start'">
+        <a-flex class="w-full" :justify="'center'" :align="'flex-start'">
+          <a-flex class="h-24 w-2/25 border-1 pl-4 pr-4" :justify="'center'" :align="'center'">
+            <span class="text-xl">限时150秒</span>
+          </a-flex>
+          <a-flex class="h-24 w-18/25 border-1" :vertical="true" :justify="'center'" :align="'center'">
+            <div class="w-full h-16 flex flex-row justify-around items-center border-b-1">
+              <div class="w-1/9 flex justify-center items-center" v-for="icon in 9">
+                <span class="iconfont text-4xl"
+                  :class="`icon-${props.questionId}_${(icon + randomNumber) % 9 + 1}`"></span>
+              </div>
+            </div>
+            <div class="w-full h-8 flex flex-row justify-around items-center">
+              <div class="text-xl" v-for="icon in 9">
+                {{ icon }}
+              </div>
+            </div>
+          </a-flex>
+          <a-flex class="h-24 w-5/25 border-1 pl-6 pr-6" :justify="'center'" :align="'center'">
+            <span class="text-xl">前10题为练习部分，不计分</span>
+          </a-flex>
+        </a-flex>
+        <a-flex class="w-full h-32" v-for="row in 2" :key="row" :vertical="true" :justify="'center'"
+          :align="'flex-start'">
+          <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
+            <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1" v-for="column in 25">
+              <span class="iconfont text-4xl"
+                :class="`icon-${props.questionId}_${Math.floor(Math.random() * 10 % 8) + 1}`"></span>
+            </div>
+          </a-flex>
+          <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
+            <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1" v-for="column in 25">
+            </div>
+          </a-flex>
+        </a-flex>
+      </a-flex>
+      <div class="w-full flex flex-row justify-around items-center" style="height: 60px;">
+        <a-button class="w-16" v-for="icon in 9" type="primary" size="large" @click="ClickGrid(icon)">
+          {{ icon }}
+        </a-button>
+      </div>
+    </a-flex>
+    <div class="w-1/2" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
       <a-flex class="w-full flex-auto" :vertical="true" :justify="'center'" :align="'flex-start'">
@@ -296,8 +358,8 @@ const modalOkClick = () => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认" :maskClosable="false"
-    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

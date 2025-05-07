@@ -1,12 +1,13 @@
 <script setup lang="ts">
 
-import { computed, ref } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText, getProperty } from '@/utils/CommonHelper'
 
 import { useAnswerStore } from '@/stores/answerStore';
 const props = defineProps<{
-  questionId: string
+  questionId: string,
+  isCurrent: boolean,
 }>()
 
 const answerStore = useAnswerStore();
@@ -85,6 +86,16 @@ const largeGridList = computed(() => {
 })
 
 // #endregion
+
+// #region 监听器
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue && stepIndex.value == 0) {
+    setModalVisible(true);
+  }
+})
+
+//#endregion
 
 // #region 答题结果
 
@@ -210,7 +221,21 @@ const modalOkClick = () => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <a-flex class="w-3/12 pb-4" :vertical="true" :align="'center'">
+      <div class="w-full aspect-square place-items-center grid grid-cols-5 p-4">
+        <div class="w-full h-full border-1 place-items-center grid text-xl cursor-pointer"
+          v-for="(grid, index) in smallGridList">
+          *
+        </div>
+      </div>
+    </a-flex>
+    <div class="w-1/2" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
       <a-flex class="w-full flex-auto" :justify="'space-between'" :align="'flex-start'">
@@ -294,8 +319,8 @@ const modalOkClick = () => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认" :maskClosable="false"
-    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

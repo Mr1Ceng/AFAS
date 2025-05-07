@@ -7,7 +7,8 @@ import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
 const props = defineProps<{
-  questionId: string
+  questionId: string,
+  isCurrent: boolean,
 }>()
 const isComplete = ref(false);
 const answerStore = useAnswerStore();
@@ -115,6 +116,12 @@ watch(() => number2Question.value?.questionA, async (newValue, oldValue) => {
 
 watch(() => number3Question.value?.questionA, async (newValue, oldValue) => {
   number3Question.value.errorCount = Math.abs(newValue - answerInfo.value.number3)
+})
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue && stepIndex.value == 0) {
+    setModalVisible(true);
+  }
 })
 
 //#endregion
@@ -263,7 +270,51 @@ const openNotification = (message: string) => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <a-flex class="w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
+      <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-10 border-b-1 border-gray-300 rounded-xl"
+        :class="stepIndex == 1 ? 'bg-blue-100' : ''">
+        <div class="h-10 w-80 text-xl flex items-center">
+          1: 数字“X”出现的次数？
+        </div>
+        <div class="h-10 w-30">
+          <a-input-number addon-after="次" size="large" :min="0" />
+        </div>
+        <div class="h-14 w-70 pl-4">
+          <audio class="w-66" :src="GetAudioUrl('听觉集中-数字题.mp3')" controls
+            controlsList="nodownload noplaybackrate"></audio>
+        </div>
+        <div class="h-10 w-40 pl-4">
+          <a-button size="large">
+            下一题
+          </a-button>
+        </div>
+      </div>
+      <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-30 border-b-1 border-gray-300 rounded-xl"
+        :class="stepIndex == 1 ? 'bg-blue-100' : ''">
+        <div class="h-10 w-80 text-xl flex items-center">
+          2: 数字“Y”出现的次数？
+        </div>
+        <div class="h-10 w-30">
+          <a-input-number addon-after="次" size="large" :min="0" />
+        </div>
+        <div class="h-14 w-70 pl-4">
+          <audio class="w-66" :src="GetAudioUrl('听觉集中-数字题.mp3')" controls
+            controlsList="nodownload noplaybackrate"></audio>
+        </div>
+        <div class="h-10 w-40 pl-4">
+          <a-button size="large">
+            下一题
+          </a-button>
+        </div>
+      </div>
+    </a-flex>
+    <div class="w-1/2" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div class="w-full flex flex-auto flex-col justify-start items-center">
         <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300 rounded-xl"
@@ -410,8 +461,8 @@ const openNotification = (message: string) => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认" :maskClosable="false"
-    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

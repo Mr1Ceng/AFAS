@@ -7,7 +7,8 @@ import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import SpiralMaze from '../spiralMaze/SpiralMaze.vue'
 const props = defineProps<{
-  questionId: string
+  questionId: string,
+  isCurrent: boolean,
 }>()
 const answerStore = useAnswerStore();
 console.log(answerStore)
@@ -66,6 +67,16 @@ const SaveAnswerS4 = async () => {
 
 
 // #endregion
+
+// #region 监听器
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue && stepIndex.value == 0) {
+    setModalVisible(true);
+  }
+})
+
+//#endregion
 
 // #region 答题结果
 
@@ -176,7 +187,14 @@ const finished = (count: number) => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <img class="h-100 pb-4" src="/images/S4-Demo.png">
+    <div class="w-1/2" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
       <a-flex class="w-full flex-auto bg-white" :vertical="true" :justify="'center'" :align="'center'">
@@ -227,8 +245,8 @@ const finished = (count: number) => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认" :maskClosable="false"
-    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

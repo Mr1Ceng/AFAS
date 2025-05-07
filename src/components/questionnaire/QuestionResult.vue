@@ -10,6 +10,9 @@ import { useAnswerStore } from '@/stores/answerStore';
 import EChart from "@/components/echart/EChart.vue";
 import _ from "lodash";
 
+const props = defineProps<{
+  isCurrent: boolean,
+}>()
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
 const sexList = EnumHelper.getEnumDescriptions(SexDescription);

@@ -6,7 +6,8 @@ import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 const props = defineProps<{
-  questionId: string
+  questionId: string,
+  isCurrent: boolean,
 }>()
 const answerStore = useAnswerStore();
 console.log(answerStore)
@@ -24,7 +25,9 @@ const GetQuestionS5 = async () => {
       questionInfo.value = response.data.questionInfo
       questionList.value = response.data.questionList
       if (questionList.value.length > 0) {
-        questionImage.value = questionList.value[Math.floor(Math.random() * questionList.value.length)].image;
+        var randomNumber = Math.floor(Math.random() * questionList.value.length);
+        questionImage.value = questionList.value[randomNumber].image;
+        demoImage.value = questionList.value[questionList.value.length - 1 - randomNumber].image;
       }
     } else {
       message.error(`获取题目信息失败，请联系工作人员！`);
@@ -70,9 +73,20 @@ const SaveAnswerS5 = async () => {
 
 // #endregion
 
+// #region 监听器
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue && stepIndex.value == 0) {
+    setModalVisible(true);
+  }
+})
+
+//#endregion
+
 // #region 答题结果
 
 const questionImage = ref<string>("");
+const demoImage = ref<string>("");
 const answerImage = ref<string>("");
 const errorCount = ref<number>(0);
 const shapeCount = ref<number>(0);
@@ -226,7 +240,18 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <div class="flex flex-row justify-center h-100 w-full pb-4">
+      <div class="h-full w-1/2 p-2 bg-white">
+        <img class="h-full w-full" :src="demoImage">
+      </div>
+    </div>
+    <div class="w-1/2" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div ref="containerRef" class="w-full flex flex-auto justify-around items-center bg-white">
         <img v-show="stepIndex == 1" :src="questionImage" class="w-full" height="auto" />
@@ -284,8 +309,8 @@ onUnmounted(() => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认" :maskClosable="false"
-    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>
