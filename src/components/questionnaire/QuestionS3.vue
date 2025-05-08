@@ -5,6 +5,7 @@ import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
+import { useAccountStore } from "@/stores/accountStore";
 import "@/assets/iconfont/iconfont.css";
 
 const props = defineProps<{
@@ -12,6 +13,7 @@ const props = defineProps<{
   isCurrent: boolean,
 }>()
 const answerStore = useAnswerStore();
+const accountStore = useAccountStore();
 const randomNumber = ref(Math.floor(Math.random() * 100));
 console.log(answerStore)
 
@@ -76,7 +78,7 @@ const SaveAnswerS3 = async () => {
       answerList: list
     }
     console.log(data)
-    const response = await apiClient.post('/Questionnaire/SaveAnswerS3/' + "User_Mr1Ceng", data)
+    const response = await apiClient.post('/Questionnaire/SaveAnswerS3/' + accountStore.user.userId, data)
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
@@ -264,7 +266,7 @@ const modalOkClick = () => {
         </a-button>
       </div>
     </a-flex>
-    <div class="w-1/2" v-html="getModalInfo"></div>
+    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
     <a-button type="primary" @click="modalOkClick">
       确认
     </a-button>
@@ -359,7 +361,8 @@ const modalOkClick = () => {
     </div>
   </a-flex>
   <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
-    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false"
+    :cancel-button-props="stepIndex == 0 ? {} : { style: { display: 'none' } }">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

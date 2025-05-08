@@ -6,6 +6,7 @@ import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
+import { useAccountStore } from "@/stores/accountStore";
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -13,6 +14,7 @@ const props = defineProps<{
 const isComplete = ref(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
+const accountStore = useAccountStore();
 const baseURL = globalStore.baseURL;
 console.log(answerStore)
 // #region 接口
@@ -75,7 +77,7 @@ const SaveAnswerT1 = async () => {
       answerList: list
     }
     console.log(data)
-    const response = await apiClient.post('/Questionnaire/SaveAnswerT1/' + "User_Mr1Ceng", data)
+    const response = await apiClient.post('/Questionnaire/SaveAnswerT1/' + accountStore.user.userId, data)
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
@@ -174,19 +176,19 @@ const playAudio = (type: string) => {
     case "Number1":
       if (number1Audio.value) {
         number1Audio.value.play();
-        //canPlay.value = false;
+        canPlay.value = false;
       }
       break;
     case "Number2":
       if (number2Audio.value) {
         number2Audio.value.play();
-        //canPlay.value = false;
+        canPlay.value = false;
       }
       break;
     case "Story":
       if (storyAudio.value) {
         storyAudio.value.play();
-        //canPlay.value = false;
+        canPlay.value = false;
       }
       break;
     default:
@@ -309,7 +311,7 @@ const openNotification = (message: string) => {
         </div>
       </div>
     </a-flex>
-    <div class="w-1/2" v-html="getModalInfo"></div>
+    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
     <a-button type="primary" @click="modalOkClick">
       确认
     </a-button>
@@ -415,7 +417,7 @@ const openNotification = (message: string) => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-8xl">{{
           `${number1Question.timeConsume ?? 0}/${number2Question.timeConsume ?? 0}/${number3Question.timeConsume ?? 0}`
-        }}</span>
+          }}</span>
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-20">数字题一</span>
@@ -462,7 +464,8 @@ const openNotification = (message: string) => {
     </div>
   </a-flex>
   <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
-    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false"
+    :cancel-button-props="stepIndex == 0 ? {} : { style: { display: 'none' } }">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

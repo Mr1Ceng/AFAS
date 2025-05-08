@@ -28,7 +28,11 @@ const login = async () => {
       accountStore.setToken(getAuthorizationString(response.data.userId, response.data.token.value))
       accountStore.setUser(response.data.user)
       //console.log(globalStore.token)
-      router.push({ name: 'Q_Test', params: {} })
+      if (response.data.user.isStaff) {
+        router.push({ name: 'Q_Query', params: {} })
+      } else {
+        router.push({ name: 'Q_Test', params: {} })
+      }
     }
   } catch (error) {
     console.error('请求失败:', error)

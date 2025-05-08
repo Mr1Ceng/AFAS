@@ -7,7 +7,14 @@ export const useAccountStore = defineStore("account", {
     token: "",
     user: {
       userName: '',
-      userId: ''
+      userId: '',
+      userAccount: '',
+      nickName: '',
+      avatarUrl: '',
+      gender: '',
+      mobile: '',
+      isDeveloper: false,
+      isStaff: false,
     }
   }),
   actions: {

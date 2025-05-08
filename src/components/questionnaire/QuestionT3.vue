@@ -7,6 +7,7 @@ import { formattedText } from '@/utils/CommonHelper'
 import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
+import { useAccountStore } from "@/stores/accountStore";
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -14,6 +15,7 @@ const props = defineProps<{
 const isComplete = ref(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
+const accountStore = useAccountStore();
 const baseURL = globalStore.baseURL;
 console.log(answerStore)
 // #region 接口
@@ -62,6 +64,14 @@ GetQuestionT3();
 
 const SaveAnswerT3 = async () => {
   try {
+    if (accountStore.user.userId == "") {
+      message.error("用户登录错误，请重新登录");
+      return;
+    }
+    if (accountStore.user.isStaff) {
+      message.error("请用学生账号登录");
+      return;
+    }
     var list = _.map(questionList.value, item => {
       return {
         questionType: item.questionType,
@@ -80,7 +90,7 @@ const SaveAnswerT3 = async () => {
       answerList: list
     }
     console.log(data)
-    const response = await apiClient.post('/Questionnaire/SaveAnswerT3/' + "User_Mr1Ceng", data)
+    const response = await apiClient.post('/Questionnaire/SaveAnswerT3/' + accountStore.user.userId, data)
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
@@ -306,7 +316,70 @@ const openNotification = (message: string) => {
 
 <template>
   <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
-    <div class="w-1/2" v-html="getModalInfo"></div>
+    <div class="w-3/4 flex flex-row items-start pb-4">
+      <div class="w-1/2 flex flex-col p-4 pt-0 ">
+        <div class="w-full h-14 text-xl flex items-center pb-2 pt-2 border-b-1 border-gray-300">
+          <div class="w-20 text-xl flex items-center">
+            <span class="">级别</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex justify-around">
+            <span class="">顺背数测试1</span>
+            <span class="">顺背数测试2</span>
+          </div>
+        </div>
+        <div class="w-full h-14 text-xl flex items-center pb-1 pt-1 border-b-1 border-gray-300"
+          v-for="(questionLevel, questionLevelIndex) in 6">
+          <div class="w-20 text-xl flex items-center">
+            <span class="pl-4">{{ `${questionLevel}` }}</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex pb-1 pt-1 rounded-xl"
+            :class="(currQuestionType && currQuestionLevel == questionLevel ? 'bg-blue-100' : '')">
+            <div class="w-1/2 h-full pl-2 pr-2" v-for="(question, questionIndex) in 2">
+              <div class="w-full h-full flex justify-center items-center rounded-2xl">
+                <div v-show="(currQuestionType && currQuestionLevel == questionLevel && currQuestionSort == question)"
+                  class="w-full h-full flex justify-center items-center">
+                  <audio class="w-full h-10" controls controlsList="nodownload noplaybackrate"></audio>
+                  <div style="margin-left: -40px!important;z-index: 999;">
+                    <PlayCircleOutlined :style="{ fontSize: '20px' }" class="cursor-pointer" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="w-1/2 flex flex-col p-4 pt-0">
+        <div class="w-full h-14 text-xl flex items-center pb-2 pt-2 border-b-1 border-gray-300">
+          <div class="w-20 text-xl flex items-center">
+            <span class="">级别</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex justify-around">
+            <span class="">逆背数测试1</span>
+            <span class="">逆背数测试2</span>
+          </div>
+        </div>
+        <div class="w-full h-14 text-xl flex items-center pb-1 pt-1 border-b-1 border-gray-300"
+          v-for="(questionLevel, questionLevelIndex) in 4">
+          <div class="w-20 text-xl flex items-center">
+            <span class="pl-4">{{ `${questionLevel}` }}</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex pb-1 pt-1 rounded-xl">
+            <div class="w-1/2 h-full pl-2 pr-2" v-for="(question, questionIndex) in 2">
+              <div class="w-full h-full flex justify-center items-center rounded-2xl">
+                <div class="w-full h-full flex justify-center items-center">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w-2/3 flex flex-row justify-around items-center mb-10" style="height: 50px;">
+      <a-button class="w-16" v-for="item in 9" type="primary" size="large">
+        {{ item }}
+      </a-button>
+    </div>
+    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
     <a-button type="primary" @click="modalOkClick">
       确认
     </a-button>
@@ -447,7 +520,8 @@ const openNotification = (message: string) => {
     </div>
   </a-flex>
   <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
-    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false"
+    :cancel-button-props="stepIndex == 0 ? {} : { style: { display: 'none' } }">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>

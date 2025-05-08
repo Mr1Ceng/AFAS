@@ -62,8 +62,8 @@ const GetTeacherList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/TEACHER')
     console.log('响应:', response)
     teacherList.value = response.data
-    if (_.find(teacherList.value, (x: { userId: string; }) => x.userId == accountStore.user.userId) != null) {
-      testResult.value.teacher = accountStore.user.userId;
+    if (teacherList.value.find(x => x.userId == accountStore.user.userId)) {
+      testResult.value.teacherId = accountStore.user.userId;
     }
   } catch (error) {
     console.error('请求失败:', error)
@@ -74,8 +74,8 @@ const GetStudentList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/STUDENT')
     console.log('响应:', response)
     studentList.value = response.data
-    if (_.find(studentList.value, (x: { userId: string; }) => x.userId == accountStore.user.userId) != null) {
-      testResult.value.student = accountStore.user.userId;
+    if (studentList.value.find(x => x.userId == accountStore.user.userId)) {
+      testResult.value.userId = accountStore.user.userId;
     }
   } catch (error) {
     console.error('请求失败:', error)

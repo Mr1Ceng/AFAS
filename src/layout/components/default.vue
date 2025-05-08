@@ -3,12 +3,30 @@
     <a-layout-header class="header flex flex-row">
       <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
         :style="{ lineHeight: '64px' }">
-        <a-menu-item v-for="(menu, index) in menuList" :key="menu.key">{{ menu.label }}</a-menu-item>
+        <a-menu-item v-for="(menu, index) in menuList" :key="menu.key" :disabled="!menu.show">{{ menu.label
+        }}</a-menu-item>
       </a-menu>
       <div class="flex items-center justify-end">
-        <span class="pr-4 text-white">
-          {{ accountStore.user.userName }}
-        </span>
+        <a-popover placement="bottomRight">
+          <template #content>
+            <span class="text-sm">{{ accountStore.user.userId }}</span>
+            <div class="w-full flex flex-row justify-end items-center pt-4">
+              <a-button size="small" type="link" @click="changePassword">
+                修改密码
+              </a-button>
+              <a-button size="small" type="link" @click="logout">
+                退出登录
+              </a-button>
+            </div>
+          </template>
+          <template #title>
+            <span class="text-xl pr-2">{{ accountStore.user.userName }}</span>
+            <span>( {{ accountStore.user.mobile }} )</span>
+          </template>
+          <a-button type="text">
+            {{ accountStore.user.userName }}
+          </a-button>
+        </a-popover>
         <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }">
           <template #checkedChildren><check-outlined /></template>
           <template #unCheckedChildren><close-outlined /></template>
@@ -29,9 +47,11 @@
     </a-layout>
   </a-layout>
 </template>
+
 <script lang="ts" setup>
 import { watch, h, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+//import apiClient from '@/utils/ApiClientHelper';
 import { useMenuStore } from '@/stores/menuStore';
 import {
   MailOutlined,
@@ -42,6 +62,7 @@ import {
 } from '@ant-design/icons-vue';
 import { useGlobalStore } from "@/stores/globalStore";
 import { useAccountStore } from "@/stores/accountStore";
+import { message } from 'ant-design-vue';
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
 const isDarktheme = ref(globalStore.isDarktheme)
@@ -53,17 +74,18 @@ const selectedKeys1 = ref<number[]>([store._selectedKeys1]);
 const selectedKeys2 = ref<string[]>(store.getSelectedKeys2());
 let openKeys = ref<string[]>(store.getOpenKeys());
 
-//菜单对象
+//#region 菜单对象
 const menuList = ref([
   {
     key: 0,
-    label: '测评管理',
-    title: '测评管理',
+    label: '测评',
+    title: '测评',
     children: [{
       key: 'Q_Test',
       icon: () => h(MailOutlined),
       label: '测评',
       title: '测评',
+      disabled: accountStore.user.isStaff && !accountStore.user.isDeveloper
     },
     {
       key: 'Q_Result',
@@ -80,6 +102,7 @@ const menuList = ref([
           key: 'Q_Import',
           label: '测评结果导入',
           title: '测评结果导入',
+          disabled: !accountStore.user.isStaff && !accountStore.user.isDeveloper
         }
       ],
     },
@@ -90,6 +113,7 @@ const menuList = ref([
       title: '测评标准',
     }
     ],
+    show: true
   },
   {
     key: 1,
@@ -119,10 +143,13 @@ const menuList = ref([
         }
       ],
     }
-    ]
+    ],
+    show: accountStore.user.isStaff || accountStore.user.isDeveloper
   }
 ]);
+//#endregion
 
+//#region 监听器
 watch(selectedKeys1, async (newValue, oldValue) => {
   selectedKeys2.value = store.getSelectedKeys2(newValue[0])
   openKeys.value = store.getOpenKeys(newValue[0])
@@ -137,8 +164,30 @@ watch(selectedKeys2, async (newValue, oldValue) => {
 watch(openKeys, async (newValue, oldValue) => {
   store.setter(selectedKeys1.value[0], selectedKeys2.value, newValue)
 })
+//#endregion
 
+const logout = async () => {
+  accountStore.setToken("")
+  accountStore.setUser({})
+  router.push({ name: 'login', params: {} })
+  // try {
+  //   const response = await apiClient.post('/Account/WebAppLogout')
+  //   console.log('响应:', response)
+  //   if (response.status == 1) {
+  //     accountStore.setToken("")
+  //     accountStore.setUser({})
+  //     router.push({ name: 'login', params: {} })
+  //   }
+  // } catch (error) {
+  //   console.error('请求失败:', error)
+  // }
+}
+
+const changePassword = () => {
+  message.info("如需修改密码，请联系管理员！");
+}
 </script>
+
 <style scoped>
 #components-layout-demo-top-side-2 .logo {
   float: left;

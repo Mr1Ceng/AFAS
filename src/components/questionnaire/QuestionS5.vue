@@ -5,11 +5,13 @@ import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
+import { useAccountStore } from "@/stores/accountStore";
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
 const answerStore = useAnswerStore();
+const accountStore = useAccountStore();
 console.log(answerStore)
 // #region 接口
 
@@ -52,7 +54,7 @@ const SaveAnswerS5 = async () => {
       remark: remark.value
     }
     console.log(data)
-    const response = await apiClient.post('/Questionnaire/SaveAnswerS5/' + "User_Mr1Ceng", data)
+    const response = await apiClient.post('/Questionnaire/SaveAnswerS5/' + accountStore.user.userId, data)
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
@@ -246,7 +248,7 @@ onUnmounted(() => {
         <img class="h-full w-full" :src="demoImage">
       </div>
     </div>
-    <div class="w-1/2" v-html="getModalInfo"></div>
+    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
     <a-button type="primary" @click="modalOkClick">
       确认
     </a-button>
@@ -310,7 +312,8 @@ onUnmounted(() => {
     </div>
   </a-flex>
   <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
-    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false">
+    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false"
+    :cancel-button-props="stepIndex == 0 ? {} : { style: { display: 'none' } }">
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>
