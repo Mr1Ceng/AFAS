@@ -20,18 +20,38 @@ const questionCodeList = EnumHelper.getEnumDescriptions(QuestionCodeDescription)
 const testResult = ref<any>({});
 //#region 获取答案
 const GetAnswerList = async () => {
+  if (answerStore._answerId == "") {
+    return;
+  }
   try {
-    const response = await apiClient.post('/Questionnaire/GetAnswerList/' + (answerStore._answerId == '' ? '1JT06RR4KRXGCCA7Z56RBE5ZA' : answerStore._answerId))
+    const response = await apiClient.post('/Questionnaire/GetAnswerList/' + answerStore._answerId)//1JT06RR4KRXGCCA7Z56RBE5ZA
     console.log('响应:', response)
     if (response.status == 1) {
-      testResult.value = response.data
-
+      if (testResult.value) {
+        testResult.value.answerList = response.data.answerList
+      } else {
+        testResult.value = response.data
+      }
     }
   } catch (error) {
     console.error('请求失败:', error)
   }
 }
 GetAnswerList();
+//#endregion
+
+// #region 监听器
+
+watch(() => props.isCurrent, async (newValue, oldValue) => {
+  if (newValue) {
+    GetAnswerList().then(
+      () => {
+        computedResult();
+      }
+    );
+  }
+})
+
 //#endregion
 
 //#region 基础数据
@@ -95,10 +115,15 @@ const currentEvaluationStandard = computed(() => {
 });
 
 watch(() => currentEvaluationStandard.value, (newValue, oldValue) => {
+  computedResult();
+})
+
+const computedResult = () => {
+  if (!testResult.value.answerList) return;
   //#region 计算答案是否达标
   if (testResult.value.answerList.length > 0) {
     _.forEach(testResult.value.answerList, item => {
-      var evaluationStandard = newValue[_.toLower(item.questionCode)];
+      var evaluationStandard = currentEvaluationStandard.value[_.toLower(item.questionCode)];
       item.evaluationStandard = evaluationStandard;
       item.isPass = item.standardScore >= evaluationStandard;
     })
@@ -157,7 +182,8 @@ watch(() => currentEvaluationStandard.value, (newValue, oldValue) => {
   testResult.value.advantage = `孩子的优势是: ${_.join([...sResultPass, ...tResultPass], '、')}`
   testResult.value.weak = `孩子的弱势是: ${_.join([...sResultFail, ...tResultFail], '、')}`
   //#endregion
-})
+  CreateRadarMap();
+}
 
 //#region 图标
 const radarMax = computed(() => {
@@ -182,6 +208,10 @@ const GetImageUrl = (image: string, type: string) => {
 //#endregion
 
 const CreateRadarMap = () => {
+  if (!currentEvaluationStandard.value) {
+    message.error("请先选择评测等级");
+    return;
+  }
   chartOptions.value = {
     title: {
       text: 'ELA 专注学习能力测试'
@@ -330,6 +360,10 @@ const CreateRadarMap = () => {
 const CreateTestReport = async () => {
   console.log(testResult.value)
   console.log(student.value)
+  if (!currentEvaluationStandard.value) {
+    message.error("请先选择评测等级");
+    return;
+  }
   try {
     const data = testResult.value
     const response = await apiClient.post('/Questionnaire/SaveAnswerResult', data)
@@ -404,9 +438,6 @@ const CreateTestReport = async () => {
         </a-select>
       </div>
       <div class="w-full flex flex-row justify-end items-center pt-8">
-        <a-button @click="CreateRadarMap()">
-          生成雷达图
-        </a-button>
         <a-button @click="CreateTestReport()">
           生成测试报告
         </a-button>

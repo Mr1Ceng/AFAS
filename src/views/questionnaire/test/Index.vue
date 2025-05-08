@@ -32,8 +32,7 @@
 
 <script lang="ts" setup>
 import { watch, reactive, h, ref } from 'vue';
-import { MailOutlined, AppstoreOutlined, SettingOutlined } from '@ant-design/icons-vue';
-import { type MenuProps, message } from 'ant-design-vue';
+import { useAnswerStore } from '@/stores/answerStore';
 import QuestionS1 from '@/components/questionnaire/QuestionS1.vue'
 import QuestionS2 from '@/components/questionnaire/QuestionS2.vue'
 import QuestionS3 from '@/components/questionnaire/QuestionS3.vue'
@@ -44,6 +43,8 @@ import QuestionT2 from '@/components/questionnaire/QuestionT2.vue'
 import QuestionT3 from '@/components/questionnaire/QuestionT3.vue'
 import QuestionResult from '@/components/questionnaire/QuestionResult.vue'
 
+const answerStore = useAnswerStore();
+answerStore.setAnswerId("");
 //弹框
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
@@ -55,6 +56,7 @@ const radioStyle = reactive({
   lineHeight: '50px',
 });
 setModalVisible(true);
+
 
 //菜单数据
 const questionnaireList = ref<any[]>([]);
@@ -118,6 +120,7 @@ const GetComponent = (questionCode: string) => {
       return null
   }
 }
+
 </script>
 
 <style scoped>
