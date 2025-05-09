@@ -12,10 +12,16 @@ const formattedText = (text: string) => {
     .join("<br>");
 }
 
-// 使用字符串键名获取属性
+/**
+ * 过对象的字段名动态获取属性值
+ * @param obj 任意对象
+ * @param key 字段名
+ * @returns 字段的值
+ */
 function getProperty<T, K extends keyof T>(obj: T, key: K): T[K] {
-  return obj[key]; // 使用索引签名
+  return obj[key];
 }
+
 // #endregion
 
 

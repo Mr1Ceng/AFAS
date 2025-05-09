@@ -1,5 +1,5 @@
 /**
- * 枚举
+ * 性别枚举
  */
 export enum SexEnum {
   Male = 'MALE',
