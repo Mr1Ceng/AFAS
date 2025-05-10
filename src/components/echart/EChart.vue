@@ -53,6 +53,7 @@ watch(
   (newOptions) => {
     if (chartInstance) {
       console.log(newOptions)
+      chartInstance.resize();
       chartInstance.setOption(newOptions); // 更新图表选项
       setTimeout(() => {
         if (chartInstance) {

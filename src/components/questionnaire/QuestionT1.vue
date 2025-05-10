@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, watch, inject, type Ref } from 'vue';
 import { message, notification } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
@@ -11,7 +11,11 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const isComplete = ref(false);
+
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
@@ -58,6 +62,10 @@ const GetAudioUrl = (fileName: string) => {
 GetQuestionT1();
 
 const SaveAnswerT1 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     var list = _.map(storyQuestion.value, item => {
       return {
@@ -82,6 +90,7 @@ const SaveAnswerT1 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -176,19 +185,19 @@ const playAudio = (type: string) => {
     case "Number1":
       if (number1Audio.value) {
         number1Audio.value.play();
-        canPlay.value = false;
+        if(!isDev) canPlay.value = false;
       }
       break;
     case "Number2":
       if (number2Audio.value) {
         number2Audio.value.play();
-        canPlay.value = false;
+        if(!isDev) canPlay.value = false;
       }
       break;
     case "Story":
       if (storyAudio.value) {
         storyAudio.value.play();
-        canPlay.value = false;
+        if(!isDev) canPlay.value = false;
       }
       break;
     default:
@@ -221,7 +230,34 @@ const getAnswerList = (questionSort: number) => {
   return _.filter(bQuestionT1AList.value, (x: { questionSort: number; }) => x.questionSort == questionSort);
 }
 
+const nextClick = () => {
+  switch (stepIndex.value) {
+    case 1:
+      if (!canPlay.value||!number1Question.value.questionA) {
+        message.info("请先完成答题！")
+        return; 
+      }
+      number1Question.value.timeConsume = seconds.value; 
+      break;
+    case 2:
+      if (!canPlay.value||!number2Question.value.questionA)  {
+        message.info("请先完成答题！")
+        return; 
+      }
+      number2Question.value.timeConsume = seconds.value; 
+      break;
+    default:
+      break;
+  }
+  setModalVisible(true); 
+  resetTimer();
+}
+
 const Completed = () => {
+  if(!number3Question.value?.questionA || (storyQuestion.value.some((item: any) => !("questionA" in item)))){
+    message.info("请先完成答题！");
+    return;
+  }
   console.log(bQuestionT1QList)
   isComplete.value = true;
   stepIndex.value++;
@@ -246,6 +282,7 @@ const modalOkClick = () => {
   switch (stepIndex.value) {
     case 0:
       playAudio("Number1");
+      canChanges.value = false;
       break;
     case 1:
       playAudio("Number2");
@@ -334,7 +371,7 @@ const openNotification = (message: string) => {
           </div>
           <div class="h-10 w-40 pl-4">
             <a-button :disabled="stepIndex != 1" size="large"
-              @click="() => { if (!canPlay || stepIndex != 1) return; setModalVisible(true); number1Question.timeConsume = seconds; resetTimer(); }">
+              @click="() => { nextClick() }">
               下一题
             </a-button>
           </div>
@@ -354,7 +391,7 @@ const openNotification = (message: string) => {
           </div>
           <div class="h-10 w-40 pl-4">
             <a-button :disabled="stepIndex != 2" size="large"
-              @click="() => { if (!canPlay) return; setModalVisible(true); number2Question.timeConsume = seconds; resetTimer(); }">
+              @click="() => { nextClick() }">
               下一题
             </a-button>
           </div>

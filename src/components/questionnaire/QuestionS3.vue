@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, inject, type Ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _, { forEach } from "lodash";
@@ -12,6 +12,11 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
+const isComplete = ref(false);
+
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
 const randomNumber = ref(Math.floor(Math.random() * 100));
@@ -56,6 +61,10 @@ const GetQuestionS3 = async () => {
 GetQuestionS3();
 
 const SaveAnswerS3 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     var list: any = []
     forEach(rowList.value, (row) => {
@@ -83,6 +92,7 @@ const SaveAnswerS3 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -187,10 +197,11 @@ const ClickGrid = (id: number) => {
   if (currentColumn == 25) {
     currentRow++;
     currentColumn = 0;
-    if (currentRow == 4) {
+    if (currentRow == (isDev?1:4)) {
       timeConsume.value = maxMin * 60 - seconds.value;
       console.log(timeConsume.value)
       stopTimer();
+      isComplete.value = true;
       setModalVisible(true);
     }
   }
@@ -212,6 +223,9 @@ const setModalVisible = (open: boolean) => {
 setModalVisible(true);
 
 const modalOkClick = () => {
+  if (stepIndex.value == 0) {
+    canChanges.value = false;
+  }
   stepIndex.value++;
   setModalVisible(false);
 }
@@ -261,7 +275,7 @@ const modalOkClick = () => {
         </a-flex>
       </a-flex>
       <div class="w-full flex flex-row justify-around items-center" style="height: 60px;">
-        <a-button class="w-16" v-for="icon in 9" type="primary" size="large" @click="ClickGrid(icon)">
+        <a-button class="w-20" v-for="icon in 9" type="primary" size="large" @click="ClickGrid(icon)">
           {{ icon }}
         </a-button>
       </div>
@@ -312,8 +326,8 @@ const modalOkClick = () => {
           </a-flex>
         </a-flex>
       </a-flex>
-      <div class="w-full flex flex-row justify-around items-center" style="height: 60px;">
-        <a-button class="w-16" v-for="icon in 9" type="primary" size="large" @click="ClickGrid(icon)">
+      <div class="w-full flex flex-row justify-around items-center" style="height: 80px;">
+        <a-button class="w-1/12 answerBtn" v-for="icon in 9" type="primary" size="large" @click="ClickGrid(icon)">
           {{ icon }}
         </a-button>
       </div>
@@ -376,5 +390,9 @@ const modalOkClick = () => {
   line-height: var(--tw-leading, var(--text-lg--line-height)
       /* calc(1.75 / 1.125) ≈ 1.5556 */
     );
+}
+.answerBtn {
+  height: 60px!important;
+  font-size: 30px!important;
 }
 </style>

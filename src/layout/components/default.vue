@@ -24,7 +24,7 @@
             <span>( {{ accountStore.user.mobile }} )</span>
           </template>
           <a-button type="text">
-            {{ accountStore.user.userName }}
+            {{ accountStore.user.userName}}
           </a-button>
         </a-popover>
         <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }">
@@ -49,6 +49,9 @@
 </template>
 
 <script lang="ts" setup>
+defineOptions({
+  name: 'DefaultLayout'
+});
 import { watch, h, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 //import apiClient from '@/utils/ApiClientHelper';
@@ -69,7 +72,6 @@ const isDarktheme = ref(globalStore.isDarktheme)
 
 const router = useRouter()
 const store = useMenuStore()
-
 const selectedKeys1 = ref<number[]>([store._selectedKeys1]);
 const selectedKeys2 = ref<string[]>(store.getSelectedKeys2());
 let openKeys = ref<string[]>(store.getOpenKeys());

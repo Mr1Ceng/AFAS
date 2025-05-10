@@ -63,4 +63,27 @@ const processResponseData = (data: any): any => {
   return data;
 };
 
-export { formattedText, getProperty, processResponseData }
+const processRequestData = (data: any): any => {
+  if (Array.isArray(data)) {
+    return data.map(item => processRequestData(item));
+  } else if (data !== null && typeof data === "object") {
+    const result: Record<string, any> = {};
+    for (const key in data) {
+      if (Object.prototype.hasOwnProperty.call(data, key)) {
+        const value = data[key];
+
+        if (dayjs.isDayjs(value)) {
+          // 判断是否包含时间部分
+          const hasTime = value.hour() !== 0 || value.minute() !== 0 || value.second() !== 0;
+          result[key] = hasTime ? value.format("YYYY-MM-DD HH:mm:ss") : value.format("YYYY-MM-DD");
+        } else {
+          result[key] = processRequestData(value);
+        }
+      }
+    }
+    return result;
+  }
+  return data;
+};
+
+export { formattedText, getProperty, processResponseData, processRequestData }

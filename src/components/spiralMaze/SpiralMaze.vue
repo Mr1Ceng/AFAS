@@ -64,6 +64,9 @@ export default {
       const r = spiral.value.a + spiral.value.b * theta;
       endCircle.x = props.width / 2 + r * Math.cos(theta);
       endCircle.y = props.height / 2 + r * Math.sin(theta);
+      startCircle.x = props.width / 2;
+      startCircle.y = props.height / 2;
+      startCircle.r = 15;
     }
 
     // 初始化动态波动的不规则漩涡路径
@@ -170,10 +173,14 @@ export default {
       }
     }
 
-    onMounted(() => {
+    const reDraw = () => {
       generateSmoothSpiralPath();
       const ctx = canvasRef.value!.getContext("2d")!;
       drawMaze(ctx);
+    }
+
+    onMounted(() => {
+      reDraw();
       canvasRef.value!.addEventListener("mousedown", onMouseDown);
       canvasRef.value!.addEventListener("mousemove", onMouseMove);
       canvasRef.value!.addEventListener("mouseup", onMouseUp);
@@ -185,16 +192,16 @@ export default {
 
     watch([spacing, perturbation], () => {
       spiral.value.b = spacing.value;
-      generateSmoothSpiralPath();
-      const ctx = canvasRef.value!.getContext("2d")!;
-      drawMaze(ctx);
+      reDraw();
     });
+
 
     return {
       canvasRef,
       spacing,
       perturbation,
-      crossCount
+      crossCount,
+      reDraw
     };
   }
 };

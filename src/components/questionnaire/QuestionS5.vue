@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, onMounted, onUnmounted, watch, inject, type Ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
@@ -10,6 +10,11 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
+const isComplete = ref(false);
+
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
 console.log(answerStore)
@@ -41,6 +46,10 @@ const GetQuestionS5 = async () => {
 GetQuestionS5();
 
 const SaveAnswerS5 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     const data = {
       answerId: answerStore.getAnswerId(),
@@ -59,6 +68,7 @@ const SaveAnswerS5 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -155,6 +165,7 @@ const Completed = () => {
   timeConsume.value = maxMin * 60 + 60 - seconds.value;
   console.log(timeConsume.value)
   stopTimer();
+  const isComplete = ref(false);
   setModalVisible(true);
 }
 
@@ -174,6 +185,9 @@ const setModalVisible = (open: boolean) => {
 setModalVisible(true);
 
 const modalOkClick = () => {
+  if (stepIndex.value == 0) {
+    canChanges.value = false;
+  }
   if (stepIndex.value <= 1) {
     startTimer();
   }

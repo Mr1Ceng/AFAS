@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, onMounted, watch } from 'vue';
+import { computed, ref, watch, inject, type Ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
@@ -11,6 +11,11 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
+const isComplete = ref(false);
+
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
 console.log(answerStore)
@@ -37,6 +42,10 @@ const GetQuestionS4 = async () => {
 GetQuestionS4();
 
 const SaveAnswerS4 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     const data = {
       answerId: answerStore.getAnswerId(),
@@ -54,6 +63,7 @@ const SaveAnswerS4 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -133,6 +143,7 @@ const Completed = () => {
   console.log(timeConsume.value)
   remark.value = "断线数：" + errorCount.value;
   stopTimer();
+  isComplete.value = true;
   setModalVisible(true);
 }
 
@@ -154,6 +165,10 @@ setModalVisible(true);
 const modalOkClick = () => {
   if (stepIndex.value == 0) {
     startTimer();
+    canChanges.value = false;
+    if(spiralMaze.value){
+      spiralMaze.value.reDraw();
+    }
   }
   stepIndex.value++;
   setModalVisible(false);
@@ -164,6 +179,14 @@ const modalOkClick = () => {
 // #region 漩涡
 const spacing = ref(5);
 const perturbation = ref(20);
+const spiralMazeContainer = ref<any>();
+const spiralMaze= ref<any>();
+const spiralMazeHeight = computed(() => {
+  return spiralMazeContainer.value?.clientHeight - 150;
+});
+const spiralMazeWidth = computed(() => {
+  return spiralMazeContainer.value?.clientWidth - 150;
+});
 const handleCrossUpdate = (newCount: number) => {
   crossCount.value = newCount;
 }
@@ -196,14 +219,30 @@ const finished = (count: number) => {
       确认
     </a-button>
   </a-flex>
-  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="modalVisible && stepIndex==0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <a-flex class="w-full flex-auto bg-white" :vertical="true" :justify="'center'" :align="'center'">
-        <SpiralMaze :initialSpacing="spacing" :initialPerturbation="perturbation" :width="1000" :height="700"
+      <div ref="spiralMazeContainer" class="w-full flex-auto" >
+
+      </div>
+      <div class="w-full" style="height: 100px;">
+        
+      </div>
+    </a-flex>
+    <div class="h-full " style="width: 400px;">
+    </div>
+  </a-flex>
+  <a-flex v-show="stepIndex>=1" class="h-full" :justify="'space-between'" :align="'flex-start'">
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
+      :align="'flex-start'">
+      <div v-show="stepIndex==1" class="w-full flex-auto flex flex-col justify-center items-center bg-white" >
+        <SpiralMaze  ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight"
           @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
           @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
-      </a-flex>
+      </div>
+      <div class="w-full flex-auto flex justify-center items-center bg-white">
+        <img v-show="stepIndex>1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
+      </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
         <div class="text-lg">注意事项：</div>
         <span class="text-lg">

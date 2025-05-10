@@ -10,5 +10,8 @@ export const generateColumns = <T>(fieldMap: Record<keyof T, string>) => {
     title,
     dataIndex: key,
     ellipsis: true,
+    align:"center",
+    width:"100px",
+    minWidth:'100px'
   }));
 };

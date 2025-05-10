@@ -5,7 +5,7 @@ import { useAccountStore } from "@/stores/accountStore";
 import router from '@/router';
 
 import { getAuthorizationString } from '@/utils/AuthorizationHelper'
-import { processResponseData } from '@/utils/CommonHelper'
+import { processResponseData ,processRequestData} from '@/utils/CommonHelper'
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
 const baseURL = globalStore.baseURL;
@@ -37,6 +37,10 @@ apiClient.interceptors.request.use(
     else {
       config.headers.Authorization = getAuthorizationString()
       accountStore.setToken(config.headers.Authorization)
+    }
+    // 处理请求数据，将 dayjs 转换为字符串
+    if (config.data) {
+      config.data = processRequestData(config.data);
     }
     return config
   },

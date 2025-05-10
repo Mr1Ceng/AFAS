@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, inject, type Ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import Nzh from "nzh";
@@ -11,6 +11,11 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
+const isComplete = ref(false);
+
 const nzhcn = Nzh.cn;
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
@@ -57,6 +62,10 @@ const GetQuestionS2 = async () => {
 GetQuestionS2();
 
 const SaveAnswerS2 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     var list: any = []
     forEach(rowList.value, (row) => {
@@ -85,6 +94,7 @@ const SaveAnswerS2 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -224,6 +234,7 @@ const Completed = () => {
   console.log(timeConsume.value)
   remark.value = "跨行数：" + crossCount.value + "；遗漏数：" + missingCount.value;
   stopTimer();
+  isComplete.value = true;
   setModalVisible(true);
 }
 
@@ -245,6 +256,7 @@ setModalVisible(true);
 const modalOkClick = () => {
   if (stepIndex.value == 0) {
     startTimer();
+    canChanges.value = false;
   }
   stepIndex.value++;
   setModalVisible(false);
@@ -312,8 +324,10 @@ const modalOkClick = () => {
           <a-flex class="h-7 flex-auto border-1" :justify="'space-around'" :align="'center'">
             <div class="flex justify-center text-xl hover:bg-sky-500 cursor-pointer" v-for="column in row.columns"
               @click="ClickGrid(row.rowId, column)"
-              :class="'w-1/' + row.columns.length + (column.selected ? (column.isTrue ? ' bg-green-500' : ' bg-red-500') : '')">
-              {{ stepIndex == 0 ? '' : column.value }}</div>
+              :class="`w-1/${row.columns.length}` + (column.selected ? (column.isTrue ? ' bg-green-500' : ' bg-red-500') : '')">
+              <span>
+                {{ stepIndex == 0 ? '' : column.value }}
+              </span></div>
           </a-flex>
           <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
             <span class="text-xl">{{ row.succussCount ?? 0 }}</span>

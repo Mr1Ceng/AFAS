@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 import apiClient from '@/utils/ApiClientHelper'
 import { EnumHelper } from '@/utils/EnumHelper';
-import { SexDescription } from '@/enums/SexEnum';
+import { GerderDescription } from '@/enums/GerderEnum';
 import { QuestionCodeDescription } from '@/enums/QuestionCodeEnum';
 import { useAccountStore } from "@/stores/accountStore";
 import { useAnswerStore } from '@/stores/answerStore';
@@ -12,34 +12,18 @@ import _ from "lodash";
 
 const props = defineProps<{
   isCurrent: boolean,
+  answerId?: string
 }>()
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
-const sexList = EnumHelper.getEnumDescriptions(SexDescription);
+const sexList = EnumHelper.getEnumDescriptions(GerderDescription);
 const questionCodeList = EnumHelper.getEnumDescriptions(QuestionCodeDescription);
 const testResult = ref<any>({});
-//#region 获取答案
-const GetAnswerList = async () => {
-  if (answerStore._answerId == "") {
-    return;
-  }
-  try {
-    const response = await apiClient.post('/Questionnaire/GetAnswerList/' + answerStore._answerId)//1JT06RR4KRXGCCA7Z56RBE5ZA
-    console.log('响应:', response)
-    if (response.status == 1) {
-      if (testResult.value) {
-        testResult.value.answerList = response.data.answerList
-      } else {
-        testResult.value = response.data
-      }
-    }
-  } catch (error) {
-    console.error('请求失败:', error)
-  }
-}
-GetAnswerList();
-//#endregion
 
+const answerId = computed(() => {
+  return (props.answerId && props.answerId != "") ?
+    props.answerId : answerStore._answerId
+})
 // #region 监听器
 
 watch(() => props.isCurrent, async (newValue, oldValue) => {
@@ -107,6 +91,35 @@ GetTeacherList();
 GetStudentList();
 //#endregion
 
+//#region 获取答案
+const GetAnswerList = async () => {
+  if (!answerId || answerId.value == "") {
+    return;
+  }
+  try {
+    const response = await apiClient.post('/Questionnaire/GetAnswerList/' + answerId.value)//1JT06RR4KRXGCCA7Z56RBE5ZA
+    console.log('响应:', response)
+    if (response.status == 1) {
+      if (testResult.value.userId) {
+        response.data.userId = testResult.value.userId;
+      }
+      if (testResult.value.suggestedCourse) {
+        response.data.suggestedCourse = testResult.value.suggestedCourse;
+      }
+      if (testResult.value.levelCode) {
+        response.data.levelCode = testResult.value.levelCode;
+      }
+      if (testResult.value.teacherId) {
+        response.data.teacherId = testResult.value.teacherId;
+      }
+      testResult.value = response.data
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+  }
+}
+GetAnswerList();
+//#endregion
 const student = computed(() => {
   return studentList.value.find(x => x.userId == testResult.value.userId) ?? {}
 })
@@ -119,7 +132,7 @@ watch(() => currentEvaluationStandard.value, (newValue, oldValue) => {
 })
 
 const computedResult = () => {
-  if (!testResult.value.answerList) return;
+  if (!testResult.value.answerList || !currentEvaluationStandard.value) return;
   //#region 计算答案是否达标
   if (testResult.value.answerList.length > 0) {
     _.forEach(testResult.value.answerList, item => {
@@ -178,9 +191,9 @@ const computedResult = () => {
   }
   //#endregion
   //#region 总结
-  testResult.value.remark = _.join(_.map(testResult.value.answerList, item => { return item.remark }), '\n')
-  testResult.value.advantage = `孩子的优势是: ${_.join([...sResultPass, ...tResultPass], '、')}`
-  testResult.value.weak = `孩子的弱势是: ${_.join([...sResultFail, ...tResultFail], '、')}`
+  testResult.value.remark = _.join(_.map(testResult.value.answerList, item => { return item.questionCode + item.remark }), '\n')
+  testResult.value.advantage = `${_.join([...sResultPass, ...tResultPass], '、')}`
+  testResult.value.weak = `${_.join([...sResultFail, ...tResultFail], '、')}`
   //#endregion
   CreateRadarMap();
 }

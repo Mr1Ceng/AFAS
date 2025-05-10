@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { theme } from 'ant-design-vue';
-import { ref, watch } from 'vue';
+import { ref, watch,provide } from 'vue';
 import { useGlobalStore } from "@/stores/globalStore";
 import zhCN from 'ant-design-vue/es/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
+import DefaultLayout from './layout/components/default.vue';
 
 dayjs.locale('zh-cn');
 const globalStore = useGlobalStore();
@@ -22,6 +23,10 @@ watch(() => globalStore.isDarktheme, async (newValue, oldValue) => {
   }
 },
 { immediate: true })
+
+const isDev = ref<boolean>(import.meta.env.MODE === "development");
+console.log("isDev",isDev.value)
+provide("isDev", isDev);
 
 </script>
 

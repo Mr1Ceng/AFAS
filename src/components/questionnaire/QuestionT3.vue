@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, watch, inject, type Ref } from 'vue';
 import { message, notification } from 'ant-design-vue';
 import { PlayCircleOutlined } from '@ant-design/icons-vue';
 import { formattedText } from '@/utils/CommonHelper'
@@ -12,6 +12,8 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const isComplete = ref(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
@@ -63,6 +65,10 @@ const GetAudioUrl = (fileName: string) => {
 GetQuestionT3();
 
 const SaveAnswerT3 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     if (accountStore.user.userId == "") {
       message.error("用户登录错误，请重新登录");
@@ -95,6 +101,7 @@ const SaveAnswerT3 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -290,6 +297,7 @@ setModalVisible(true);
 const modalOkClick = () => {
   switch (stepIndex.value) {
     case 0:
+    canChanges.value = false;
       break;
     case 1:
       break;
@@ -478,8 +486,8 @@ const openNotification = (message: string) => {
           </div>
         </div>
       </div>
-      <div class="w-full flex flex-row justify-around items-center" style="height: 50px;">
-        <a-button class="w-16" v-for="item in 9" type="primary" size="large" @click="answerClick(item)">
+      <div class="w-full flex flex-row justify-around items-center" style="height: 80px;">
+        <a-button class="w-1/12 answerBtn" v-for="item in 9" type="primary" size="large" @click="answerClick(item)">
           {{ item }}
         </a-button>
       </div>
@@ -568,5 +576,10 @@ audio::-webkit-media-controls-seek-back-button,
 audio::-webkit-media-controls-seek-forward-button,
 audio::-webkit-media-controls-timeline {
   pointer-events: none;
+}
+
+.answerBtn {
+  height: 60px!important;
+  font-size: 30px!important;
 }
 </style>

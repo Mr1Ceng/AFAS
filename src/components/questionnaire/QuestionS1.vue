@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, watch } from 'vue';
+import { computed, ref, watch, inject, type Ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { formattedText, getProperty } from '@/utils/CommonHelper'
 
@@ -10,6 +10,10 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
+const isComplete = ref(false);
 
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
@@ -38,6 +42,10 @@ const GetQuestionS1 = async () => {
 GetQuestionS1();
 
 const SaveAnswerS1 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     const data = {
       answerId: answerStore.getAnswerId(),
@@ -65,6 +73,7 @@ const SaveAnswerS1 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -156,7 +165,7 @@ const ClickGrid = (grid: any) => {
         if (grid.gridValue == lastNumber + 1) {
           questionList.value[index].selected = true;
           answer.value.push(grid.gridValue);
-          if (answer.value.length == 25) {
+          if (answer.value.length == (isDev.value ? 3 : 25)) {
             switch (showGridTypes.value.at(-1)) {
               case "LARGE":
                 largeGridTimeConsume.value = seconds.value;
@@ -166,7 +175,7 @@ const ClickGrid = (grid: any) => {
                 break;
               case "SMALL":
                 smallGridTimeConsume.value = seconds.value;
-
+                isComplete.value = true;
                 break;
               default:
                 break;
@@ -202,6 +211,7 @@ const modalOkClick = () => {
     case 0:
       showGridTypes.value.push("LARGE");
       startTimer();
+      canChanges.value = false;
       break;
     case 1:
       showGridTypes.value.push("MIDDLE");

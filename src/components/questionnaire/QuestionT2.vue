@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
+import { computed, ref, watch, inject, type Ref } from 'vue';
 import { message, notification } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _, { forEach } from "lodash";
@@ -11,6 +11,8 @@ const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
 }>()
+const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const isComplete = ref(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
@@ -56,6 +58,10 @@ const GetAudioUrl = (fileName: string) => {
 GetQuestionT2();
 
 const SaveAnswerT2 = async () => {
+  if(!isComplete.value){
+    message.info("请先完成题目，再提交！")
+    return;
+  }
   try {
     var list = _.flatten(_.map(bQuestionT2QList.value, item => {
       return _.map(item.questionA, x => {
@@ -80,6 +86,7 @@ const SaveAnswerT2 = async () => {
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
       message.success(`保存成功`);
+      canChanges.value = true;
     } else {
       message.error(`保存题目信息失败，请联系工作人员！`);
     }
@@ -172,12 +179,12 @@ const playAudio = (index: number, type: string) => {
   if (type == "Diff") {
     if (AudioDiffRefs.value[index]) {
       AudioDiffRefs.value[index].play();
-      canPlay.value = false;
+      if(!isDev) canPlay.value = false;
     }
   } else {
     if (AudioSameRefs.value[index]) {
       AudioSameRefs.value[index].play();
-      canPlay.value = false;
+      if(!isDev) canPlay.value = false;
     }
   }
 }
@@ -218,6 +225,7 @@ const modalOkClick = () => {
   switch (stepIndex.value) {
     case 0:
       playAudio(0, "Diff");
+      canChanges.value = false;
       break;
     case 1:
       playAudio(0, "Same");
@@ -338,11 +346,11 @@ const openNotification = (message: string) => {
             <div class="h-14 w-40 pl-4 flex items-center">
               <a-button v-if="questionIndex + 1 == answerInfo.number1"
                 :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { setModalVisible(true) }">
+                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;} setModalVisible(true) }">
                 完成
               </a-button>
               <a-button v-else :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { playAudio(questionIndex + 1, 'Diff') }">
+                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;} playAudio(questionIndex + 1, 'Diff') }">
                 下一题
               </a-button>
             </div>
@@ -374,11 +382,11 @@ const openNotification = (message: string) => {
             <div class="h-14 w-40 pl-4 flex items-center">
               <a-button v-if="questionIndex + 1 == answerInfo.number2"
                 :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { setModalVisible(true) }">
+                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;}  setModalVisible(true) }">
                 完成
               </a-button>
               <a-button v-else :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { playAudio(questionIndex + 1, 'Same') }">
+                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;} playAudio(questionIndex + 1, 'Same') }">
                 下一题
               </a-button>
             </div>
