@@ -3,24 +3,21 @@
     <div class="w-full h-16 pt-2">
       <span class="text-xl">用户查询</span>
     </div>
-    <div class="w-full h-12 flex flex-row pb-4">
-      <a-input-search class="pr-4" v-model:value="queryText" placeholder="姓名/手机号/账号" style="width: 200px"
-        @search="UserGridQuery" />
+    <div class="w-full h-12 pb-4">
+      <a-row>
+        <a-col flex="auto">
+          <a-input-search class="pr-4" v-model:value="queryText" placeholder="姓名/手机号/账号" style="width: 200px"
+            @search="UserGridQuery" /></a-col>
+        <a-col flex="100px" class="flex pr-4 justify-end">
+          <a-button type="primary" @click="setDrawerVisible(true,'')">新增</a-button>
+        </a-col>
+      </a-row>
     </div>
     <div ref="tableContainer" class="w-full h-[calc(100%-112px)] flex">
       <a-table class="h-full" :columns="columns" :data-source="Users?.data" :pagination="pagination"
         :scroll="{ y: tableHeight }">
-        <!-- <template #headerCell="{ column }">
-          <template
-            v-if="column.dataIndex === 'radarImage' || column.dataIndex === 'sImage' || column.dataIndex === 'tImage'">
-            <span>
-              qqq
-            </span>
-          </template>
-</template> -->
         <template #bodyCell="{ column, record }">
-          <template
-            v-if="column.dataIndex === 'avatarUrl'">
+          <template v-if="column.dataIndex === 'avatarUrl'">
             <a-popover placement="left">
               <template #content>
                 <img class="w-100" :src="record[column.dataIndex]">
@@ -34,29 +31,29 @@
             {{ EnumHelper.getDescriptionByValue(GerderDescription, record[column.dataIndex]) }}
           </template>
           <template v-if="column.dataIndex === 'isDeveloper'">
-            {{ record[column.dataIndex]?'是':'否'}}
+            {{ record[column.dataIndex] ? '是' : '否' }}
           </template>
           <template v-if="column.dataIndex === 'role'">
             {{ EnumHelper.getDescriptionByValue(RoleDescription, record[column.dataIndex]) }}
           </template>
           <template v-else-if="column.dataIndex === 'action'">
-            <a-button size="small" type="link" @click="() => {currentUserId = record['userId'];setDrawerVisible(true); }">
+            <a-button size="small" type="link" @click="() => { setDrawerVisible(true, record['userId']); }">
               详情
+            </a-button>
+            <a-button v-show="record['role'] == RoleEnum.STUDENT || record['userId'] == accountStore.user.userId" size="small" type="link" @click="() => { setModalVisible(true, record['userId']); }">
+              修改密码
             </a-button>
           </template>
         </template>
       </a-table>
     </div>
   </div>
-  <a-drawer
-    title="用户编辑"
-    placement="right"
-    :open="drawerVisible"
-    :destroyOnClose="true"
-    @close="()=>{setDrawerVisible(false);UserGridQuery();}"
-    :width="600"
-  >
-    <UserEdit :user-id="currentUserId"></UserEdit>
+  <a-modal v-model:open="modalVisible" width="600px" title="" centered :maskClosable="false" :closable="false" :footer="null" :bodyStyle="{ height: '288px' }">
+    <PasswordEdit :user-id="currentUserId" @save-success="saveSuccess" @cancel="setModalVisible(false)"></PasswordEdit>
+  </a-modal>
+  <a-drawer title="用户编辑" placement="right" :open="drawerVisible" :destroyOnClose="true"
+    @close="() => { setDrawerVisible(false); }" :width="600">
+    <UserEdit :user-id="currentUserId" @save-success="saveSuccess"></UserEdit>
   </a-drawer>
 </template>
 
@@ -70,10 +67,13 @@ import type { TableQueryModelWithData } from "@/models/common/TableQueryModel";
 import type { DataList } from "@/models/common/DataList";
 import { UserColumns, type UserQueryRow } from "@/models/user/UserQueryRow";
 import UserEdit from '@/components/user/UserEdit.vue';
+import PasswordEdit from '@/components/user/PasswordEdit.vue';
 import { EnumHelper } from '@/utils/EnumHelper';
 import { GerderDescription } from '@/enums/GerderEnum';
-import { RoleDescription } from '@/enums/RoleEnum';
+import { RoleDescription, RoleEnum } from '@/enums/RoleEnum';
+import { useAccountStore } from "@/stores/accountStore";
 
+const accountStore = useAccountStore();
 const tableContainer = ref<any>();
 const tableHeight = computed(() => {
   return tableContainer.value?.clientHeight - 150;
@@ -100,7 +100,7 @@ const UserGridQuery = async () => {
   }
 }
 
-onMounted(()=>{
+onMounted(() => {
   UserGridQuery();
 })
 
@@ -124,8 +124,8 @@ const columns = computed(() => {
     )
   });
   columns.forEach((item) => {
-    if (item.dataIndex == 'account' || item.dataIndex == 'userName' || item.dataIndex == 'mobile'){
-      item.fixed ='left';
+    if (item.dataIndex == 'account' || item.dataIndex == 'userName' || item.dataIndex == 'mobile') {
+      item.fixed = 'left';
     }
   })
   columns.push({
@@ -165,10 +165,29 @@ const pagination = computed(() => {
 });
 //#endregion
 
+//弹框
+const modalVisible = ref<boolean>(false);
+const setModalVisible = (open: boolean, userId: string = '') => {
+  modalVisible.value = open;
+  if (open) {
+    currentUserId.value = userId
+  } else {
+  }
+};
 //抽屉
 const drawerVisible = ref<boolean>(false);
-  const setDrawerVisible = (open: boolean) => {
-    drawerVisible.value = open;
+const setDrawerVisible = (open: boolean, userId: string = '') => {
+  drawerVisible.value = open;
+  if (open) {
+    currentUserId.value = userId
+  } else {
+    UserGridQuery();
+  }
 };
 const currentUserId = ref<string>("")
+
+const saveSuccess = () => {
+  setDrawerVisible(false);
+  setModalVisible(false);
+}
 </script>

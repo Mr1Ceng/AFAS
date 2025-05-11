@@ -46,6 +46,9 @@
       </a-layout>
     </a-layout>
   </a-layout>
+  <a-modal v-model:open="modalVisible" width="600px" title="" centered :maskClosable="false" :closable="false" :footer="null" :bodyStyle="{ height: '288px' }">
+    <PasswordEdit :user-id="currentUserId" @save-success="saveSuccess" @cancel="setModalVisible(false)"></PasswordEdit>
+  </a-modal>
 </template>
 
 <script lang="ts" setup>
@@ -54,8 +57,9 @@ defineOptions({
 });
 import { watch, h, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-//import apiClient from '@/utils/ApiClientHelper';
+import apiClient from '@/utils/ApiClientHelper';
 import { useMenuStore } from '@/stores/menuStore';
+import PasswordEdit from '@/components/user/PasswordEdit.vue';
 import {
   MailOutlined,
   CalendarOutlined,
@@ -139,6 +143,11 @@ const menuList = ref([
           title: '测评试卷管理',
         },
         {
+          key: 'S_SpiralMaze',
+          label: '漩涡迷宫配置管理',
+          title: '漩涡迷宫配置管理',
+        },
+        {
           key: 'S_Standard',
           label: '测评标准管理',
           title: '测评标准管理',
@@ -169,24 +178,40 @@ watch(openKeys, async (newValue, oldValue) => {
 //#endregion
 
 const logout = async () => {
-  accountStore.setToken("")
-  accountStore.setUser({})
-  router.push({ name: 'login', params: {} })
-  // try {
-  //   const response = await apiClient.post('/Account/WebAppLogout')
-  //   console.log('响应:', response)
-  //   if (response.status == 1) {
-  //     accountStore.setToken("")
-  //     accountStore.setUser({})
-  //     router.push({ name: 'login', params: {} })
-  //   }
-  // } catch (error) {
-  //   console.error('请求失败:', error)
-  // }
+  // accountStore.setToken("")
+  // accountStore.setUser({})
+  // router.push({ name: 'login', params: {} })
+  try {
+    const response = await apiClient.post('/Account/WebAppLogout')
+    console.log('响应:', response)
+    if (response.status == 1) {
+      accountStore.setToken("")
+      accountStore.setUser({})
+      router.push({ name: 'login', params: {} })
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+  }
 }
 
 const changePassword = () => {
   message.info("如需修改密码，请联系管理员！");
+  setModalVisible(true,accountStore.user.userId);
+}
+
+//弹框
+const currentUserId = ref<string>("")
+const modalVisible = ref<boolean>(false);
+const setModalVisible = (open: boolean, userId: string = '') => {
+  modalVisible.value = open;
+  if (open) {
+    currentUserId.value = userId
+  } else {
+  }
+};
+const saveSuccess = () => {
+  setModalVisible(false);
+  logout()
 }
 </script>
 

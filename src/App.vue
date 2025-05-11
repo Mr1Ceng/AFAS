@@ -6,7 +6,6 @@ import { useGlobalStore } from "@/stores/globalStore";
 import zhCN from 'ant-design-vue/es/locale/zh_CN';
 import dayjs from 'dayjs';
 import 'dayjs/locale/zh-cn';
-import DefaultLayout from './layout/components/default.vue';
 
 dayjs.locale('zh-cn');
 const globalStore = useGlobalStore();
@@ -31,8 +30,10 @@ provide("isDev", isDev);
 </script>
 
 <template>
-  <a-config-provider :theme="{ token: { fontSize: 16 }, algorithm: currentAlgorithm }" :locale="zhCN">
-    <RouterView :data-doc-theme="globalStore.isDarktheme ? 'dark' : 'light'" />
+  <a-config-provider :theme="{ token: { fontSize: 16 }, algorithm: currentAlgorithm }" :locale="zhCN"  >
+    <div class="w-full h-full" :data-doc-theme="globalStore.isDarktheme ? 'dark' : 'light'">
+      <RouterView />
+    </div>
   </a-config-provider>
 </template>
 

@@ -15,6 +15,11 @@ const routes: RouteRecordRaw = {
       component: () => import('@/views/settingManager/questionnaire/Index.vue')
     },
     {
+      path: 'questionnaire/spiramaze',
+      name: 'S_SpiralMaze',
+      component: () => import('@/views/settingManager/questionnaire/SpiralMazeIndex.vue')
+    },
+    {
       path: 'questionnaire/standard',
       name: 'S_Standard',
       component: () => import('@/views/settingManager/questionnaire/Standard.vue')

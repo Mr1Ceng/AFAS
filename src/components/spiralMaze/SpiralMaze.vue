@@ -8,10 +8,10 @@
           <label for="spacing">漩涡间距:</label>
         </a-col>
         <a-col :span="12">
-          <a-slider v-model:value="spacing" :min="1" :max="10" :step="1" />
+          <a-slider v-model:value="spacing" :min="20" :max="50" :step="1" />
         </a-col>
         <a-col :span="4">
-          <a-input-number v-model:value="spacing" :min="1" :max="10" style="margin-left: 16px" />
+          <a-input-number v-model:value="spacing" :min="20" :max="50" style="margin-left: 16px" disabled/>
         </a-col>
       </a-row>
       <a-row :justify="'center'">
@@ -22,7 +22,7 @@
           <a-slider v-model:value="perturbation" :min="0" :max="30" :step="1" />
         </a-col>
         <a-col :span="4">
-          <a-input-number v-model:value="perturbation" :min="0" :max="30" style="margin-left: 16px" />
+          <a-input-number v-model:value="perturbation" :min="0" :max="30" style="margin-left: 16px" disabled/>
         </a-col>
       </a-row>
     </div>
@@ -41,7 +41,7 @@ export default {
     width: { type: Number, default: 800 },
     height: { type: Number, default: 600 },
   },
-  emits: ["update-cross-count", "update-error-count", "started", "finished", "getQuestionImage", "getAnswerImage"],
+  emits: ["update-cross-count", "update-error-count", "started", "finished", "getQuestionImage", "getAnswerImage","getSetting"],
   setup(props, { emit }) {
     const canvasRef = ref<HTMLCanvasElement | null>(null);
     const questionImage = ref<string>("");
@@ -54,13 +54,13 @@ export default {
     let mousePath: { x: number; y: number }[] = [];
     let hasTouched = false; // 用于防止重复计数
     const layers = 10; // 固定漩涡层数为10层
-    const spiral = ref({ a: 1, b: spacing.value }); // 螺旋间距参数
+    const spiral = ref({ a: 1, b: spacing.value *0.1 + 2}); // 螺旋间距参数
     const startCircle = { x: props.width / 2, y: props.height / 2, r: 15 }; // 起始位置圆
     const endCircle = { x: 0, y: 0, r: 15 }; // 结束位置圆（动态生成）
     let spiralPath: { x: number; y: number }[] = []; // 用于存储生成的光滑漩涡路径
 
     function updateEndCircle() {
-      const theta = Math.PI * layers * 2;
+      const theta = Math.PI * layers*2;
       const r = spiral.value.a + spiral.value.b * theta;
       endCircle.x = props.width / 2 + r * Math.cos(theta);
       endCircle.y = props.height / 2 + r * Math.sin(theta);
@@ -191,8 +191,16 @@ export default {
     });
 
     watch([spacing, perturbation], () => {
-      spiral.value.b = spacing.value;
+      spiral.value.b = spacing.value * 0.1 + 2;
       reDraw();
+      emit("getSetting", spacing.value,perturbation.value);
+    });
+
+    watch(()=>props.initialSpacing, (newValue, oldValue) => {
+      spacing.value = newValue
+    });
+    watch(()=>props.initialPerturbation, (newValue, oldValue) => {
+      perturbation.value = newValue
     });
 
 

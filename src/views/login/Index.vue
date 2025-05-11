@@ -27,7 +27,6 @@ const login = async () => {
     if (response.status == 1) {
       accountStore.setToken(getAuthorizationString(response.data.userId, response.data.token.value))
       accountStore.setUser(response.data.user)
-      //console.log(globalStore.token)
       if (response.data.user.isStaff) {
         router.push({ name: 'Q_Query', params: {} })
       } else {
