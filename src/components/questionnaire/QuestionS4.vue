@@ -40,10 +40,38 @@ const GetQuestionS4 = async () => {
   }
 }
 GetQuestionS4();
+const spiralMazeSetting = ref<any>({});
+const GetSpiralMazeSetting = async () => {
+  try {
+    console.log(accountStore.user)
+    const response = await apiClient.post('/SpiralMaze/GetSpiralMaze/' + accountStore.user.age)
+    console.log('响应:', response)
+    if (response.status == 1) {
+      spiralMazeSetting.value = response.data
+      if (spiralMazeSetting.value.age != 0) {
+        spacing.value = spiralMazeSetting.value.spacing;
+        perturbation.value = spiralMazeSetting.value.perturbation;
+      }
+    } else {
+      message.error(`获取题目信息失败，请联系工作人员！`);
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+  }
+}
+GetSpiralMazeSetting();
 
 const SaveAnswerS4 = async () => {
-  if(!isComplete.value){
+  if (!isComplete.value) {
     message.info("请先完成题目，再提交！")
+    return;
+  }
+  if (accountStore.user.userId == "") {
+    message.error("用户登录错误，请重新登录");
+    return;
+  }
+  if (accountStore.user.isStaff) {
+    message.error("请用学生账号登录");
     return;
   }
   try {
@@ -156,6 +184,10 @@ const getModalInfo = computed(() => {
   const column: string = (stepIndex.value == 0 ? 'instruction' : 'instruction' + (stepIndex.value + 1)).toString();
   return formattedText(questionInfo.value[column])
 })
+const getTipInfo = computed(() => {
+  const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
+  return formattedText(questionInfo.value[column])
+})
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -166,7 +198,7 @@ const modalOkClick = () => {
   if (stepIndex.value == 0) {
     startTimer();
     canChanges.value = false;
-    if(spiralMaze.value){
+    if (spiralMaze.value) {
       spiralMaze.value.reDraw();
     }
   }
@@ -177,10 +209,10 @@ const modalOkClick = () => {
 // #endregion
 
 // #region 漩涡
-const spacing = ref(5);
-const perturbation = ref(20);
+const spacing = ref(25);
+const perturbation = ref(15);
 const spiralMazeContainer = ref<any>();
-const spiralMaze= ref<any>();
+const spiralMaze = ref<any>();
 const spiralMazeHeight = computed(() => {
   return spiralMazeContainer.value?.clientHeight - 150;
 });
@@ -219,29 +251,35 @@ const finished = (count: number) => {
       确认
     </a-button>
   </a-flex>
-  <a-flex v-show="modalVisible && stepIndex==0" class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="modalVisible && stepIndex == 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <div ref="spiralMazeContainer" class="w-full flex-auto" >
+      <div ref="spiralMazeContainer" class="w-full flex-auto">
 
       </div>
       <div class="w-full" style="height: 100px;">
-        
+
       </div>
     </a-flex>
     <div class="h-full " style="width: 400px;">
     </div>
   </a-flex>
-  <a-flex v-show="stepIndex>=1" class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="stepIndex >= 1" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <div v-show="stepIndex==1" class="w-full flex-auto flex flex-col justify-center items-center bg-white" >
-        <SpiralMaze  ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight"
-          @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
-          @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
+      <div class="w-full border-b-2 border-gray-300 pb-2">
+        <span class="text-lg">
+          <div v-html="getTipInfo"></div>
+        </span>
+      </div>
+      <div v-show="stepIndex == 1" class="w-full flex-auto flex flex-col justify-center items-center bg-white">
+        <SpiralMaze ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation"
+          :width="spiralMazeWidth" :height="spiralMazeHeight" @update-cross-count="handleCrossUpdate"
+          @update-error-count="handleErrorUpdate" @started="started" @finished="finished"
+          @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
       </div>
       <div class="w-full flex-auto flex justify-center items-center bg-white">
-        <img v-show="stepIndex>1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
+        <img v-show="stepIndex > 1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
         <div class="text-lg">注意事项：</div>

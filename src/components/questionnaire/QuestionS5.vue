@@ -46,8 +46,16 @@ const GetQuestionS5 = async () => {
 GetQuestionS5();
 
 const SaveAnswerS5 = async () => {
-  if(!isComplete.value){
+  if (!isComplete.value) {
     message.info("请先完成题目，再提交！")
+    return;
+  }
+  if (accountStore.user.userId == "") {
+    message.error("用户登录错误，请重新登录");
+    return;
+  }
+  if (accountStore.user.isStaff) {
+    message.error("请用学生账号登录");
     return;
   }
   try {
@@ -165,7 +173,7 @@ const Completed = () => {
   timeConsume.value = maxMin * 60 + 60 - seconds.value;
   console.log(timeConsume.value)
   stopTimer();
-  const isComplete = ref(false);
+  isComplete.value = true;
   setModalVisible(true);
 }
 
@@ -176,6 +184,10 @@ const Completed = () => {
 const stepIndex = ref<number>(0);
 const getModalInfo = computed(() => {
   const column: string = (stepIndex.value == 0 ? 'instruction' : 'instruction' + (stepIndex.value + 1)).toString();
+  return formattedText(questionInfo.value[column])
+})
+const getTipInfo = computed(() => {
+  const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
 const modalVisible = ref<boolean>(false);
@@ -269,6 +281,11 @@ onUnmounted(() => {
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
+      <div class="w-full border-b-2 border-gray-300 pb-2">
+        <span class="text-lg">
+          <div v-html="getTipInfo"></div>
+        </span>
+      </div>
       <div ref="containerRef" class="w-full flex flex-auto justify-around items-center bg-white">
         <img v-show="stepIndex == 1" :src="questionImage" class="w-full" height="auto" />
         <canvas v-show="stepIndex == 2" ref="canvasRef" class="bg-white"></canvas>

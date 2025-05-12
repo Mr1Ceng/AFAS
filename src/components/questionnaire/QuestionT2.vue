@@ -17,7 +17,7 @@ const isComplete = ref(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
-const baseURL = globalStore.baseURL;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 console.log(answerStore)
 // #region 接口
 
@@ -58,8 +58,16 @@ const GetAudioUrl = (fileName: string) => {
 GetQuestionT2();
 
 const SaveAnswerT2 = async () => {
-  if(!isComplete.value){
+  if (!isComplete.value) {
     message.info("请先完成题目，再提交！")
+    return;
+  }
+  if (accountStore.user.userId == "") {
+    message.error("用户登录错误，请重新登录");
+    return;
+  }
+  if (accountStore.user.isStaff) {
+    message.error("请用学生账号登录");
     return;
   }
   try {
@@ -179,12 +187,12 @@ const playAudio = (index: number, type: string) => {
   if (type == "Diff") {
     if (AudioDiffRefs.value[index]) {
       AudioDiffRefs.value[index].play();
-      if(!isDev) canPlay.value = false;
+      if (!isDev) canPlay.value = false;
     }
   } else {
     if (AudioSameRefs.value[index]) {
       AudioSameRefs.value[index].play();
-      if(!isDev) canPlay.value = false;
+      if (!isDev) canPlay.value = false;
     }
   }
 }
@@ -202,7 +210,6 @@ const getAnswerList = (questionSort: number) => {
 const Completed = () => {
   console.log(bQuestionT2QList)
   isComplete.value = true;
-  stepIndex.value++;
   CurrQuestionSort.value++;
 }
 
@@ -213,6 +220,10 @@ const Completed = () => {
 const stepIndex = ref<number>(0);
 const getModalInfo = computed(() => {
   const column: string = (stepIndex.value == 0 ? 'instruction' : 'instruction' + (stepIndex.value + 1)).toString();
+  return formattedText(questionInfo.value[column])
+})
+const getTipInfo = computed(() => {
+  const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
 const modalVisible = ref<boolean>(false);
@@ -316,6 +327,11 @@ const openNotification = (message: string) => {
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
+      <div class="w-full border-b-2 border-gray-300 pb-2">
+        <span class="text-lg">
+          <div v-html="getTipInfo"></div>
+        </span>
+      </div>
       <div class="w-full flex flex-auto flex-col justify-start items-center">
         <div class="w-full flex flex-col justify-between p-4">
           <div class="w-full text-xl flex items-start pb-2 border-b-1 border-gray-300">
@@ -346,11 +362,11 @@ const openNotification = (message: string) => {
             <div class="h-14 w-40 pl-4 flex items-center">
               <a-button v-if="questionIndex + 1 == answerInfo.number1"
                 :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;} setModalVisible(true) }">
+                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } setModalVisible(true) }">
                 完成
               </a-button>
               <a-button v-else :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;} playAudio(questionIndex + 1, 'Diff') }">
+                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } playAudio(questionIndex + 1, 'Diff') }">
                 下一题
               </a-button>
             </div>
@@ -382,11 +398,11 @@ const openNotification = (message: string) => {
             <div class="h-14 w-40 pl-4 flex items-center">
               <a-button v-if="questionIndex + 1 == answerInfo.number2"
                 :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;}  setModalVisible(true) }">
+                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } setModalVisible(true) }">
                 完成
               </a-button>
               <a-button v-else :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if(!question.questionA){ message.info('请先完成答题！'); return;} playAudio(questionIndex + 1, 'Same') }">
+                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } playAudio(questionIndex + 1, 'Same') }">
                 下一题
               </a-button>
             </div>

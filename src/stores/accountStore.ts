@@ -12,6 +12,7 @@ export const useAccountStore = defineStore("account", {
       nickName: '',
       avatarUrl: '',
       gender: '',
+      age: 0,
       mobile: '',
       isDeveloper: false,
       isStaff: false,

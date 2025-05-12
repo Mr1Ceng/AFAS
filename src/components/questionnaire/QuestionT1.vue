@@ -19,7 +19,7 @@ const isComplete = ref(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
-const baseURL = globalStore.baseURL;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 console.log(answerStore)
 // #region 接口
 
@@ -62,8 +62,16 @@ const GetAudioUrl = (fileName: string) => {
 GetQuestionT1();
 
 const SaveAnswerT1 = async () => {
-  if(!isComplete.value){
+  if (!isComplete.value) {
     message.info("请先完成题目，再提交！")
+    return;
+  }
+  if (accountStore.user.userId == "") {
+    message.error("用户登录错误，请重新登录");
+    return;
+  }
+  if (accountStore.user.isStaff) {
+    message.error("请用学生账号登录");
     return;
   }
   try {
@@ -185,19 +193,19 @@ const playAudio = (type: string) => {
     case "Number1":
       if (number1Audio.value) {
         number1Audio.value.play();
-        if(!isDev) canPlay.value = false;
+        if (!isDev) canPlay.value = false;
       }
       break;
     case "Number2":
       if (number2Audio.value) {
         number2Audio.value.play();
-        if(!isDev) canPlay.value = false;
+        if (!isDev) canPlay.value = false;
       }
       break;
     case "Story":
       if (storyAudio.value) {
         storyAudio.value.play();
-        if(!isDev) canPlay.value = false;
+        if (!isDev) canPlay.value = false;
       }
       break;
     default:
@@ -233,28 +241,28 @@ const getAnswerList = (questionSort: number) => {
 const nextClick = () => {
   switch (stepIndex.value) {
     case 1:
-      if (!canPlay.value||!number1Question.value.questionA) {
+      if (!canPlay.value || !number1Question.value.questionA) {
         message.info("请先完成答题！")
-        return; 
+        return;
       }
-      number1Question.value.timeConsume = seconds.value; 
+      number1Question.value.timeConsume = seconds.value;
       break;
     case 2:
-      if (!canPlay.value||!number2Question.value.questionA)  {
+      if (!canPlay.value || !number2Question.value.questionA) {
         message.info("请先完成答题！")
-        return; 
+        return;
       }
-      number2Question.value.timeConsume = seconds.value; 
+      number2Question.value.timeConsume = seconds.value;
       break;
     default:
       break;
   }
-  setModalVisible(true); 
+  setModalVisible(true);
   resetTimer();
 }
 
 const Completed = () => {
-  if(!number3Question.value?.questionA || (storyQuestion.value.some((item: any) => !("questionA" in item)))){
+  if (!number3Question.value?.questionA || (storyQuestion.value.some((item: any) => !("questionA" in item)))) {
     message.info("请先完成答题！");
     return;
   }
@@ -270,6 +278,10 @@ const Completed = () => {
 const stepIndex = ref<number>(0);
 const getModalInfo = computed(() => {
   const column: string = (stepIndex.value == 0 ? 'instruction' : 'instruction' + (stepIndex.value + 1)).toString();
+  return formattedText(questionInfo.value[column])
+})
+const getTipInfo = computed(() => {
+  const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
 const modalVisible = ref<boolean>(false);
@@ -355,6 +367,11 @@ const openNotification = (message: string) => {
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
+      <div class="w-full border-b-2 border-gray-300 pb-2">
+        <span class="text-lg">
+          <div v-html="getTipInfo"></div>
+        </span>
+      </div>
       <div class="w-full flex flex-auto flex-col justify-start items-center">
         <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300 rounded-xl"
           :class="stepIndex == 1 ? 'bg-blue-100' : ''">
@@ -370,8 +387,7 @@ const openNotification = (message: string) => {
               controls controlsList="nodownload noplaybackrate"></audio>
           </div>
           <div class="h-10 w-40 pl-4">
-            <a-button :disabled="stepIndex != 1" size="large"
-              @click="() => { nextClick() }">
+            <a-button :disabled="stepIndex != 1" size="large" @click="() => { nextClick() }">
               下一题
             </a-button>
           </div>
@@ -390,8 +406,7 @@ const openNotification = (message: string) => {
               controls controlsList="nodownload noplaybackrate"></audio>
           </div>
           <div class="h-10 w-40 pl-4">
-            <a-button :disabled="stepIndex != 2" size="large"
-              @click="() => { nextClick() }">
+            <a-button :disabled="stepIndex != 2" size="large" @click="() => { nextClick() }">
               下一题
             </a-button>
           </div>

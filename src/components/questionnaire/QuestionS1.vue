@@ -42,8 +42,16 @@ const GetQuestionS1 = async () => {
 GetQuestionS1();
 
 const SaveAnswerS1 = async () => {
-  if(!isComplete.value){
+  if (!isComplete.value) {
     message.info("请先完成题目，再提交！")
+    return;
+  }
+  if (accountStore.user.userId == "") {
+    message.error("用户登录错误，请重新登录");
+    return;
+  }
+  if (accountStore.user.isStaff) {
+    message.error("请用学生账号登录");
     return;
   }
   try {
@@ -200,6 +208,10 @@ const getModalInfo = computed(() => {
   const column: string = (stepIndex.value == 0 ? 'instruction' : 'instruction' + (stepIndex.value + 1)).toString();
   return formattedText(questionInfo.value[column])
 })
+const getTipInfo = computed(() => {
+  const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
+  return formattedText(questionInfo.value[column])
+})
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -250,6 +262,11 @@ const modalOkClick = () => {
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
+      <div class="w-full border-b-2 border-gray-300 pb-2">
+        <span class="text-lg">
+          <div v-html="getTipInfo"></div>
+        </span>
+      </div>
       <a-flex class="w-full flex-auto" :justify="'space-between'" :align="'flex-start'">
         <a-flex class="h-full w-5/12" :vertical="true" :align="'center'">
           <span class="text-2xl text-neutral-600">大图</span>
