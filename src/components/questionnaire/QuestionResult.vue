@@ -394,7 +394,7 @@ const CreateTestReport = async () => {
 
 <template>
   <div class="w-full h-full flex flex-row">
-    <div class="h-full w-[calc(100%-400px)] pl-4 pr-4 flex">
+    <div class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll flex">
       <div class="w-3/5 h-full">
         <EChart :options="chartOptions" @get-image-url="(image: string) => { GetImageUrl(image, 'radarImage') }" />
       </div>

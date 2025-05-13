@@ -8,6 +8,7 @@ import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
 import { useAccountStore } from "@/stores/accountStore";
+import { CaretRightOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -292,6 +293,8 @@ const getTipInfo = computed(() => {
   const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
+
+const activeKey = ref(['1']);
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -345,7 +348,7 @@ const openNotification = (message: string) => {
             <span class="pl-4">{{ `${questionLevel}` }}</span>
           </div>
           <div class="w-[calc(100%-80px)] flex pb-1 pt-1 rounded-xl"
-            :class="(currQuestionType && currQuestionLevel == questionLevel ? 'bg-blue-100' : '')">
+            :class="(currQuestionType && currQuestionLevel == questionLevel ? 'row-striped' : '')">
             <div class="w-1/2 h-full pl-2 pr-2" v-for="(question, questionIndex) in 2">
               <div class="w-full h-full flex justify-center items-center rounded-2xl">
                 <div v-show="(currQuestionType && currQuestionLevel == questionLevel && currQuestionSort == question)"
@@ -397,12 +400,17 @@ const openNotification = (message: string) => {
     </a-button>
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
-      <div class="w-full border-b-2 border-gray-300 pb-2">
-        <span class="text-lg">
-          <div v-html="getTipInfo"></div>
-        </span>
-      </div>
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
+      <a-collapse v-model:activeKey="activeKey" :bordered="false" style="">
+        <template #expandIcon="{ isActive }">
+          <caret-right-outlined :rotate="isActive ? 90 : 0" />
+        </template>
+        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <span class="text-base">
+            <div v-html="getTipInfo"></div>
+          </span>
+        </a-collapse-panel>
+      </a-collapse>
       <div class="w-full flex flex-auto flex-row justify-start items-center">
         <div class="w-1/2 h-full flex flex-col p-4 pt-0">
           <div class="w-full h-14 text-xl flex items-center pb-2 pt-2 border-b-1 border-gray-300">
@@ -419,8 +427,8 @@ const openNotification = (message: string) => {
             <div class="w-20 text-xl flex items-center">
               <span class="pl-4">{{ `${questionLevel.key}` }}</span>
             </div>
-            <div class="w-[calc(100%-80px)] flex pb-1 pt-1 rounded-xl"
-              :class="(currQuestionType && currQuestionLevel == questionLevel.key ? 'bg-blue-100' : '')">
+            <div class="w-[calc(100%-80px)] h-full flex pb-1 pt-1 rounded-xl"
+              :class="(currQuestionType && currQuestionLevel == questionLevel.key ? 'row-striped' : '')">
               <div class="w-1/2 h-full pl-2 pr-2" v-for="(question, questionIndex) in questionLevel.items">
                 <div class="w-full h-full flex justify-center items-center rounded-2xl"
                   v-show="!isComplete && !questionLevel.isPass && !question.answer">
@@ -431,7 +439,7 @@ const openNotification = (message: string) => {
                       @ended="onAudioEnd(question.questionSort)" controls
                       controlsList="nodownload noplaybackrate"></audio>
                     <div v-show="!question.played" style="margin-left: -40px!important;z-index: 999;">
-                      <PlayCircleOutlined :style="{ fontSize: '20px' }" class="cursor-pointer"
+                      <PlayCircleOutlined :style="{ fontSize: '20px', color: '#595959' }" class="cursor-pointer"
                         @click="playAudio(questionLevelIndex * 2 + questionIndex, currQuestionType); question.played = true;" />
                     </div>
                   </div>
@@ -464,8 +472,8 @@ const openNotification = (message: string) => {
             <div class="w-20 text-xl flex items-center">
               <span class="pl-4">{{ `${questionLevel.key}` }}</span>
             </div>
-            <div class="w-[calc(100%-80px)] flex pb-1 pt-1 rounded-xl"
-              :class="(!currQuestionType && currQuestionLevel == questionLevel.key ? 'bg-blue-100' : '')">
+            <div class="w-[calc(100%-80px)] h-full flex pb-1 pt-1 rounded-xl"
+              :class="(!currQuestionType && currQuestionLevel == questionLevel.key ? 'row-striped' : '')">
               <div class="w-1/2 h-full pl-2 pr-2" v-for="(question, questionIndex) in questionLevel.items">
                 <div class="w-full h-full flex justify-center items-center rounded-2xl"
                   v-show="!isComplete && !questionLevel.isPass && !question.answer">
@@ -476,7 +484,7 @@ const openNotification = (message: string) => {
                       @ended="onAudioEnd(question.questionSort)" controls
                       controlsList="nodownload noplaybackrate"></audio>
                     <div v-show="!question.played" style="margin-left: -40px!important;z-index: 999;">
-                      <PlayCircleOutlined :style="{ fontSize: '20px' }" class="cursor-pointer"
+                      <PlayCircleOutlined :style="{ fontSize: '20px', color: '#595959' }" class="cursor-pointer"
                         @click="playAudio(questionLevelIndex * 2 + questionIndex, currQuestionType); question.played = true;" />
                     </div>
                   </div>
@@ -501,8 +509,8 @@ const openNotification = (message: string) => {
         </a-button>
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
-        <div class="text-lg">注意事项：</div>
-        <span class="text-lg">
+        <div class="text-base">注意事项：</div>
+        <span class="text-base">
           <!-- <div v-html="formattedText(questionInfo?.precautions)"></div> -->
           {{ questionInfo?.precautions }}
         </span>
@@ -590,5 +598,13 @@ audio::-webkit-media-controls-timeline {
 .answerBtn {
   height: 60px !important;
   font-size: 30px !important;
+}
+
+[data-doc-theme='light'] .row-striped {
+  background-color: #e6f4ff;
+}
+
+[data-doc-theme='dark'] .row-striped {
+  background-color: #111a2c;
 }
 </style>

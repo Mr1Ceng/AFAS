@@ -1,6 +1,6 @@
 <template>
   <div class="h-full w-full">
-    <a-tabs :activeKey="selectedQuestion" @tabClick="handleTabClick">
+    <a-tabs class="h-full w-full" :activeKey="selectedQuestion" @tabClick="handleTabClick">
       <a-tab-pane v-for="(question, index) in questionList" :key="question.questionId" :tab="question.questionName">
         <!-- 动态加载组件 -->
         <component :is="GetComponent(question.questionCode)" :questionId="question.questionId"
@@ -31,7 +31,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watch, reactive, h,onMounted, ref, provide,onActivated,onDeactivated } from 'vue';
+import { watch, reactive, h, onMounted, ref, provide, onActivated, onDeactivated } from 'vue';
 import { useAnswerStore } from '@/stores/answerStore';
 import QuestionS1 from '@/components/questionnaire/QuestionS1.vue'
 import QuestionS2 from '@/components/questionnaire/QuestionS2.vue'

@@ -18,15 +18,10 @@
   }
 }
 
-.ant-layout {
-  display: flex;
-  width: 100%;
-  min-height: 100%;
-}
-.ant-tabs {
-  height: 100%;
-}
 .ant-tabs-content,
 .ant-tabs-tabpane {
   height: 100%;
+}
+.ant-tabs-tabpane {
+  overflow: hidden;
 }

@@ -1,5 +1,5 @@
 <template>
-  <a-layout>
+  <a-layout class="h-full">
     <a-layout-header class="header flex flex-row">
       <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
         :style="{ lineHeight: '64px' }">
@@ -24,7 +24,7 @@
             <span>( {{ accountStore.user.mobile }} )</span>
           </template>
           <a-button type="text">
-            {{ accountStore.user.userName}}
+            {{ accountStore.user.userName }}
           </a-button>
         </a-popover>
         <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }">
@@ -33,20 +33,21 @@
         </a-switch>
       </div>
     </a-layout-header>
-    <a-layout>
+    <a-layout class="flex-1">
       <a-layout-sider width="200">
         <a-menu v-model:selectedKeys="selectedKeys2" v-model:openKeys="openKeys"
           :items="menuList[selectedKeys1[0]].children" mode="inline" :style="{ height: '100%', borderRight: 0 }">
         </a-menu>
       </a-layout-sider>
-      <a-layout>
-        <a-layout-content :style="{ padding: '12px 24px 0', margin: 0, minHeight: '280px' }">
+      <a-layout class="flex-1">
+        <a-layout-content class="h-full w-full" :style="{ padding: '12px 24px 0', margin: 0, minHeight: '280px' }">
           <router-view></router-view>
         </a-layout-content>
       </a-layout>
     </a-layout>
   </a-layout>
-  <a-modal v-model:open="modalVisible" width="600px" title="" centered :maskClosable="false" :closable="false" :footer="null" :bodyStyle="{ height: '288px' }">
+  <a-modal v-model:open="modalVisible" width="600px" title="" centered :maskClosable="false" :closable="false"
+    :footer="null" :bodyStyle="{ height: '288px' }">
     <PasswordEdit :user-id="currentUserId" @save-success="saveSuccess" @cancel="setModalVisible(false)"></PasswordEdit>
   </a-modal>
 </template>
@@ -196,7 +197,7 @@ const logout = async () => {
 
 const changePassword = () => {
   message.info("如需修改密码，请联系管理员！");
-  setModalVisible(true,accountStore.user.userId);
+  setModalVisible(true, accountStore.user.userId);
 }
 
 //弹框

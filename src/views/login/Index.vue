@@ -6,7 +6,9 @@ import { useGlobalStore } from "@/stores/globalStore";
 import apiClient from '@/utils/ApiClientHelper'
 import { getAuthorizationString } from '@/utils/AuthorizationHelper'
 import router from '@/router';
+import { useMenuStore } from '@/stores/menuStore';
 const globalStore = useGlobalStore();
+const menuStore = useMenuStore()
 const isDarktheme = ref(globalStore.isDarktheme)
 const accountStore = useAccountStore();
 const account = ref<string>("");
@@ -28,8 +30,10 @@ const login = async () => {
       accountStore.setToken(getAuthorizationString(response.data.userId, response.data.token.value))
       accountStore.setUser(response.data.user)
       if (response.data.user.isStaff) {
+        menuStore.setter(0, ["Q_Query"], ["Q_Result"])
         router.push({ name: 'Q_Query', params: {} })
       } else {
+        menuStore.setter(0, ["Q_Test"], ["Q_Result"])
         router.push({ name: 'Q_Test', params: {} })
       }
     }

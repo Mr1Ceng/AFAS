@@ -7,6 +7,7 @@ import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
 import { useAccountStore } from "@/stores/accountStore";
+import { CaretRightOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -226,6 +227,8 @@ const getTipInfo = computed(() => {
   const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
+
+const activeKey = ref(['1']);
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -326,19 +329,24 @@ const openNotification = (message: string) => {
     </a-button>
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
-      <div class="w-full border-b-2 border-gray-300 pb-2">
-        <span class="text-lg">
-          <div v-html="getTipInfo"></div>
-        </span>
-      </div>
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
+      <a-collapse v-model:activeKey="activeKey" :bordered="false" style="">
+        <template #expandIcon="{ isActive }">
+          <caret-right-outlined :rotate="isActive ? 90 : 0" />
+        </template>
+        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <span class="text-base">
+            <div v-html="getTipInfo"></div>
+          </span>
+        </a-collapse-panel>
+      </a-collapse>
       <div class="w-full flex flex-auto flex-col justify-start items-center">
         <div class="w-full flex flex-col justify-between p-4">
           <div class="w-full text-xl flex items-start pb-2 border-b-1 border-gray-300">
             找不同
           </div>
           <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
-            :class="CurrQuestionSort == question.questionSort ? 'bg-blue-100' : ''"
+            :class="CurrQuestionSort == question.questionSort ? 'row-striped' : ''"
             v-for="(question, questionIndex) in questionDiffList">
             <div class="h-14 w-80 text-xl flex items-center">
               <span class="pr-4">{{ `${question.questionSort}:` }}</span>
@@ -351,7 +359,7 @@ const openNotification = (message: string) => {
                 <div class="h-full w-36 text-xl flex items-start"
                   v-for="answer in getAnswerList(question.questionSort)">
                   <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2"
-                    :class="isComplete ? (answer.isTrue ? 'bg-green-500' : '') : ''">
+                    :class="isComplete ? (answer.isTrue ? 'answer-true' : '') : ''">
                     <a-checkbox class="text-xl" :disabled="CurrQuestionSort != question.questionSort"
                       :value="answer.answerSort">
                       {{ `${answer.answerSort}: ${answer.answer}` }}</a-checkbox>
@@ -375,7 +383,7 @@ const openNotification = (message: string) => {
             找相同
           </div>
           <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300 rounded-xl"
-            :class="CurrQuestionSort == question.questionSort ? 'bg-blue-100' : ''"
+            :class="CurrQuestionSort == question.questionSort ? 'row-striped' : ''"
             v-for="(question, questionIndex) in questionSameList">
             <div class="h-14 w-80 text-xl flex items-center">
               <span class="pr-4">{{ `${question.questionSort}:` }}</span>
@@ -388,7 +396,7 @@ const openNotification = (message: string) => {
                 <div class="h-full w-36 text-xl flex items-start"
                   v-for="answer in getAnswerList(question.questionSort)">
                   <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2"
-                    :class="isComplete ? (answer.isTrue ? 'bg-green-500' : '') : ''">
+                    :class="isComplete ? (answer.isTrue ? 'answer-true' : '') : ''">
                     <a-checkbox :disabled="CurrQuestionSort != question.questionSort" :value="answer.answerSort">
                       {{ `${answer.answerSort}: ${answer.answer}` }}</a-checkbox>
                   </div>
@@ -410,8 +418,8 @@ const openNotification = (message: string) => {
         </div>
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
-        <div class="text-lg">注意事项：</div>
-        <span class="text-lg">
+        <div class="text-base">注意事项：</div>
+        <span class="text-base">
           <!-- <div v-html="formattedText(questionInfo?.precautions)"></div> -->
           {{ questionInfo?.precautions }}
         </span>
@@ -499,5 +507,21 @@ audio::-webkit-media-controls-seek-back-button,
 audio::-webkit-media-controls-seek-forward-button,
 audio::-webkit-media-controls-timeline {
   pointer-events: none;
+}
+
+[data-doc-theme='light'] .row-striped {
+  background-color: #e6f4ff;
+}
+
+[data-doc-theme='dark'] .row-striped {
+  background-color: #111a2c;
+}
+
+[data-doc-theme='light'] .answer-true {
+  background-color: var(--color-green-500)
+}
+
+[data-doc-theme='dark'] .answer-true {
+  background-color: var(--color-green-950)
 }
 </style>

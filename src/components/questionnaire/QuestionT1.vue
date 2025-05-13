@@ -7,6 +7,7 @@ import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
 import { useAccountStore } from "@/stores/accountStore";
+import { CaretRightOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -284,6 +285,8 @@ const getTipInfo = computed(() => {
   const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
+
+const activeKey = ref(['1']);
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -324,7 +327,7 @@ const openNotification = (message: string) => {
   <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
     <a-flex class="w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
       <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-10 border-b-1 border-gray-300 rounded-xl"
-        :class="stepIndex == 1 ? 'bg-blue-100' : ''">
+        :class="stepIndex == 1 ? 'row-striped' : ''">
         <div class="h-10 w-80 text-xl flex items-center">
           1: 数字“X”出现的次数？
         </div>
@@ -342,7 +345,7 @@ const openNotification = (message: string) => {
         </div>
       </div>
       <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-30 border-b-1 border-gray-300 rounded-xl"
-        :class="stepIndex == 1 ? 'bg-blue-100' : ''">
+        :class="stepIndex == 1 ? 'row-striped' : ''">
         <div class="h-10 w-80 text-xl flex items-center">
           2: 数字“Y”出现的次数？
         </div>
@@ -366,15 +369,20 @@ const openNotification = (message: string) => {
     </a-button>
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
-      <div class="w-full border-b-2 border-gray-300 pb-2">
-        <span class="text-lg">
-          <div v-html="getTipInfo"></div>
-        </span>
-      </div>
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
+      <a-collapse v-model:activeKey="activeKey" :bordered="false" style="">
+        <template #expandIcon="{ isActive }">
+          <caret-right-outlined :rotate="isActive ? 90 : 0" />
+        </template>
+        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <span class="text-base">
+            <div v-html="getTipInfo"></div>
+          </span>
+        </a-collapse-panel>
+      </a-collapse>
       <div class="w-full flex flex-auto flex-col justify-start items-center">
         <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300 rounded-xl"
-          :class="stepIndex == 1 ? 'bg-blue-100' : ''">
+          :class="stepIndex == 1 ? 'row-striped' : ''">
           <div class="h-10 w-80 text-xl flex items-center">
             {{ number1Question.questionSort + ": " + number1Question?.questionQ }}
           </div>
@@ -393,7 +401,7 @@ const openNotification = (message: string) => {
           </div>
         </div>
         <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 border-b-1 border-gray-300 rounded-xl"
-          :class="stepIndex == 2 ? 'bg-blue-100' : ''">
+          :class="stepIndex == 2 ? 'row-striped' : ''">
           <div class="h-10 w-80 text-xl flex items-center">
             {{ number2Question.questionSort + ": " + number2Question?.questionQ }}
           </div>
@@ -411,7 +419,7 @@ const openNotification = (message: string) => {
             </a-button>
           </div>
         </div>
-        <div class="w-full flex felx-row items-center p-4 rounded-t-xl" :class="stepIndex == 3 ? 'bg-blue-100' : ''">
+        <div class="w-full flex felx-row items-center p-4 rounded-t-xl" :class="stepIndex == 3 ? 'row-striped' : ''">
           <div class="h-10 w-80 text-xl flex items-center">
             {{ number3Question.questionSort + ": " + number3Question?.questionQ }}
           </div>
@@ -425,7 +433,7 @@ const openNotification = (message: string) => {
           </div>
         </div>
         <div class="w-full flex felx-row items-start p-4 border-b-1 border-gray-300 rounded-b-xl"
-          :class="stepIndex == 3 ? 'bg-blue-100' : ''">
+          :class="stepIndex == 3 ? 'row-striped' : ''">
           <div class="w-[calc(100%-160px)] flex flex-col justify-between">
             <div class="w-full text-xl flex items-start pb-2" v-for="question in storyQuestion">
               <div class="h-10 w-80 text-xl flex items-center">
@@ -452,14 +460,14 @@ const openNotification = (message: string) => {
           </div>
         </div>
       </div>
-      <div class="w-1/2 flex flex-row justify-around items-center" style="height: 50px;">
+      <div class="w-full flex flex-row justify-around items-center" style="height: 50px;">
         <a-button type="primary" @click="Completed(); number3Question.timeConsume = seconds; resetTimer();">
           完成
         </a-button>
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
-        <div class="text-lg">注意事项：</div>
-        <span class="text-lg">
+        <div class="text-base">注意事项：</div>
+        <span class="text-base">
           <!-- <div v-html="formattedText(questionInfo?.precautions)"></div> -->
           {{ questionInfo?.precautions }}
         </span>
@@ -558,5 +566,13 @@ audio::-webkit-media-controls-seek-back-button,
 audio::-webkit-media-controls-seek-forward-button,
 audio::-webkit-media-controls-timeline {
   pointer-events: none;
+}
+
+[data-doc-theme='light'] .row-striped {
+  background-color: #e6f4ff;
+}
+
+[data-doc-theme='dark'] .row-striped {
+  background-color: #111a2c;
 }
 </style>

@@ -6,6 +6,7 @@ import { formattedText, getProperty } from '@/utils/CommonHelper'
 
 import { useAnswerStore } from '@/stores/answerStore';
 import { useAccountStore } from "@/stores/accountStore";
+import { CaretRightOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -212,6 +213,8 @@ const getTipInfo = computed(() => {
   const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
+
+const activeKey = ref(['1']);
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -260,20 +263,26 @@ const modalOkClick = () => {
     </a-button>
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <div class="w-full border-b-2 border-gray-300 pb-2">
-        <span class="text-lg">
-          <div v-html="getTipInfo"></div>
-        </span>
-      </div>
+      <a-collapse v-model:activeKey="activeKey" :bordered="false" style="">
+        <template #expandIcon="{ isActive }">
+          <caret-right-outlined :rotate="isActive ? 90 : 0" />
+        </template>
+        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <span class="text-base">
+            <div v-html="getTipInfo"></div>
+          </span>
+        </a-collapse-panel>
+      </a-collapse>
       <a-flex class="w-full flex-auto" :justify="'space-between'" :align="'flex-start'">
         <a-flex class="h-full w-5/12" :vertical="true" :align="'center'">
           <span class="text-2xl text-neutral-600">大图</span>
           <div class="w-full aspect-square place-items-center grid grid-cols-5 p-4">
             <div class="w-full h-full border-1  place-items-center grid text-5xl cursor-pointer"
               v-for="(grid, index) in largeGridList" @click="ClickGrid(grid)"
-              :class="grid.selected ? 'bg-green-500' : ''">{{ (showGridTypes.includes("LARGE") ? grid.gridValue : '*')
+              :class="grid.selected ? 'bg-green-500' : ''">{{
+                (showGridTypes.includes("LARGE") ? grid.gridValue : '*')
               }}
             </div>
           </div>
@@ -283,8 +292,9 @@ const modalOkClick = () => {
           <div class="w-full aspect-square place-items-center grid grid-cols-5 p-4">
             <div class="w-full h-full border-1  place-items-center grid text-3xl cursor-pointer"
               v-for="(grid, index) in middleGridList" @click="ClickGrid(grid)"
-              :class="grid.selected ? 'bg-green-500' : ''">{{ (showGridTypes.includes("MIDDLE") ?
-                grid.gridValue : '*')
+              :class="grid.selected ? 'bg-green-500' : ''">{{
+                (showGridTypes.includes("MIDDLE") ?
+                  grid.gridValue : '*')
               }}
             </div>
           </div>
@@ -301,8 +311,8 @@ const modalOkClick = () => {
         </a-flex>
       </a-flex>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
-        <div class="text-lg">注意事项：</div>
-        <span class="text-lg">
+        <div class="text-base">注意事项：</div>
+        <span class="text-base">
           <!-- <div v-html="formattedText(questionInfo?.precautions)"></div> -->
           {{ questionInfo?.precautions }}
         </span>

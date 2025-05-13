@@ -7,6 +7,7 @@ import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useAccountStore } from "@/stores/accountStore";
 import SpiralMaze from '../spiralMaze/SpiralMaze.vue'
+import { CaretRightOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -188,6 +189,8 @@ const getTipInfo = computed(() => {
   const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
+
+const activeKey = ref(['1']);
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -252,7 +255,7 @@ const finished = (count: number) => {
     </a-button>
   </a-flex>
   <a-flex v-show="modalVisible && stepIndex == 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
       <div ref="spiralMazeContainer" class="w-full flex-auto">
 
@@ -265,13 +268,18 @@ const finished = (count: number) => {
     </div>
   </a-flex>
   <a-flex v-show="stepIndex >= 1" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'"
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <div class="w-full border-b-2 border-gray-300 pb-2">
-        <span class="text-lg">
-          <div v-html="getTipInfo"></div>
-        </span>
-      </div>
+      <a-collapse v-model:activeKey="activeKey" :bordered="false" style="">
+        <template #expandIcon="{ isActive }">
+          <caret-right-outlined :rotate="isActive ? 90 : 0" />
+        </template>
+        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <span class="text-base">
+            <div v-html="getTipInfo"></div>
+          </span>
+        </a-collapse-panel>
+      </a-collapse>
       <div v-show="stepIndex == 1" class="w-full flex-auto flex flex-col justify-center items-center bg-white">
         <SpiralMaze ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation"
           :width="spiralMazeWidth" :height="spiralMazeHeight" @update-cross-count="handleCrossUpdate"
@@ -282,8 +290,8 @@ const finished = (count: number) => {
         <img v-show="stepIndex > 1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
-        <div class="text-lg">注意事项：</div>
-        <span class="text-lg">
+        <div class="text-base">注意事项：</div>
+        <span class="text-base">
           <!-- <div v-html="formattedText(questionInfo?.precautions)"></div> -->
           {{ questionInfo?.precautions }}
         </span>

@@ -6,6 +6,7 @@ import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useAccountStore } from "@/stores/accountStore";
+import { CaretRightOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -190,6 +191,8 @@ const getTipInfo = computed(() => {
   const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
+
+const activeKey = ref(['1']);
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
@@ -280,12 +283,17 @@ onUnmounted(() => {
     </a-button>
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
-      <div class="w-full border-b-2 border-gray-300 pb-2">
-        <span class="text-lg">
-          <div v-html="getTipInfo"></div>
-        </span>
-      </div>
+    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
+      <a-collapse v-model:activeKey="activeKey" :bordered="false" style="">
+        <template #expandIcon="{ isActive }">
+          <caret-right-outlined :rotate="isActive ? 90 : 0" />
+        </template>
+        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <span class="text-base">
+            <div v-html="getTipInfo"></div>
+          </span>
+        </a-collapse-panel>
+      </a-collapse>
       <div ref="containerRef" class="w-full flex flex-auto justify-around items-center bg-white">
         <img v-show="stepIndex == 1" :src="questionImage" class="w-full" height="auto" />
         <canvas v-show="stepIndex == 2" ref="canvasRef" class="bg-white"></canvas>
@@ -293,7 +301,7 @@ onUnmounted(() => {
         <img v-show="stepIndex > 2" :src="questionImage" class="w-1/2" height="auto" />
         <img v-show="stepIndex > 2" :src="answerImage" class="w-1/2" height="auto" />
       </div>
-      <div class="w-1/2 flex flex-row justify-around items-center" style="height: 50px;">
+      <div class="w-full flex flex-row justify-around items-center" style="height: 50px;">
         <a-button v-show="stepIndex == 1" type="primary" @click="StartDraw()">
           开始绘图
         </a-button>
@@ -302,8 +310,8 @@ onUnmounted(() => {
         </a-button>
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
-        <div class="text-lg">注意事项：</div>
-        <span class="text-lg">
+        <div class="text-base">注意事项：</div>
+        <span class="text-base">
           <!-- <div v-html="formattedText(questionInfo?.precautions)"></div> -->
           {{ questionInfo?.precautions }}
         </span>
