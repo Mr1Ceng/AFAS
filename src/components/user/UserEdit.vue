@@ -63,7 +63,7 @@ const SaveUser = async () => {
     console.log("表单验证失败:", error);
     message.error("表单验证失败!");
     return;
-  }  
+  }
   try {
     const response = await apiClient.post('/User/SaveUser', user.value)
     console.log('响应:', response)
@@ -75,11 +75,6 @@ const SaveUser = async () => {
     console.error('请求失败:', error)
   }
 }
-
-
-const onFinishFailed = (errorInfo: any) => {
-  console.log('数据校验错误:', errorInfo);
-};
 
 onMounted(() => {
   GetUserInfo();
@@ -155,10 +150,9 @@ const validateEmpty = (fieldName: string) => {
 
 <template>
   <div class="w-full h-full p-4">
-    <a-form ref="formRef" :model="user" :layout="'horizontal'" :label-col="{ style: { width: '80px' } }"
-    @finishFailed="onFinishFailed">
+    <a-form ref="formRef" :model="user" :layout="'horizontal'" :label-col="{ style: { width: '80px' } }">
       <a-form-item v-if="user.userId" label="用户编码">
-        <a-input v-model:value="user.userId" size="large" disabled/>
+        <a-input v-model:value="user.userId" size="large" disabled />
       </a-form-item>
       <a-form-item label="用户姓名" name="userName" :rules="[{ required: true, validator: validateEmpty('用户姓名') }]">
         <a-input v-model:value="user.userName" size="large" />
@@ -167,9 +161,9 @@ const validateEmpty = (fieldName: string) => {
         <a-input v-model:value="user.nickName" size="large" />
       </a-form-item>
       <a-form-item label="用户头像">
-        <a-upload :file-list="fileList" :maxCount="1" :before-upload="beforeUpload" @remove="handleRemove" @change="handleChange"
-          list-type="picture-card">
-          <div v-if="fileList?.length==0">
+        <a-upload :file-list="fileList" :maxCount="1" :before-upload="beforeUpload" @remove="handleRemove"
+          @change="handleChange" list-type="picture-card">
+          <div v-if="fileList?.length == 0">
             <plus-outlined></plus-outlined>
             <div class="ant-upload-text">上传头像</div>
           </div>
