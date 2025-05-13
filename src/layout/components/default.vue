@@ -46,8 +46,8 @@
       </a-layout>
     </a-layout>
   </a-layout>
-  <a-modal v-model:open="modalVisible" width="600px" title="" centered :maskClosable="false" :closable="false"
-    :footer="null" :bodyStyle="{ height: '288px' }">
+  <a-modal v-model:open="modalVisible" width="600px" title="密码修改" centered :maskClosable="false" :closable="false"
+    :footer="null" :bodyStyle="{ height: '318px', paddingTop: '20px' }">
     <PasswordEdit :user-id="currentUserId" @save-success="saveSuccess" @cancel="setModalVisible(false)"></PasswordEdit>
   </a-modal>
 </template>

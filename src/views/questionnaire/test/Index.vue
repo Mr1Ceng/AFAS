@@ -4,24 +4,24 @@
       <a-card class="w-161" title="信息确认">
         <a-form ref="formRef" :layout="'horizontal'" :label-col="{ style: { width: '100px', paddingRight: '20px' } }">
           <a-form-item label="姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名">
-            <a-select :style="{ width: '300px' }" v-model:value="student.userId" size="large" disabled>
+            <a-select :style="{ width: '100%' }" v-model:value="student.userId" size="large" disabled>
               <a-select-option v-for="student in studentList" :value="student.userId">{{
                 student.userName }}</a-select-option>
             </a-select>
           </a-form-item>
           <a-form-item label="性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别">
-            <a-radio-group size="large" v-model:value="student.sex" disabled>
-              <a-radio-button :style="{ width: '150px' }" v-for="item in sexList" :value="item.value">{{
+            <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="student.gender" disabled>
+              <a-radio-button :style="{ width: '50%' }" v-for="item in sexList" :value="item.value">{{
                 item.description }}</a-radio-button>
             </a-radio-group>
           </a-form-item>
           <a-form-item label="年&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;龄">
-            <a-input-number :style="{ width: '300px' }" v-model:value="student.age" size="large" addon-after="岁"
-              :min="0" disabled />
+            <a-input-number :style="{ width: '100%' }" v-model:value="student.age" size="large" addon-after="岁" :min="0"
+              disabled />
           </a-form-item>
           <a-form-item label="评估版本">
-            <a-radio-group size="large" v-model:value="selectedQuestionnaire">
-              <a-radio-button v-for="(questionnaire, index) in questionnaireList"
+            <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="selectedQuestionnaire">
+              <a-radio-button :style="{ width: '50%' }" v-for="(questionnaire, index) in questionnaireList"
                 :value="questionnaire.questionnaireId">{{ questionnaire.questionnaireName + "-" +
                   questionnaire.versionName }}</a-radio-button>
             </a-radio-group>

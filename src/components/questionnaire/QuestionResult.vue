@@ -408,9 +408,10 @@ const CreateTestReport = async () => {
       </div>
     </div>
     <div class="h-full border-l-2 border-gray-300 p-4 flex flex-col" style="width: 400px;">
-      <a-form ref="formRef" :model="testResult" :layout="'horizontal'" :label-col="{ style: { width: '80px' } }">
+      <a-form ref="formRef" :model="testResult" :layout="'horizontal'"
+        :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
         <a-form-item label="日期">
-          <a-date-picker v-model:value="testResult.questionnaireDate" size="large" />
+          <a-date-picker style="width: 100%;" v-model:value="testResult.questionnaireDate" size="large" />
         </a-form-item>
         <a-form-item label="学生">
           <a-select v-model:value="testResult.userId" size="large">
@@ -419,12 +420,14 @@ const CreateTestReport = async () => {
           </a-select>
         </a-form-item>
         <a-form-item label="性别">
-          <a-radio-group v-model:value="student.sex" disabled>
-            <a-radio-button v-for="item in sexList" :value="item.value">{{ item.description }}</a-radio-button>
+          <a-radio-group style="width: 100%;" size="large" v-model:value="student.gender" disabled>
+            <a-radio-button style="width: 50%;" v-for="item in sexList" :value="item.value">{{ item.description
+            }}</a-radio-button>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="年龄">
-          <a-input-number v-model:value="student.age" size="large" addon-after="岁" :min="0" disabled />
+          <a-input-number style="width: 100%;" v-model:value="student.age" size="large" addon-after="岁" :min="0"
+            disabled />
         </a-form-item>
         <a-form-item label="评测等级">
           <a-select v-model:value="testResult.levelCode" size="large">

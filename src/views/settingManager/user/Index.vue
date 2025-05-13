@@ -9,7 +9,7 @@
           <a-input-search class="pr-4" v-model:value="queryText" placeholder="姓名/手机号/账号" style="width: 200px"
             @search="UserGridQuery" /></a-col>
         <a-col flex="100px" class="flex pr-4 justify-end">
-          <a-button type="primary" @click="setDrawerVisible(true,'')">新增</a-button>
+          <a-button type="primary" @click="setDrawerVisible(true, '')">新增</a-button>
         </a-col>
       </a-row>
     </div>
@@ -40,7 +40,8 @@
             <a-button size="small" type="link" @click="() => { setDrawerVisible(true, record['userId']); }">
               详情
             </a-button>
-            <a-button v-show="record['role'] == RoleEnum.STUDENT || record['userId'] == accountStore.user.userId" size="small" type="link" @click="() => { setModalVisible(true, record['userId']); }">
+            <a-button v-show="record['role'] == RoleEnum.STUDENT || record['userId'] == accountStore.user.userId"
+              size="small" type="link" @click="() => { setModalVisible(true, record['userId']); }">
               修改密码
             </a-button>
           </template>
@@ -48,7 +49,8 @@
       </a-table>
     </div>
   </div>
-  <a-modal v-model:open="modalVisible" width="600px" title="" centered :maskClosable="false" :closable="false" :footer="null" :bodyStyle="{ height: '288px' }">
+  <a-modal v-model:open="modalVisible" width="600px" title="密码修改" centered :maskClosable="false" :closable="false"
+    :footer="null" :bodyStyle="{ height: '318px', paddingTop: '20px' }">
     <PasswordEdit :user-id="currentUserId" @save-success="saveSuccess" @cancel="setModalVisible(false)"></PasswordEdit>
   </a-modal>
   <a-drawer title="用户编辑" placement="right" :open="drawerVisible" :destroyOnClose="true"
