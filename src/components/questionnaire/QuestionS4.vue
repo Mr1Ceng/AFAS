@@ -8,6 +8,8 @@ import { useAnswerStore } from '@/stores/answerStore';
 import { useAccountStore } from "@/stores/accountStore";
 import SpiralMaze from '../spiralMaze/SpiralMaze.vue'
 import { CaretRightOutlined } from '@ant-design/icons-vue';
+import { useGlobalStore } from "@/stores/globalStore";
+
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -19,6 +21,7 @@ const isComplete = ref(false);
 
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
+const globalStore = useGlobalStore();
 console.log(answerStore)
 // #region 接口
 
@@ -280,13 +283,13 @@ const finished = (count: number) => {
           </span>
         </a-collapse-panel>
       </a-collapse>
-      <div v-show="stepIndex == 1" class="w-full flex-auto flex flex-col justify-center items-center bg-white">
-        <SpiralMaze ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation"
-          :width="spiralMazeWidth" :height="spiralMazeHeight" @update-cross-count="handleCrossUpdate"
-          @update-error-count="handleErrorUpdate" @started="started" @finished="finished"
-          @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
+      <div v-show="stepIndex == 1" class="w-full flex-auto flex flex-col justify-center items-center">
+        <SpiralMaze ref="spiralMaze" :initial-spacing="spacing" :initial-perturbation="perturbation"
+          :width="spiralMazeWidth" :height="spiralMazeHeight" :is-dark-theme="globalStore.isDarkTheme"
+          @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
+          @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
       </div>
-      <div class="w-full flex-auto flex justify-center items-center bg-white">
+      <div class="w-full flex-auto flex justify-center items-center">
         <img v-show="stepIndex > 1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
       </div>
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">

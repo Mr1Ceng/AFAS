@@ -9,7 +9,7 @@ import router from '@/router';
 import { useMenuStore } from '@/stores/menuStore';
 const globalStore = useGlobalStore();
 const menuStore = useMenuStore()
-const isDarktheme = ref(globalStore.isDarktheme)
+const isDarkTheme = ref(globalStore.isDarkTheme)
 const accountStore = useAccountStore();
 const account = ref<string>("");
 const password = ref<string>("");
@@ -61,7 +61,7 @@ const login = async () => {
       </div>
       <div class="w-100 h-full p-8">
         <div class="h-10 flex justify-end items-center">
-          <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }" />
+          <a-switch v-model:checked="isDarkTheme" @change="() => { globalStore.changeTheme() }" />
         </div>
         <div class="h-30 flex items-center">
           <span class="text-3xl ">

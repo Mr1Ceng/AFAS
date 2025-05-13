@@ -4,7 +4,7 @@
       <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
         :style="{ lineHeight: '64px' }">
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key" :disabled="!menu.show">{{ menu.label
-          }}</a-menu-item>
+        }}</a-menu-item>
       </a-menu>
       <div class="flex items-center justify-end">
         <a-popover placement="bottomRight">
@@ -27,7 +27,7 @@
             {{ accountStore.user.userName }}
           </a-button>
         </a-popover>
-        <a-switch v-model:checked="isDarktheme" @change="() => { globalStore.changeTheme() }">
+        <a-switch v-model:checked="isDarkTheme" @change="() => { globalStore.changeTheme() }">
           <template #checkedChildren><check-outlined /></template>
           <template #unCheckedChildren><close-outlined /></template>
         </a-switch>
@@ -73,7 +73,7 @@ import { useAccountStore } from "@/stores/accountStore";
 import { message } from 'ant-design-vue';
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
-const isDarktheme = ref(globalStore.isDarktheme)
+const isDarkTheme = ref(globalStore.isDarkTheme)
 
 const router = useRouter()
 const store = useMenuStore()

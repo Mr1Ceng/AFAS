@@ -5,7 +5,8 @@
     </div>
     <div class="w-full h-[calc(100%-64px)] flex">
       <div ref="tableContainer" class="w-1/2 h-full pr-4">
-        <a-table class="h-full ant-table-striped" :columns="columns" :data-source="SpiralMazes" :pagination="pagination" :row-class-name="(_record: SpiralMazeRow, index: number) => (_record.age == currentSpiralMaze.age? 'table-striped' : null)"
+        <a-table class="h-full ant-table-striped" :columns="columns" :data-source="SpiralMazes" :pagination="pagination"
+          :row-class-name="(_record: SpiralMazeRow, index: number) => (_record.age == currentSpiralMaze.age ? 'table-striped' : null)"
           :scroll="{ y: tableHeight }">
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'action'">
@@ -16,12 +17,9 @@
           </template>
         </a-table>
       </div>
-      <div class="w-1/2 h-full bg-white">
+      <div class="w-1/2 h-full">
         <div class="w-full h-30 p-4">
-          <a-form
-            layout="inline"
-            :model="currentSpiralMaze"
-          >
+          <a-form layout="inline" :model="currentSpiralMaze">
             <a-form-item label="年龄">
               <a-input-number v-model:value="currentSpiralMaze.age" :min="1" style="margin-left: 16px" disabled />
             </a-form-item>
@@ -29,22 +27,22 @@
               <a-input-number v-model:value="currentSpiralMaze.spacing" :min="20" :max="50" style="margin-left: 16px" />
             </a-form-item>
             <a-form-item label="波动程度">
-              <a-input-number v-model:value="currentSpiralMaze.perturbation" :min="0" :max="30" style="margin-left: 16px" />
+              <a-input-number v-model:value="currentSpiralMaze.perturbation" :min="0" :max="30"
+                style="margin-left: 16px" />
             </a-form-item>
             <a-form-item>
-              <a-button
-                type="primary" @click="SaveSpiralMaze"
-              >
+              <a-button type="primary" @click="SaveSpiralMaze">
                 保存
               </a-button>
             </a-form-item>
           </a-form>
         </div>
-        <SpiralMaze ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight" :show-control="true"
-          @get-setting="getSetting"/>
+        <SpiralMaze ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation"
+          :width="spiralMazeWidth" :height="spiralMazeHeight" :show-control="true"
+          :is-dark-theme="globalStore.isDarkTheme" @get-setting="getSetting" />
       </div>
     </div>
-    
+
   </div>
 </template>
 
@@ -57,7 +55,9 @@ import { SpiralMazeColumns, type SpiralMazeRow } from "@/models/spiralMaze/Spira
 import SpiralMaze from '@/components/spiralMaze/SpiralMaze.vue'
 import _ from "lodash";
 import { message } from 'ant-design-vue';
+import { useGlobalStore } from "@/stores/globalStore";
 
+const globalStore = useGlobalStore();
 const tableContainer = ref<any>();
 const tableHeight = computed(() => {
   return tableContainer.value?.clientHeight - 150;
@@ -79,11 +79,11 @@ const GetSpiralMazeList = async () => {
   }
 }
 const SaveSpiralMaze = async () => {
-  if(!currentSpiralMaze.value||!currentSpiralMaze.value.age){
+  if (!currentSpiralMaze.value || !currentSpiralMaze.value.age) {
     return;
   }
   try {
-    const response = await apiClient.post('/SpiralMaze/SaveSpiralMaze',currentSpiralMaze.value)
+    const response = await apiClient.post('/SpiralMaze/SaveSpiralMaze', currentSpiralMaze.value)
     console.log('响应:', response)
     if (response.status == 1) {
       message.success("保存成功！")
@@ -94,11 +94,11 @@ const SaveSpiralMaze = async () => {
   }
 }
 
-const ShowDetail = (data:SpiralMazeRow)=>{
+const ShowDetail = (data: SpiralMazeRow) => {
   currentSpiralMaze.value = _.cloneDeep(data);
-  spacing.value =data.spacing;
-  perturbation.value =  data.perturbation;
-  if(spiralMaze.value){
+  spacing.value = data.spacing;
+  perturbation.value = data.perturbation;
+  if (spiralMaze.value) {
     spiralMaze.value.reDraw();
   }
 }
@@ -121,7 +121,7 @@ const columns = computed(() => {
     )
   });
   columns.forEach((item) => {
-    
+
   })
   columns.push({
     title: '操作',
@@ -154,7 +154,7 @@ const pagination = computed(() => {
 // #region 漩涡
 const spacing = ref(30);
 const perturbation = ref(20);
-const spiralMaze= ref<any>();
+const spiralMaze = ref<any>();
 const spiralMazeHeight = computed(() => {
   return tableContainer.value?.clientHeight - 300;
 });
@@ -162,7 +162,7 @@ const spiralMazeWidth = computed(() => {
   return tableContainer.value?.clientWidth - 150;
 });
 const currentSpiralMaze = ref<any>({})
-const getSetting = (newSpacing: number,newPerturbation: number) => {
+const getSetting = (newSpacing: number, newPerturbation: number) => {
   currentSpiralMaze.value.spacing = newSpacing;
   currentSpiralMaze.value.perturbation = newPerturbation;
   spacing.value = newSpacing;
@@ -170,11 +170,11 @@ const getSetting = (newSpacing: number,newPerturbation: number) => {
 
 }
 watch(spacing, (newValue, oldValue) => {
-      console.log(newValue)
-    });
-    watch(perturbation, (newValue, oldValue) => {
-      console.log(newValue)
-    });
+  console.log(newValue)
+});
+watch(perturbation, (newValue, oldValue) => {
+  console.log(newValue)
+});
 
 // #endregion
 </script>

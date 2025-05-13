@@ -38,7 +38,7 @@ const initChart = (theme: string = 'default') => {
   }
 };
 
-watch(() => globalStore.isDarktheme, async (newValue, oldValue) => {
+watch(() => globalStore.isDarkTheme, async (newValue, oldValue) => {
   // 销毁当前实例
   if (chartInstance) {
     chartInstance.dispose();
@@ -69,7 +69,7 @@ watch(
 
 // 在组件挂载时初始化图表
 onMounted(() => {
-  initChart(globalStore.isDarktheme ? 'dark' : 'default');
+  initChart(globalStore.isDarkTheme ? 'dark' : 'default');
 });
 </script>
 
