@@ -40,10 +40,17 @@
             <a-button size="small" type="link" @click="() => { setDrawerVisible(true, record['userId']); }">
               详情
             </a-button>
-            <a-button v-show="record['role'] == RoleEnum.STUDENT || record['userId'] == accountStore.user.userId"
-              size="small" type="link" @click="() => { setModalVisible(true, record['userId']); }">
-              修改密码
-            </a-button>
+            <a-dropdown>
+              <template #overlay>
+                <a-menu>
+                  <a-menu-item key="1" danger @click="() => { showDeleteConfirm(record); }">删除</a-menu-item>
+                  <a-menu-item key="2" @click="() => { setModalVisible(true, record['userId']); }">修改密码</a-menu-item>
+                </a-menu>
+              </template>
+              <a-button size="small" type="link">
+                编辑
+              </a-button>
+            </a-dropdown>
           </template>
         </template>
       </a-table>
@@ -61,7 +68,7 @@
 
 
 <script lang="ts" setup>
-import { watch, h, ref, computed, onMounted } from 'vue';
+import { watch, h, ref, computed, onMounted, createVNode } from 'vue';
 import apiClient from '@/utils/ApiClientHelper'
 import dayjs from "dayjs";
 import { Sorter } from "@/enums/common/Sorter";
@@ -74,14 +81,13 @@ import { EnumHelper } from '@/utils/EnumHelper';
 import { GerderDescription } from '@/enums/GerderEnum';
 import { RoleDescription, RoleEnum } from '@/enums/RoleEnum';
 import { useAccountStore } from "@/stores/accountStore";
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { message, Modal } from 'ant-design-vue';
 
 const accountStore = useAccountStore();
 const tableContainer = ref<any>();
 const tableHeight = computed(() => {
   return tableContainer.value?.clientHeight - 150;
-});
-const tableWidth = computed(() => {
-  return tableContainer.value?.clientWidth;
 });
 const tableQueryModel = ref<TableQueryModelWithData<Record<string, any>>>({
   index: 0,
@@ -96,6 +102,19 @@ const UserGridQuery = async () => {
     console.log('响应:', response)
     if (response.status == 1) {
       Users.value = response.data
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+  }
+}
+
+const RemoveUser = async (userId: string) => {
+  try {
+    const response = await apiClient.post(`/User/RemoveUser/${userId}`)
+    console.log('响应:', response)
+    if (response.status == 1) {
+      message.success("删除成功！");
+      UserGridQuery();
     }
   } catch (error) {
     console.error('请求失败:', error)
@@ -126,6 +145,9 @@ const columns = computed(() => {
     )
   });
   columns.forEach((item) => {
+    if (item.dataIndex == 'account') {
+      item.width = '160px'
+    }
     if (item.dataIndex == 'account' || item.dataIndex == 'userName' || item.dataIndex == 'mobile') {
       item.fixed = 'left';
     }
@@ -136,7 +158,7 @@ const columns = computed(() => {
     ellipsis: true,
     align: "center",
     fixed: 'right',
-    width: "100px",
+    width: "150px",
   })
   return columns;
 });
@@ -192,4 +214,17 @@ const saveSuccess = () => {
   setDrawerVisible(false);
   setModalVisible(false);
 }
+
+const showDeleteConfirm = (data: any) => {
+  Modal.confirm({
+    title: `确认删除用户【${data.userName}】?`,
+    icon: createVNode(ExclamationCircleOutlined),
+    okText: '确认',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk() {
+      RemoveUser(data.userId)
+    }
+  });
+};
 </script>

@@ -10,6 +10,8 @@ export interface TestResultQueryRow {
   versionName: string; // 试卷版本
   userId: string; // 用户编码
   userName: string; // 用户姓名
+  gender: string; // 性别
+  age: number; // 年龄
   questionnaireDate: string; // 测评日期
   teacherId: string; // 测评老师
   teacherName: string; // 测评老师姓名
@@ -32,12 +34,14 @@ export interface TestResultQueryRow {
  * 映射字段名称
  */
 export const TestResultFieldMap: Record<keyof TestResultQueryRow, string> = {
-  answerId: "答案编码",
+  answerId: "测评编号",
   questionnaireId: "试卷编码",
   questionnaireName: "试卷名称",
   versionName: "试卷版本",
   userId: "用户编码",
-  userName: "用户姓名",
+  userName: "测评对象",
+  gender: "性别",
+  age: "年龄",
   questionnaireDate: "测评日期",
   teacherId: "测评老师",
   teacherName: "测评老师",

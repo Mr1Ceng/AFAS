@@ -49,17 +49,22 @@
       </a-tab-pane>
       <template #leftExtra>
         <a-select :style="{ marginRight: '16px' }" size="large" ref="select" v-model:value="selectedQuestionnaire"
-          @change="() => { GetQuestionList(); }">
+          @change="() => { }">
           <a-select-option v-for="(questionnaire, index) in questionnaireList" :value="questionnaire.questionnaireId">{{
             questionnaire.questionnaireName + "—" +
             questionnaire.versionName }}</a-select-option>
         </a-select>
       </template>
       <template #rightExtra>
-        <a-select :style="{ marginLeft: '16px' }" v-model:value="student.userId" size="large" disabled>
-          <a-select-option v-for="student in studentList" :value="student.userId">{{
-            student.userName }}</a-select-option>
-        </a-select>
+        <a-space :size="20">
+          <a-select :style="{ marginLeft: '16px' }" v-model:value="student.userId" size="large" disabled>
+            <a-select-option v-for="student in studentList" :value="student.userId">{{
+              student.userName }}</a-select-option>
+          </a-select>
+          <a-button size="large" type="primary" @click="() => { showResetConfirm(); }">
+            重新测评
+          </a-button>
+        </a-space>
       </template>
     </a-tabs>
   </div>
@@ -74,7 +79,7 @@
 </template>
 
 <script lang="ts" setup>
-import { watch, reactive, computed, h, onMounted, ref, provide, onActivated, onDeactivated } from 'vue';
+import { watch, reactive, computed, h, onMounted, ref, provide, createVNode } from 'vue';
 import { useAnswerStore } from '@/stores/answerStore';
 import QuestionS1 from '@/components/questionnaire/QuestionS1.vue'
 import QuestionS2 from '@/components/questionnaire/QuestionS2.vue'
@@ -85,6 +90,9 @@ import QuestionT1 from '@/components/questionnaire/QuestionT1.vue'
 import QuestionT2 from '@/components/questionnaire/QuestionT2.vue'
 import QuestionT3 from '@/components/questionnaire/QuestionT3.vue'
 import QuestionResult from '@/components/questionnaire/QuestionResult.vue'
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
+import { message, Modal } from 'ant-design-vue';
+import apiClient from '@/utils/ApiClientHelper'
 defineOptions({
   name: 'Q_Test'
 });
@@ -118,7 +126,10 @@ const selectedQuestion = ref<string>("");
 const answerStore = useAnswerStore();
 answerStore.setAnswerId("");
 
-
+watch(selectedQuestionnaire, (newvalue, oldValue) => {
+  canChanges.value = true;
+  GetQuestionList();
+})
 import { useAccountStore } from "@/stores/accountStore";
 import { EnumHelper } from '@/utils/EnumHelper';
 import { GerderDescription } from '@/enums/GerderEnum';
@@ -154,8 +165,6 @@ onMounted(() => {
 
 
 //#region接口
-import apiClient from '@/utils/ApiClientHelper'
-import { message } from 'ant-design-vue';
 
 const GetQuestionnaireList = async () => {
   try {
@@ -190,6 +199,21 @@ GetQuestionnaireList()
 const canChanges = ref(true);
 provide("canChanges", canChanges);
 
+
+const showResetConfirm = () => {
+  Modal.confirm({
+    title: `确认重新开启测评?`,
+    icon: createVNode(ExclamationCircleOutlined),
+    okText: '确认',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk() {
+      answerStore.setAnswerId("");
+      selectedQuestion.value = "";
+      canChanges.value = true;
+    }
+  });
+};
 </script>
 
 <style scoped>

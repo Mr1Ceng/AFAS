@@ -10,6 +10,9 @@
           :scroll="{ y: tableHeight }">
           <template #bodyCell="{ column, record }">
             <template v-if="column.dataIndex === 'action'">
+              <a-button size="small" danger type="text" @click="() => { showDeleteConfirm(record); }">
+                删除
+              </a-button>
               <a-button size="small" type="link" @click="ShowDetail(record)">
                 编辑
               </a-button>
@@ -21,7 +24,7 @@
         <div class="w-full h-30 p-4">
           <a-form layout="inline" :model="currentSpiralMaze">
             <a-form-item label="年龄">
-              <a-input-number v-model:value="currentSpiralMaze.age" :min="1" style="margin-left: 16px" disabled />
+              <a-input-number v-model:value="currentSpiralMaze.age" :min="1" style="margin-left: 16px" />
             </a-form-item>
             <a-form-item label="间距">
               <a-input-number v-model:value="currentSpiralMaze.spacing" :min="20" :max="50" style="margin-left: 16px" />
@@ -48,13 +51,14 @@
 
 
 <script lang="ts" setup>
-import { watch, h, ref, computed, onMounted } from 'vue';
+import { watch, h, ref, computed, onMounted, createVNode } from 'vue';
 import apiClient from '@/utils/ApiClientHelper'
 import type { TableQueryModelWithData } from "@/models/common/TableQueryModel"
 import { SpiralMazeColumns, type SpiralMazeRow } from "@/models/spiralMaze/SpiralMazeRow";
 import SpiralMaze from '@/components/spiralMaze/SpiralMaze.vue'
 import _ from "lodash";
-import { message } from 'ant-design-vue';
+import { message, Modal } from 'ant-design-vue';
+import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { useGlobalStore } from "@/stores/globalStore";
 
 const globalStore = useGlobalStore();
@@ -102,6 +106,32 @@ const ShowDetail = (data: SpiralMazeRow) => {
     spiralMaze.value.reDraw();
   }
 }
+
+
+const RemoveSpiralMaze = async (age: number) => {
+  try {
+    const response = await apiClient.post(`/SpiralMaze/RemoveSpiralMaze/${age}`)
+    console.log('响应:', response)
+    if (response.status == 1) {
+      message.success("删除成功！");
+      GetSpiralMazeList();
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+  }
+}
+const showDeleteConfirm = (data: any) => {
+  Modal.confirm({
+    title: `确认删除漩涡迷宫配置【${data.age}岁】?`,
+    icon: createVNode(ExclamationCircleOutlined),
+    okText: '确认',
+    okType: 'danger',
+    cancelText: '取消',
+    onOk() {
+      RemoveSpiralMaze(data.age)
+    }
+  });
+};
 onMounted(() => {
   GetSpiralMazeList();
 })

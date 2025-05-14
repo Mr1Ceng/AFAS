@@ -8,9 +8,6 @@ import { RoleDescription } from '@/enums/RoleEnum';
 import _ from "lodash";
 import { PlusOutlined } from '@ant-design/icons-vue';
 import type { UploadProps, UploadFile } from 'ant-design-vue';
-import type { Rule } from 'ant-design-vue/es/form';
-
-
 
 const props = defineProps<{
   userId: string
@@ -173,7 +170,7 @@ const validateEmpty = (fieldName: string) => {
       <a-form-item label="性别">
         <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.gender">
           <a-radio-button :style="{ width: '50%' }" v-for="item in gerderList" :value="item.value">{{ item.description
-            }}</a-radio-button>
+          }}</a-radio-button>
         </a-radio-group>
       </a-form-item>
       <a-form-item label="年龄">
@@ -185,7 +182,7 @@ const validateEmpty = (fieldName: string) => {
       <a-form-item label="角色">
         <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.role">
           <a-radio-button :style="{ width: '50%' }" v-for="item in roleList" :value="item.value">{{ item.description
-            }}</a-radio-button>
+          }}</a-radio-button>
         </a-radio-group>
       </a-form-item>
       <a-form-item :span="24" style="text-align: right">

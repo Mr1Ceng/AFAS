@@ -191,7 +191,7 @@ const computedResult = () => {
   }
   //#endregion
   //#region 总结
-  testResult.value.remark = _.join(_.map(testResult.value.answerList, item => { return item.questionCode + item.remark }), '\n')
+  testResult.value.remark = _.join(_.map(testResult.value.answerList, item => { return item.questionCode + ':' + item.remark }), '\n')
   testResult.value.advantage = `${_.join([...sResultPass, ...tResultPass], '、')}`
   testResult.value.weak = `${_.join([...sResultFail, ...tResultFail], '、')}`
   //#endregion
@@ -370,7 +370,7 @@ const CreateRadarMap = () => {
     ]
   };
 }
-const CreateTestReport = async () => {
+const SaveTestResult = async () => {
   console.log(testResult.value)
   console.log(student.value)
   if (!currentEvaluationStandard.value) {
@@ -379,12 +379,12 @@ const CreateTestReport = async () => {
   }
   try {
     const data = testResult.value
-    const response = await apiClient.post('/Questionnaire/SaveAnswerResult', data)
+    const response = await apiClient.post('/Questionnaire/SaveTestResult', data)
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       message.success(`保存成功`);
     } else {
-      message.error(`保存题目信息失败，请联系工作人员！`);
+      message.error(`保存题目信息失败，请联系测评老师！`);
     }
   } catch (error) {
     console.error('请求失败:', error)
@@ -448,8 +448,23 @@ const CreateTestReport = async () => {
               teacher.userName }}</a-select-option>
           </a-select>
         </a-form-item>
+        <!-- <a-form-item label="视知觉结果">
+          <a-textarea style="width: 100%;" v-model:value="testResult.sResult" :rows="4" />
+        </a-form-item>
+        <a-form-item label="听知觉结果">
+          <a-textarea style="width: 100%;" v-model:value="testResult.tResult" :rows="4" />
+        </a-form-item> -->
+        <a-form-item label="弱势">
+          <a-textarea style="width: 100%;" v-model:value="testResult.weak" :rows="3" />
+        </a-form-item>
+        <a-form-item label="优势">
+          <a-textarea style="width: 100%;" v-model:value="testResult.advantage" :rows="3" />
+        </a-form-item>
+        <a-form-item label="备注">
+          <a-textarea style="width: 100%;" v-model:value="testResult.remark" :rows="4" />
+        </a-form-item>
         <a-form-item :span="24" style="text-align: right">
-          <a-button type="primary" @click="CreateTestReport()">
+          <a-button type="primary" @click="SaveTestResult()">
             生成测试报告
           </a-button>
         </a-form-item>

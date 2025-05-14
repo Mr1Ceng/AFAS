@@ -22,7 +22,7 @@ const routes: RouteRecordRaw = {
     {
       path: 'questionnaire/standard',
       name: 'S_Standard',
-      component: () => import('@/views/settingManager/questionnaire/Standard.vue')
+      component: () => import('@/views/settingManager/questionnaire/EvaluationStandardIndex.vue')
     }
   ]
 }

@@ -25,16 +25,16 @@ const GetEvaluationStandardList = async () => {
 }
 GetEvaluationStandardList();
 const columns = [
-  { title: '等级编码', dataIndex: 'levelCode', key: 'levelCode', },
-  { title: '等级名称', dataIndex: 'levelName', key: 'levelName', },
-  { title: '视觉广度', dataIndex: 's1', key: 's1', },
-  { title: '视觉稳定性', dataIndex: 's2', key: 's2', },
-  { title: '视觉转移', dataIndex: 's3', key: 's3', },
-  { title: '手眼协调', dataIndex: 's4', key: 's4', },
-  { title: '视觉工作记忆', dataIndex: 's5', key: 's5', },
-  { title: '听觉集中', dataIndex: 't1', key: 't1', },
-  { title: '听觉分辨', dataIndex: 't2', key: 't2', },
-  { title: '听觉记忆', dataIndex: 't3', key: 't3', },
+  { title: '等级编码', ellipsis: true, align: "center", dataIndex: 'levelCode', key: 'levelCode', },
+  { title: '等级名称', ellipsis: true, align: "center", dataIndex: 'levelName', key: 'levelName', },
+  { title: '视觉广度', ellipsis: true, align: "center", dataIndex: 's1', key: 's1', },
+  { title: '视觉稳定性', ellipsis: true, align: "center", dataIndex: 's2', key: 's2', },
+  { title: '视觉转移', ellipsis: true, align: "center", dataIndex: 's3', key: 's3', },
+  { title: '手眼协调', ellipsis: true, align: "center", dataIndex: 's4', key: 's4', },
+  { title: '视觉工作记忆', ellipsis: true, align: "center", dataIndex: 's5', key: 's5', },
+  { title: '听觉集中', ellipsis: true, align: "center", dataIndex: 't1', key: 't1', },
+  { title: '听觉分辨', ellipsis: true, align: "center", dataIndex: 't2', key: 't2', },
+  { title: '听觉记忆', ellipsis: true, align: "center", dataIndex: 't3', key: 't3', },
 ]
 
 </script>
