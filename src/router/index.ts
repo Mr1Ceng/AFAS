@@ -1,5 +1,4 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
 import DefaultLayout from '../layout/components/default.vue'
 import SettingRoutes from './settingManager/Index'
 import QuestionnaireRoutes from './questionnaire/Index'
@@ -10,9 +9,8 @@ const routes: RouteRecordRaw[] = [
     component: DefaultLayout,
     children: [
       {
-        path: 'home',
-        name: 'home',
-        component: HomeView
+        path: '/',
+        redirect: { name: 'login' }
       },
       SettingRoutes,
       QuestionnaireRoutes

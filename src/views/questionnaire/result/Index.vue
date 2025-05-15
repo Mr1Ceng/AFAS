@@ -5,12 +5,12 @@
     </div>
     <div class="w-full h-12 flex flex-row pb-4">
       <a-space :size="20">
-        <a-input-search v-model:value="queryText" placeholder="学生/老师/试卷名" style="width: 200px"
+        <a-input-search v-model:value="queryText" placeholder="学生/老师/测评编号/试卷名" style="width: 300px"
           @search="TestResultGridQuery" />
         <a-range-picker v-model:value="dateRange" />
         <a-select style="width: 120px" v-model:value="status">
           <a-select-option v-for="item in dataStatusList" :value="item.value">{{ item.description
-            }}</a-select-option>
+          }}</a-select-option>
         </a-select>
       </a-space>
     </div>
@@ -105,16 +105,12 @@
     ok-text="关闭" :maskClosable="false" :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
     <img class="w-300" :src="modelImage">
   </a-modal>
-  <a-modal v-model:open="pdfModalVisible" width="100%" @ok="() => { pdfModalVisible = false }" ok-text="关闭"
-    :maskClosable="false" :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
-    <div class="w-full h-full overflow-y-scroll">
-      <PdfViewer :src="pdfUrl" />
-    </div>
-  </a-modal>
   <a-drawer title="测试结果" placement="right" :open="drawerVisible" :destroyOnClose="true"
     @close="() => { setDrawerVisible(false); TestResultGridQuery(); }" :width="tableWidth">
     <QuestionResult :is-current="true" :answer-id="currentAnswerId"></QuestionResult>
   </a-drawer>
+  <PdfViewer :src="pdfUrl" :visible="pdfModalVisible" @closed="() => { pdfModalVisible = false }"
+    @downloaded="() => { pdfModalVisible = false }" />
 </template>
 
 

@@ -6,7 +6,7 @@
     <div class="w-full h-12 pb-4">
       <a-row>
         <a-col flex="auto">
-          <a-input-search class="pr-4" v-model:value="queryText" placeholder="姓名/手机号/账号" style="width: 200px"
+          <a-input-search class="pr-4" v-model:value="queryText" placeholder="姓名/手机号/账号" style="width: 300px"
             @search="UserGridQuery" /></a-col>
         <a-col flex="100px" class="flex pr-4 justify-end">
           <a-button type="primary" @click="setDrawerVisible(true, '')">新增</a-button>
