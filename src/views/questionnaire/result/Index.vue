@@ -107,8 +107,8 @@
     @close="() => { setDrawerVisible(false); TestResultGridQuery(); }" :width="tableWidth">
     <QuestionResult :is-current="true" :answer-id="currentAnswerId"></QuestionResult>
   </a-drawer>
-  <PdfViewer :src="pdfUrl" :visible="pdfModalVisible" @closed="() => { pdfModalVisible = false }"
-    @downloaded="() => { pdfModalVisible = false }" />
+  <!-- <PdfViewer :src="pdfUrl" :visible="pdfModalVisible" @closed="() => { pdfModalVisible = false }"
+    @downloaded="() => { pdfModalVisible = false }" /> -->
 </template>
 
 
@@ -315,11 +315,40 @@ const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
 };
 //Pdf弹框
-const pdfModalVisible = ref<boolean>(false);
-const setPDFModalVisible = (open: boolean) => {
-  pdfModalVisible.value = open;
-  if (!open) {
-    currentAnswerId.value = "";
+// const pdfModalVisible = ref<boolean>(false);
+// const setPDFModalVisible = (open: boolean) => {
+//   pdfModalVisible.value = open;
+//   if (!open) {
+//     currentAnswerId.value = "";
+//   }
+// };
+//下载PDF
+const download = async (record: TestResultQueryRow): Promise<void> => {
+  if (record.status == DataStatusEnum.Draft) {
+    message.warn("请生成报告后，再下载");
+    return;
+  }
+  currentAnswerId.value = record.answerId;
+  if (!pdfUrl.value) {
+    message.warn('PDF源不可用');
+    return;
+  }
+
+  try {
+    const response: Response = await fetch(pdfUrl.value);
+    const blob: Blob = await response.blob();
+    const url: string = URL.createObjectURL(blob);
+    const a: HTMLAnchorElement = document.createElement("a");
+    a.href = url;
+    a.download = pdfUrl.value.split('/').pop() || 'document.pdf';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    message.success('下载PDF完成');
+  } catch (error) {
+    console.error('下载PDF失败', error);
+    message.error('下载PDF失败');
   }
 };
 //抽屉
@@ -328,14 +357,6 @@ const setDrawerVisible = (open: boolean) => {
   drawerVisible.value = open;
 };
 const currentAnswerId = ref<string>("")
-const download = (record: TestResultQueryRow) => {
-  if (record.status == DataStatusEnum.Draft) {
-    message.warn("请生成报告后，再下载");
-    return;
-  }
-  currentAnswerId.value = record.answerId;
-  setPDFModalVisible(true)
-}
 const showDeleteConfirm = (data: any) => {
   Modal.confirm({
     title: `确认删除【${data.userName}】的测评结果【${data.answerId}】?`,
