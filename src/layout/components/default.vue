@@ -4,7 +4,7 @@
       <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
         :style="{ lineHeight: '64px' }">
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key" :disabled="!menu.show">{{ menu.label
-        }}</a-menu-item>
+          }}</a-menu-item>
       </a-menu>
       <div class="flex items-center justify-end">
         <a-popover placement="bottomRight">
@@ -58,7 +58,7 @@ defineOptions({
 });
 import { watch, h, ref } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import apiClient from '@/utils/ApiClientHelper';
+import { apiClient } from '@/utils/ApiClientHelper';
 import { useMenuStore } from '@/stores/menuStore';
 import PasswordEdit from '@/components/user/PasswordEdit.vue';
 import {

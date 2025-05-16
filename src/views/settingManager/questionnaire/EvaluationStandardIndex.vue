@@ -57,7 +57,7 @@
 
 <script lang="ts" setup>
 import { watch, h, ref, computed, onMounted, createVNode } from 'vue';
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 import { Sorter } from "@/enums/common/Sorter";
 import type { TableQueryModelWithData } from "@/models/common/TableQueryModel";
 import { EvaluationStandardColumns, type EvaluationStandardRow } from "@/models/evaluationStandard/EvaluationStandardRow";

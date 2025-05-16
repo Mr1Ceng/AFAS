@@ -10,7 +10,7 @@
         <a-range-picker v-model:value="dateRange" />
         <a-select style="width: 120px" v-model:value="status">
           <a-select-option v-for="item in dataStatusList" :value="item.value">{{ item.description
-          }}</a-select-option>
+            }}</a-select-option>
         </a-select>
       </a-space>
     </div>
@@ -116,7 +116,7 @@
 
 <script lang="ts" setup>
 import { watch, h, ref, computed, onMounted, createVNode } from 'vue';
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 import dayjs from "dayjs";
 import { Sorter } from "@/enums/common/Sorter";
 import type { TableQueryModelWithData } from "@/models/common/TableQueryModel";

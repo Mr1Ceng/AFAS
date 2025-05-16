@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 import { EnumHelper } from '@/utils/EnumHelper';
 import { GerderDescription } from '@/enums/GerderEnum';
 import { QuestionCodeDescription } from '@/enums/QuestionCodeEnum';
@@ -422,7 +422,7 @@ const SaveTestResult = async () => {
         <a-form-item label="性别">
           <a-radio-group style="width: 100%;" size="large" v-model:value="student.gender" disabled>
             <a-radio-button style="width: 50%;" v-for="item in sexList" :value="item.value">{{ item.description
-            }}</a-radio-button>
+              }}</a-radio-button>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="年龄">

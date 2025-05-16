@@ -9,7 +9,7 @@
 import { ref } from 'vue';
 
 //接口
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 
 //评估标准数据
 const evaluationStandardList = ref<any[]>([]);

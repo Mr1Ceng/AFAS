@@ -66,24 +66,29 @@ const processResponseData = (data: any): any => {
 const processRequestData = (data: any): any => {
   if (Array.isArray(data)) {
     return data.map(item => processRequestData(item));
-  } else if (data !== null && typeof data === "object") {
+  }
+  else if (data !== null && typeof data === "object") {
+    // 处理 dayjs 类型，但保留其他对象类型
+    if (dayjs.isDayjs(data)) {
+      const hasTime = data.hour() !== 0 || data.minute() !== 0 || data.second() !== 0;
+      return hasTime ? data.format("YYYY-MM-DD HH:mm:ss") : data.format("YYYY-MM-DD");
+    }
+
+    // 处理普通对象，但跳过 File、Blob 类型
+    if (data instanceof File || data instanceof Blob) {
+      return data;
+    }
+
     const result: Record<string, any> = {};
     for (const key in data) {
       if (Object.prototype.hasOwnProperty.call(data, key)) {
-        const value = data[key];
-
-        if (dayjs.isDayjs(value)) {
-          // 判断是否包含时间部分
-          const hasTime = value.hour() !== 0 || value.minute() !== 0 || value.second() !== 0;
-          result[key] = hasTime ? value.format("YYYY-MM-DD HH:mm:ss") : value.format("YYYY-MM-DD");
-        } else {
-          result[key] = processRequestData(value);
-        }
+        result[key] = processRequestData(data[key]);
       }
     }
     return result;
   }
-  return data;
+
+  return data; // 其他类型原样返回
 };
 
 export { formattedText, getProperty, processResponseData, processRequestData }

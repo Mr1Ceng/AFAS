@@ -29,7 +29,7 @@ const bQuestionT2AList = ref<any[]>([]);
 
 const questionDiffList = ref<any[]>([]);
 const questionSameList = ref<any[]>([]);
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 console.log(props.questionId)
 const GetQuestionT2 = async () => {
   try {

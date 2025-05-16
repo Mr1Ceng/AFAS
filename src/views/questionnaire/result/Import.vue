@@ -98,24 +98,26 @@
       </a-table>
     </div>
   </div>
-  <a-modal v-model:open="modalVisible" width="500px" title="导入测评结果" centered @ok="() => { setModalVisible(false) }"
+  <a-modal v-model:open="modalVisible" width="500px" title="导入测评结果" centered @ok="() => { TestResultImport() }"
     ok-text="导入" @cancel="() => { setModalVisible(false) }" cancel-text="取消" :maskClosable="false" :closable="false">
     <a-form ref="formRef" :model="uploadFile" :layout="'horizontal'"
       :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
       <a-form-item>
         <a-upload-dragger :file-list="fileList" :maxCount="1" :before-upload="beforeUpload" @remove="handleRemove"
-          @change="handleChange">
-          <div v-if="fileList?.length == 0">
+          @change="handleChange" listType="text">
+          <div>
             <p class="ant-upload-drag-icon">
               <inbox-outlined></inbox-outlined>
             </p>
             <p class="ant-upload-text">点击或拖拽文件到此区域</p>
             <p class="ant-upload-hint">
-              Support for a single or bulk upload. Strictly prohibit from uploading company data or other
-              band files
+              支持单个excel文件
             </p>
           </div>
         </a-upload-dragger>
+      </a-form-item>
+      <a-form-item>
+        <input type="file" ref="excelFile" @change="updateExcelFile" name="fname">
       </a-form-item>
     </a-form>
   </a-modal>
@@ -128,7 +130,7 @@
 
 <script lang="ts" setup>
 import { watch, h, ref, computed, onMounted, createVNode } from 'vue';
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 import dayjs from "dayjs";
 import { Sorter } from "@/enums/common/Sorter";
 import type { TableQueryModelWithData } from "@/models/common/TableQueryModel";
@@ -141,9 +143,10 @@ import { useAccountStore } from "@/stores/accountStore";
 import { DataStatusEnum } from '@/enums/common/DataStatus';
 import { GerderDescription } from '@/enums/GerderEnum'
 import { EnumHelper } from '@/utils/EnumHelper'
-import { PlusOutlined } from '@ant-design/icons-vue';
+import { InboxOutlined } from '@ant-design/icons-vue';
 import type { UploadProps, UploadFile } from 'ant-design-vue';
-
+import _ from 'lodash';
+import axios from 'axios';
 
 
 const dataStatusList = [
@@ -183,6 +186,20 @@ const TestResultImportGridQuery = async () => {
     console.log('响应:', response)
     if (response.status == 1) {
       testResults.value = response.data
+    }
+  } catch (error) {
+    console.error('请求失败:', error)
+  }
+}
+const TestResultImport = async () => {
+  console.log(uploadFile.value)
+  try {
+    const response = await apiClient.postForm('/Questionnaire/TestResultImport', {
+      file: uploadFile.value,
+    })
+    console.log('响应:', response)
+    if (response.status == 1) {
+      setModalVisible(false)
     }
   } catch (error) {
     console.error('请求失败:', error)
@@ -282,17 +299,12 @@ const pagination = computed(() => {
 });
 //#endregion
 
-//#region 头像上传
+//#region Excel文件
 const fileList = ref<UploadFile[]>([]);
-const uploadFile = ref({});
-const getBase64 = (file: File): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = () => resolve(reader.result as string);
-    reader.onerror = (error) => reject(error);
-  });
-};
+const uploadFile = ref<UploadFile>()
+const updateExcelFile = (file: any) => {
+  console.log(file)
+}
 
 const handleRemove: UploadProps['onRemove'] = file => {
   if (!fileList.value) return;
@@ -304,33 +316,18 @@ const handleRemove: UploadProps['onRemove'] = file => {
 
 // 文件验证
 const beforeUpload: UploadProps['beforeUpload'] = file => {
-  const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
-  if (!isJpgOrPng) {
-    message.error('请选择图片上传!');
+  const isExcel = file.type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+  if (!isExcel) {
+    message.error('请选择Excel文件上传!');
     return;
   }
-  const isLt2M = file.size / 1024 / 1024 < 2;
-  if (!isLt2M) {
-    message.error('请选择小于2MB的图片!');
-    return;
-  }
+  uploadFile.value = file;
   return false;
 };
 
-// 处理文件上传，转换为 Base64 并显示在预览列表
+// 处理文件上传
 const handleChange = async (info: any) => {
-  const newFile = info.file;
-  if (newFile.status === "done" || newFile.status === "success") {
-    return;
-  }
-  const base64 = await getBase64(newFile);
-  const previewFile: UploadFile = {
-    uid: newFile.uid,
-    name: newFile.name,
-    status: "done",
-    url: base64, // 让图片预览
-  };
-  fileList.value = [...fileList.value, previewFile]; // 更新文件列表
+  fileList.value = [...fileList.value, ...info.fileList]; // 更新文件列表
 };
 //#endregion
 //弹框

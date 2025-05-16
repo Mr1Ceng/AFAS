@@ -3,7 +3,7 @@ import { computed, ref, onMounted, onUnmounted, watch } from 'vue';
 import { EyeTwoTone, EyeInvisibleOutlined, UserOutlined, LockOutlined } from '@ant-design/icons-vue';
 import { useAccountStore } from "@/stores/accountStore";
 import { useGlobalStore } from "@/stores/globalStore";
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 import { getAuthorizationString } from '@/utils/AuthorizationHelper'
 import router from '@/router';
 import { useMenuStore } from '@/stores/menuStore';

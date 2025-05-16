@@ -52,7 +52,7 @@
 
 <script lang="ts" setup>
 import { watch, h, ref, computed, onMounted, createVNode } from 'vue';
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 import type { TableQueryModelWithData } from "@/models/common/TableQueryModel"
 import { SpiralMazeColumns, type SpiralMazeRow } from "@/models/spiralMaze/SpiralMazeRow";
 import SpiralMaze from '@/components/spiralMaze/SpiralMaze.vue'

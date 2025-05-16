@@ -33,7 +33,7 @@ const number1Question = ref<any>({});
 const number2Question = ref<any>({});
 const number3Question = ref<any>({});
 const storyQuestion = ref<any>([]);
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 console.log(props.questionId)
 const GetQuestionT1 = async () => {
   try {
@@ -477,7 +477,7 @@ const openNotification = (message: string) => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-8xl">{{
           `${number1Question.timeConsume ?? 0}/${number2Question.timeConsume ?? 0}/${number3Question.timeConsume ?? 0}`
-          }}</span>
+        }}</span>
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-20">数字题一</span>

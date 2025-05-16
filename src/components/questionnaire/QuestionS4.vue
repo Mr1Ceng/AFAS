@@ -27,7 +27,7 @@ console.log(answerStore)
 
 const questionInfo = ref<any>({});
 const questionList = ref<any>([]);
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 console.log(props.questionId)
 const GetQuestionS4 = async () => {
   try {

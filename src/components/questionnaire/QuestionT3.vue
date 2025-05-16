@@ -28,7 +28,7 @@ const questionList = ref<any>({});
 
 const questionForwardList = ref<any[]>([]);
 const questionBackwardList = ref<any[]>([]);
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 console.log(props.questionId)
 const GetQuestionT3 = async () => {
   try {

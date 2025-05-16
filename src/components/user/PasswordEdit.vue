@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch, defineEmits } from 'vue';
 import { message } from 'ant-design-vue';
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 import _ from "lodash";
 
 
@@ -50,7 +50,7 @@ const WebAppResetPassword = async () => {
     console.log("表单验证失败:", error);
     message.error("表单验证失败!");
     return;
-  }  
+  }
   try {
     const response = await apiClient.post(`/Account/WebAppResetPassword/${user.value.userId}/${user.value.password}`)
     console.log('响应:', response)
@@ -87,13 +87,13 @@ const validateEmpty = (fieldName: string) => {
   <div class="w-full h-full">
     <a-form ref="formRef" :model="user" :layout="'horizontal'" :label-col="{ style: { width: '80px' } }">
       <a-form-item v-if="user.userId" label="用户编码">
-        <a-input v-model:value="user.userId" size="large" disabled/>
+        <a-input v-model:value="user.userId" size="large" disabled />
       </a-form-item>
       <a-form-item label="用户姓名">
-        <a-input v-model:value="user.userName" size="large" disabled/>
+        <a-input v-model:value="user.userName" size="large" disabled />
       </a-form-item>
       <a-form-item label="账号">
-        <a-input v-model:value="user.account" size="large" disabled/>
+        <a-input v-model:value="user.account" size="large" disabled />
       </a-form-item>
       <a-form-item label="密码" name="password" :rules="[{ required: true, validator: validateEmpty('密码') }]">
         <a-input-password v-model:value="user.password" size="large" />

@@ -92,7 +92,7 @@ import QuestionT3 from '@/components/questionnaire/QuestionT3.vue'
 import QuestionResult from '@/components/questionnaire/QuestionResult.vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { message, Modal } from 'ant-design-vue';
-import apiClient from '@/utils/ApiClientHelper'
+import { apiClient } from '@/utils/ApiClientHelper'
 defineOptions({
   name: 'Q_Test'
 });
