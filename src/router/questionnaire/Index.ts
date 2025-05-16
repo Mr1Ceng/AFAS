@@ -1,6 +1,6 @@
 import { type RouteRecordRaw, RouterView } from 'vue-router'
 
-import QuestionnaireView from '@/views/questionnaire/index.vue'
+import QuestionnaireView from '@/views/questionnaire/Index.vue'
 
 const routes: RouteRecordRaw = {
   path: 'questionnaire',
@@ -13,10 +13,11 @@ const routes: RouteRecordRaw = {
       meta: { keepAlive: true }
     },
     {
-      path: 'result/query',
+      path: 'result/query/:importId?',
       name: 'Q_Query',
       component: () => import('@/views/questionnaire/result/Index.vue'),
-      meta: { keepAlive: true }
+      meta: { keepAlive: true },
+      props: true
     },
     {
       path: 'result/import',

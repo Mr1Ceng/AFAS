@@ -3,16 +3,18 @@
     <div class="w-full h-16 pt-2">
       <span class="text-xl">测试结果导入</span>
     </div>
-    <div class="w-full h-12 flex flex-row pb-4">
+    <div class="w-full h-12 flex flex-row justify-between pb-4">
       <a-space :size="20">
-        <a-input-search v-model:value="queryText" placeholder="学生/老师/测评编号/试卷名" style="width: 300px"
+        <a-input-search v-model:value="queryText" placeholder="导入老师/导入编号" style="width: 300px"
           @search="TestResultImportGridQuery" />
         <a-range-picker v-model:value="dateRange" />
         <a-select style="width: 120px" v-model:value="status">
           <a-select-option v-for="item in dataStatusList" :value="item.value">{{ item.description
-          }}</a-select-option>
+            }}</a-select-option>
         </a-select>
-        <a-button @click="setModalVisible(true)">添加导入</a-button>
+      </a-space>
+      <a-space :size="20">
+        <a-button type="primary" @click="setModalVisible(true)">导入测评结果</a-button>
       </a-space>
     </div>
     <div ref="tableContainer" class="w-full h-[calc(100%-112px)] flex">
@@ -59,27 +61,30 @@
               </span>
             </a-tooltip>
           </template>
-          <template v-else-if="column.dataIndex === 'ImportStamp'">
+          <template v-else-if="column.dataIndex === 'importStamp'">
             <a-tooltip placement="top">
               <template #title>
                 <span>
-                  {{ record[column.dataIndex].format('YYYY-MM-DD HH:mm:ss') }}
+                  {{ record[column.dataIndex]?.format('YYYY-MM-DD HH:mm:ss') }}
                 </span>
               </template>
               <span>
-                {{ record[column.dataIndex].format('YYYY-MM-DD HH:mm:ss') }}
+                {{ record[column.dataIndex]?.format('YYYY-MM-DD HH:mm:ss') }}
               </span>
             </a-tooltip>
           </template>
           <template v-else-if="column.dataIndex === 'action'">
-            <a-button v-show="accountStore.user.isStaff || accountStore.user.isDeveloper" size="small" danger
-              type="text" @click="() => { showDeleteConfirm(record); }">
-              删除
-            </a-button>
-            <a-button size="small" type="link"
-              @click="() => { currentAnswerId = record['answerId']; setDrawerVisible(true); console.log(currentAnswerId) }">
+            <a-button size="small" type="link" @click="showDetail(record['importId'])">
               详情
             </a-button>
+          </template>
+
+          <template v-else-if="column.dataIndex === 'importResult'">
+            <a-tooltip placement="top">
+              <span>
+                {{ record[column.dataIndex] }}
+              </span>
+            </a-tooltip>
           </template>
 
           <template v-else>
@@ -98,10 +103,9 @@
       </a-table>
     </div>
   </div>
-  <a-modal v-model:open="modalVisible" width="500px" title="导入测评结果" centered @ok="() => { TestResultImport() }"
+  <a-modal v-model:open="modalVisible" width="500px" title="导入测评结果" centered @ok="() => { TestResultImport() }" :confirm-loading="loading"
     ok-text="导入" @cancel="() => { setModalVisible(false) }" cancel-text="取消" :maskClosable="false" :closable="false">
-    <a-form ref="formRef" :model="uploadFile" :layout="'horizontal'"
-      :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
+    <a-form ref="formRef" :layout="'horizontal'" :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
       <a-form-item>
         <a-upload-dragger :file-list="fileList" :maxCount="1" :before-upload="beforeUpload" @remove="handleRemove"
           @change="handleChange" listType="text">
@@ -115,9 +119,6 @@
             </p>
           </div>
         </a-upload-dragger>
-      </a-form-item>
-      <a-form-item>
-        <input type="file" ref="excelFile" @change="updateExcelFile" name="fname">
       </a-form-item>
     </a-form>
   </a-modal>
@@ -147,6 +148,8 @@ import { InboxOutlined } from '@ant-design/icons-vue';
 import type { UploadProps, UploadFile } from 'ant-design-vue';
 import _ from 'lodash';
 import axios from 'axios';
+import router from '@/router';
+import { useMenuStore } from '@/stores/menuStore';
 
 
 const dataStatusList = [
@@ -164,6 +167,7 @@ const dataStatusList = [
 ];
 const baseURL = import.meta.env.VITE_API_BASE_URL;
 const accountStore = useAccountStore();
+const menuStore = useMenuStore()
 const tableContainer = ref<any>();
 const tableHeight = computed(() => {
   return tableContainer.value?.clientHeight - 150;
@@ -192,20 +196,29 @@ const TestResultImportGridQuery = async () => {
   }
 }
 const TestResultImport = async () => {
-  console.log(uploadFile.value)
+  loading.value = true;
+  if (fileList.value.length < 1) {
+    message.info("请选择导入文件");
+    return;
+  }
   try {
     const response = await apiClient.postForm('/Questionnaire/TestResultImport', {
-      file: uploadFile.value,
+      file: fileList.value[0],
     })
     console.log('响应:', response)
     if (response.status == 1) {
       setModalVisible(false)
+      TestResultImportGridQuery()
     }
   } catch (error) {
     console.error('请求失败:', error)
   }
+  loading.value = false;
 }
-
+const showDetail = (importId: string) => {
+  menuStore.setter(0, ["Q_Query"], ["Q_Result"])
+  router.push({ name: 'Q_Query', params: { importId: importId } })
+}
 onMounted(() => {
   TestResultImportGridQuery();
 })
@@ -216,9 +229,9 @@ const columns = computed(() => {
     'importId',
     'importStamp',
     'isSuccess',
-    'importResult',
     'importCount',
     'userName',
+    'importResult',
   ];
   const columns: any[] = [];
   columnsList.forEach((item) => {
@@ -301,10 +314,6 @@ const pagination = computed(() => {
 
 //#region Excel文件
 const fileList = ref<UploadFile[]>([]);
-const uploadFile = ref<UploadFile>()
-const updateExcelFile = (file: any) => {
-  console.log(file)
-}
 
 const handleRemove: UploadProps['onRemove'] = file => {
   if (!fileList.value) return;
@@ -321,7 +330,6 @@ const beforeUpload: UploadProps['beforeUpload'] = file => {
     message.error('请选择Excel文件上传!');
     return;
   }
-  uploadFile.value = file;
   return false;
 };
 
@@ -330,28 +338,21 @@ const handleChange = async (info: any) => {
   fileList.value = [...fileList.value, ...info.fileList]; // 更新文件列表
 };
 //#endregion
+
 //弹框
 const modelImage = ref<string>("")
 const modalVisible = ref<boolean>(false);
 const setModalVisible = (open: boolean) => {
   modalVisible.value = open;
+  if (!open) fileList.value = [];
 };
 //抽屉
 const drawerVisible = ref<boolean>(false);
 const setDrawerVisible = (open: boolean) => {
   drawerVisible.value = open;
 };
+
 const currentAnswerId = ref<string>("")
 
-const showDeleteConfirm = (data: any) => {
-  Modal.confirm({
-    title: `确认删除【${data.userName}】的测评结果【${data.answerId}】?`,
-    icon: createVNode(ExclamationCircleOutlined),
-    okText: '确认',
-    okType: 'danger',
-    cancelText: '取消',
-    onOk() {
-    }
-  });
-};
+const loading = ref<boolean>(false);
 </script>

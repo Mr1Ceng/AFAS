@@ -30,7 +30,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, onMounted, watch, defineProps, defineEmits } from "vue";
+import { ref, onMounted, watch, defineProps } from "vue";
 const props = defineProps({
   initialSpacing: { type: Number, default: 5 },
   initialPerturbation: { type: Number, default: 10 },

@@ -38,7 +38,7 @@ export class EnumHelper {
     descriptions: T,
     value: string
   ): string {
-    return descriptions[value] || '未知备注';
+    return descriptions[value] || '';
   }
 
   /**
@@ -54,6 +54,6 @@ export class EnumHelper {
     key: keyof T // 将 key 类型定义为 keyof T，确保类型安全
   ): string {
     const value = enumObj[key];
-    return descriptions[value as string] || '未知备注'; // 强制将 value 转换为 string
+    return descriptions[value as string] || ''; // 强制将 value 转换为 string
   }
 }

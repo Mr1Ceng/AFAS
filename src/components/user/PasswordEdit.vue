@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, defineEmits } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 import { apiClient } from '@/utils/ApiClientHelper'
 import _ from "lodash";
@@ -73,7 +73,14 @@ onMounted(() => {
 
 const validateEmpty = (fieldName: string) => {
   return async (_rule: any, value: string) => {
-    if (!value || value.trim() === "") {
+    console.log(value)
+    if (!value) {
+      return Promise.reject(new Error(`${fieldName} 不能为空`));
+    }
+    if (typeof value == "number" && value === 0) {
+      return Promise.reject(new Error(`${fieldName} 不能为零`));
+    }
+    else if (typeof value == "string" && value.trim() === "") {
       return Promise.reject(new Error(`${fieldName} 不能为空`));
     }
     return Promise.resolve();

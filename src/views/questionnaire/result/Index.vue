@@ -10,7 +10,7 @@
         <a-range-picker v-model:value="dateRange" />
         <a-select style="width: 120px" v-model:value="status">
           <a-select-option v-for="item in dataStatusList" :value="item.value">{{ item.description
-            }}</a-select-option>
+          }}</a-select-option>
         </a-select>
       </a-space>
     </div>
@@ -38,7 +38,7 @@
                 </span>
                 <br />
                 <span>
-                  {{ `（${record["userId"]}）` }}
+                  {{ `（${record.userId}）` }}
                 </span>
               </template>
               <span>
@@ -76,15 +76,13 @@
               删除
             </a-button>
             <a-button size="small" type="link"
-              @click="() => { currentAnswerId = record['answerId']; setDrawerVisible(true); console.log(currentAnswerId) }">
+              @click="() => { currentAnswerId = record.answerId; setDrawerVisible(true); console.log(currentAnswerId) }">
               详情
             </a-button>
-            <a-button size="small" type="link"
-              @click="() => { currentAnswerId = record['answerId']; setPDFModalVisible(true) }">
+            <a-button size="small" type="link" @click="() => { download(record); }">
               下载报告
             </a-button>
           </template>
-
           <template v-else>
             <a-tooltip placement="top">
               <template #title>
@@ -131,9 +129,26 @@ import { GerderDescription } from '@/enums/GerderEnum'
 import { EnumHelper } from '@/utils/EnumHelper'
 import PdfViewer from '@/components/pdf/PDFViewer.vue'
 
+const props = defineProps({
+  importId: String
+})
 
-
+watch(() => props.importId, async (newValue, oldValue) => {
+  console.log(newValue)
+  if (tableQueryModel.value.data) {
+    tableQueryModel.value.data.ImportId = newValue
+  } else {
+    tableQueryModel.value.data = {
+      ImportId: newValue
+    }
+  }
+  TestResultGridQuery();
+})
 const dataStatusList = [
+  {
+    value: '',
+    description: "全部"
+  },
   {
     value: DataStatusEnum.Active,
     description: "已完成"
@@ -156,8 +171,11 @@ const tableQueryModel = ref<TableQueryModelWithData<Record<string, any>>>({
   index: 0,
   size: 10,
   sorter: { key: "QuestionnaireDate", value: Sorter.DESC },
-  data: {},
+  data: {
+    ImportId: props.importId
+  },
 });
+
 const testResults = ref<DataList<TestResultQueryRow>>();
 const TestResultGridQuery = async () => {
   try {
@@ -300,6 +318,9 @@ const setModalVisible = (open: boolean) => {
 const pdfModalVisible = ref<boolean>(false);
 const setPDFModalVisible = (open: boolean) => {
   pdfModalVisible.value = open;
+  if (!open) {
+    currentAnswerId.value = "";
+  }
 };
 //抽屉
 const drawerVisible = ref<boolean>(false);
@@ -307,7 +328,14 @@ const setDrawerVisible = (open: boolean) => {
   drawerVisible.value = open;
 };
 const currentAnswerId = ref<string>("")
-
+const download = (record: TestResultQueryRow) => {
+  if (record.status == DataStatusEnum.Draft) {
+    message.warn("请生成报告后，再下载");
+    return;
+  }
+  currentAnswerId.value = record.answerId;
+  setPDFModalVisible(true)
+}
 const showDeleteConfirm = (data: any) => {
   Modal.confirm({
     title: `确认删除【${data.userName}】的测评结果【${data.answerId}】?`,

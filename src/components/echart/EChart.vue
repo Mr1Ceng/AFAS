@@ -3,7 +3,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, defineEmits } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useGlobalStore } from "@/stores/globalStore";
 import * as echarts from 'echarts';
 const emit = defineEmits<{

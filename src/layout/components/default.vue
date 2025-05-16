@@ -1,7 +1,7 @@
 <template>
   <a-layout class="h-full">
     <a-layout-header class="header flex flex-row">
-      <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
+      <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal" @select="changeMenu1"
         :style="{ lineHeight: '64px' }">
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key" :disabled="!menu.show">{{ menu.label
           }}</a-menu-item>
@@ -35,7 +35,7 @@
     </a-layout-header>
     <a-layout class="flex-1">
       <a-layout-sider width="200">
-        <a-menu v-model:selectedKeys="selectedKeys2" v-model:openKeys="openKeys"
+        <a-menu v-model:selectedKeys="selectedKeys2" v-model:openKeys="openKeys" @select="changeMenu2"
           :items="menuList[selectedKeys1[0]].children" mode="inline" :style="{ height: '100%', borderRight: 0 }">
         </a-menu>
       </a-layout-sider>
@@ -71,6 +71,8 @@ import {
 import { useGlobalStore } from "@/stores/globalStore";
 import { useAccountStore } from "@/stores/accountStore";
 import { message } from 'ant-design-vue';
+import { storeToRefs } from 'pinia';
+
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
 const isDarkTheme = ref(globalStore.isDarkTheme)
@@ -80,6 +82,7 @@ const store = useMenuStore()
 const selectedKeys1 = ref<number[]>([store._selectedKeys1]);
 const selectedKeys2 = ref<string[]>(store.getSelectedKeys2());
 let openKeys = ref<string[]>(store.getOpenKeys());
+const { _selectedKeys1,_selectedKeys2,_openKeys } = storeToRefs(store);
 
 //#region 菜单对象
 const menuList = ref([
@@ -138,11 +141,11 @@ const menuList = ref([
       label: '测评管理',
       title: '测评管理',
       children: [
-        {
-          key: 'S_Questionnaire',
-          label: '测评试卷管理',
-          title: '测评试卷管理',
-        },
+        // {
+        //   key: 'S_Questionnaire',
+        //   label: '测评试卷管理',
+        //   title: '测评试卷管理',
+        // },
         {
           key: 'S_SpiralMaze',
           label: '漩涡迷宫配置管理',
@@ -162,21 +165,41 @@ const menuList = ref([
 //#endregion
 
 //#region 监听器
-watch(selectedKeys1, async (newValue, oldValue) => {
-  selectedKeys2.value = store.getSelectedKeys2(newValue[0])
-  openKeys.value = store.getOpenKeys(newValue[0])
-  store.setter(newValue[0], selectedKeys2.value, openKeys.value)
-})
 
-watch(selectedKeys2, async (newValue, oldValue) => {
-  store.setter(selectedKeys1.value[0], newValue, openKeys.value)
-  router.push({ name: newValue[0], params: {} })
-})
+watch(_selectedKeys1,async (newValue, oldValue) => {
+  // console.log("_selectedKeys1", newValue)
+  // console.log("selectedKeys1",selectedKeys1.value)
+  selectedKeys1.value = [newValue]
+},{ deep: true })
+watch(_selectedKeys2,async (newValue, oldValue) => {
+  // console.log("_selectedKeys2",newValue)
+  // console.log("selectedKeys2",selectedKeys2.value)
+  selectedKeys2.value = newValue[_selectedKeys1.value]
+},{ deep: true })
 
-watch(openKeys, async (newValue, oldValue) => {
-  store.setter(selectedKeys1.value[0], selectedKeys2.value, newValue)
-})
+watch(_openKeys,async (newValue, oldValue) => {
+  // console.log("_openKeys",newValue)
+  // console.log("openKeys",openKeys.value)
+  openKeys.value = newValue[_selectedKeys1.value]
+},{ deep: true })
+
 //#endregion
+
+const changeMenu1 = ({ key, selectedKeys }: { key: number; selectedKeys: number[] })=>{
+  // console.log(key)
+  // console.log(selectedKeys)
+  selectedKeys2.value = store.getSelectedKeys2(key)
+  openKeys.value = store.getOpenKeys(key)
+  store.setter(key, selectedKeys2.value, openKeys.value)
+  router.push({ name: selectedKeys2.value[0], params: {} })
+}
+
+const changeMenu2 = ({ key, selectedKeys }: { key: string; selectedKeys: string[] })=>{
+  // console.log(key)
+  // console.log(selectedKeys)
+  store.setter(selectedKeys1.value[0], selectedKeys2.value, openKeys.value)
+  router.push({ name: selectedKeys2.value[0], params: {} })
+}
 
 const logout = async () => {
   // accountStore.setToken("")

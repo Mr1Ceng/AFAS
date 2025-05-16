@@ -284,7 +284,7 @@ onUnmounted(() => {
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
-      <a-collapse v-model:activeKey="activeKey" :bordered="false" style="">
+      <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
         <template #expandIcon="{ isActive }">
           <caret-right-outlined :rotate="isActive ? 90 : 0" />
         </template>
@@ -344,7 +344,7 @@ onUnmounted(() => {
         <a-textarea class="inputWidth" v-model:value="remark" :rows="4" />
       </div>
       <div class="w-full flex flex-row justify-end items-center pt-8">
-        <a-button @click="SaveAnswerS5()">
+        <a-button @click="SaveAnswerS5()" type="primary">
           提交
         </a-button>
       </div>

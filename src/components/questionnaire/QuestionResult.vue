@@ -66,7 +66,7 @@ const GetTeacherList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/TEACHER')
     console.log('响应:', response)
     teacherList.value = response.data
-    if (teacherList.value.find(x => x.userId == accountStore.user.userId)) {
+    if (teacherList.value.find(x => x.userId == accountStore.user.userId && !testResult.value.teacherId)) {
       testResult.value.teacherId = accountStore.user.userId;
     }
   } catch (error) {
@@ -78,7 +78,7 @@ const GetStudentList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/STUDENT')
     console.log('响应:', response)
     studentList.value = response.data
-    if (studentList.value.find(x => x.userId == accountStore.user.userId)) {
+    if (studentList.value.find(x => x.userId == accountStore.user.userId && !testResult.value.userId)) {
       testResult.value.userId = accountStore.user.userId;
     }
   } catch (error) {
@@ -87,8 +87,7 @@ const GetStudentList = async () => {
 }
 GetEvaluationStandardList();
 GetSuggestedCourseList();
-GetTeacherList();
-GetStudentList();
+
 //#endregion
 
 //#region 获取答案
@@ -118,7 +117,10 @@ const GetAnswerList = async () => {
     console.error('请求失败:', error)
   }
 }
-GetAnswerList();
+GetAnswerList().then(() => {
+  GetTeacherList();
+  GetStudentList();
+});
 //#endregion
 const student = computed(() => {
   return studentList.value.find(x => x.userId == testResult.value.userId) ?? {}
@@ -371,6 +373,7 @@ const CreateRadarMap = () => {
   };
 }
 const SaveTestResult = async () => {
+  loading.value = true;
   console.log(testResult.value)
   console.log(student.value)
   if (!currentEvaluationStandard.value) {
@@ -389,10 +392,13 @@ const SaveTestResult = async () => {
   } catch (error) {
     console.error('请求失败:', error)
   }
+  loading.value = false;
 }
+const loading = ref<boolean>(false);
 </script>
 
 <template>
+
   <div class="w-full h-full flex flex-row">
     <div class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll flex">
       <div class="w-3/5 h-full">
@@ -407,9 +413,13 @@ const SaveTestResult = async () => {
         </div>
       </div>
     </div>
+
     <div class="h-full border-l-2 border-gray-300 p-4 flex flex-col" style="width: 400px;">
       <a-form ref="formRef" :model="testResult" :layout="'horizontal'"
         :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
+        <a-form-item label="测评编码">
+          <a-input style="width: 100%;" size="large" v-model:value="testResult.answerId" disabled/>
+        </a-form-item>
         <a-form-item label="日期">
           <a-date-picker style="width: 100%;" v-model:value="testResult.questionnaireDate" size="large" />
         </a-form-item>
@@ -422,7 +432,7 @@ const SaveTestResult = async () => {
         <a-form-item label="性别">
           <a-radio-group style="width: 100%;" size="large" v-model:value="student.gender" disabled>
             <a-radio-button style="width: 50%;" v-for="item in sexList" :value="item.value">{{ item.description
-              }}</a-radio-button>
+            }}</a-radio-button>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="年龄">
@@ -449,11 +459,11 @@ const SaveTestResult = async () => {
           </a-select>
         </a-form-item>
         <!-- <a-form-item label="视知觉结果">
-          <a-textarea style="width: 100%;" v-model:value="testResult.sResult" :rows="4" />
-        </a-form-item>
-        <a-form-item label="听知觉结果">
-          <a-textarea style="width: 100%;" v-model:value="testResult.tResult" :rows="4" />
-        </a-form-item> -->
+                    <a-textarea style="width: 100%;" v-model:value="testResult.sResult" :rows="4" />
+                  </a-form-item>
+                  <a-form-item label="听知觉结果">
+                    <a-textarea style="width: 100%;" v-model:value="testResult.tResult" :rows="4" />
+                  </a-form-item> -->
         <a-form-item label="弱势">
           <a-textarea style="width: 100%;" v-model:value="testResult.weak" :rows="3" />
         </a-form-item>
@@ -464,7 +474,7 @@ const SaveTestResult = async () => {
           <a-textarea style="width: 100%;" v-model:value="testResult.remark" :rows="4" />
         </a-form-item>
         <a-form-item :span="24" style="text-align: right">
-          <a-button type="primary" @click="SaveTestResult()">
+          <a-button type="primary" @click="SaveTestResult()" :loading="loading">
             生成测试报告
           </a-button>
         </a-form-item>

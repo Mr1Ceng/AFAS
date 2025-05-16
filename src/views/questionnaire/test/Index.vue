@@ -49,7 +49,7 @@
       </a-tab-pane>
       <template #leftExtra>
         <a-select :style="{ marginRight: '16px' }" size="large" ref="select" v-model:value="selectedQuestionnaire"
-          @change="() => { }">
+          @change="()=>{GetQuestionList();}">
           <a-select-option v-for="(questionnaire, index) in questionnaireList" :value="questionnaire.questionnaireId">{{
             questionnaire.questionnaireName + "—" +
             questionnaire.versionName }}</a-select-option>
@@ -57,6 +57,9 @@
       </template>
       <template #rightExtra>
         <a-space :size="20">
+          <span class="text-xl">
+            {{ `测评编码：${answerStore._answerId}`}}
+          </span>
           <a-select :style="{ marginLeft: '16px' }" v-model:value="student.userId" size="large" disabled>
             <a-select-option v-for="student in studentList" :value="student.userId">{{
               student.userName }}</a-select-option>
@@ -128,7 +131,6 @@ answerStore.setAnswerId("");
 
 watch(selectedQuestionnaire, (newvalue, oldValue) => {
   canChanges.value = true;
-  GetQuestionList();
 })
 import { useAccountStore } from "@/stores/accountStore";
 import { EnumHelper } from '@/utils/EnumHelper';

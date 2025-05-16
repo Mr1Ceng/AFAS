@@ -1,8 +1,11 @@
 <script lang="ts" setup>
 import { ref, onMounted, watch } from 'vue';
-import { VuePdf, createLoadingTask } from 'vue3-pdfjs/esm';
-import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
+// import { VuePdf, createLoadingTask } from 'vue3-pdfjs/esm';
+// import { PDFDocumentProxy } from 'pdfjs-dist/types/src/display/api';
 import { message } from 'ant-design-vue';
+
+const VuePdf = require('vue3-pdfjs/esm').VuePdf;
+const createLoadingTask = require('vue3-pdfjs/esm').createLoadingTask;
 const props = defineProps<{
   src: string,
   visible: boolean
@@ -43,7 +46,7 @@ onMounted(() => {
  */
 const load = () => {
   const loadingTask = createLoadingTask(pdfSrc.value);
-  loadingTask.promise.then((pdf: PDFDocumentProxy) => {
+  loadingTask.promise.then((pdf: any) => {
     console.log(pdf)
     numOfPages.value = pdf.numPages;
   });

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch, defineEmits } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { message } from 'ant-design-vue';
 import { apiClient } from '@/utils/ApiClientHelper'
 import { EnumHelper } from '@/utils/EnumHelper';
@@ -53,6 +53,7 @@ const GetUserInfo = async () => {
 }
 const formRef = ref();
 const SaveUser = async () => {
+  loading.value = true;
   try {
     await formRef.value.validate();
     console.log("表单验证通过！");
@@ -71,6 +72,7 @@ const SaveUser = async () => {
   } catch (error) {
     console.error('请求失败:', error)
   }
+  loading.value = false;
 }
 
 onMounted(() => {
@@ -137,12 +139,20 @@ const handleChange = async (info: any) => {
 
 const validateEmpty = (fieldName: string) => {
   return async (_rule: any, value: string) => {
-    if (!value || value.trim() === "") {
+    console.log(value)
+    if (!value) {
+      return Promise.reject(new Error(`${fieldName} 不能为空`));
+    }
+    if (typeof value == "number" && value === 0) {
+      return Promise.reject(new Error(`${fieldName} 不能为零`));
+    }
+    else if (typeof value == "string" && value.trim() === "") {
       return Promise.reject(new Error(`${fieldName} 不能为空`));
     }
     return Promise.resolve();
   };
 };
+const loading = ref<boolean>(false);
 </script>
 
 <template>
@@ -173,7 +183,7 @@ const validateEmpty = (fieldName: string) => {
             }}</a-radio-button>
         </a-radio-group>
       </a-form-item>
-      <a-form-item label="年龄">
+      <a-form-item label="年龄" name="age" :rules="[{ required: true, validator: validateEmpty('年龄') }]">
         <a-input-number :style="{ width: '100%' }" v-model:value="user.age" size="large" addon-after="岁" :min="0" />
       </a-form-item>
       <a-form-item label="联系电话">
@@ -186,7 +196,7 @@ const validateEmpty = (fieldName: string) => {
         </a-radio-group>
       </a-form-item>
       <a-form-item :span="24" style="text-align: right">
-        <a-button type="primary" @click='SaveUser'>保存</a-button>
+        <a-button type="primary" @click='SaveUser' :loading="loading">保存</a-button>
       </a-form-item>
     </a-form>
   </div>
