@@ -1,5 +1,6 @@
 import _ from "lodash";
 import CryptoJS from "crypto-js";
+import { v4 as uuidv4 } from 'uuid';
 
 const TerminalKey = 'fb78e6c9c1e444319b';
 const TerminalSecret = '28ea6c66bd504e8583f7c76380789cc7';
@@ -30,7 +31,7 @@ function encryptSHA256(input: string): string {
  */
 function getAuthorizationString(keyId: string = "", token: string = ""): string {
   // 生成随机字符串
-  const random = crypto.randomUUID();
+  const random = uuidv4();
 
   // 获取当前时间戳（以毫秒为单位）
   const timeStamp = Date.now().toString();
