@@ -8,10 +8,11 @@
           <label for="spacing">漩涡间距:</label>
         </a-col>
         <a-col :span="12">
-          <a-slider v-model:value="spacing" :min="20" :max="50" :step="1" />
+          <a-slider v-model:value="spacing" :min="20" :max="Math.floor(props.height / 20)" :step="1" />
         </a-col>
         <a-col :span="4">
-          <a-input-number v-model:value="spacing" :min="20" :max="50" style="margin-left: 16px" disabled />
+          <a-input-number v-model:value="spacing" :min="20" :max="Math.floor(props.height / 20)"
+            style="margin-left: 16px" disabled />
         </a-col>
       </a-row>
       <a-row :justify="'center'">
@@ -30,6 +31,7 @@
 </template>
 
 <script lang="ts" setup>
+import _ from "lodash";
 import { ref, onMounted, watch, defineProps } from "vue";
 const props = defineProps({
   initialSpacing: { type: Number, default: 5 },
@@ -203,7 +205,9 @@ watch([spacing, perturbation], () => {
 });
 
 watch(() => props.initialSpacing, (newValue, oldValue) => {
-  spacing.value = newValue
+  spacing.value = Math.min(newValue, Math.floor(props.height / 20))
+  console.log(spacing.value)
+  console.log(newValue)
 });
 
 watch(() => props.initialPerturbation, (newValue, oldValue) => {

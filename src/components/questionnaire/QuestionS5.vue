@@ -159,11 +159,11 @@ const resetTimer = (): void => {
 // #region 答题方法
 
 const StartDraw = () => {
-  if (stepIndex.value != 1) {
+  if (seconds.value != 0) {
+    message.info("请先完成一分钟观察，在开始绘画！")
     return;
   }
-  stopTimer();
-  seconds.value += maxMin * 60;
+  resetTimer();
   setModalVisible(true);
 }
 

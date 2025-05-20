@@ -21,7 +21,7 @@
         </a-table>
       </div>
       <div class="w-1/2 h-full">
-        <div class="w-full h-30 p-4">
+        <div class="w-full h-16 p-4">
           <a-form layout="inline" :model="currentSpiralMaze">
             <a-form-item label="年龄">
               <a-input-number v-model:value="currentSpiralMaze.age" :min="1" style="margin-left: 16px" />
@@ -186,10 +186,10 @@ const spacing = ref(30);
 const perturbation = ref(20);
 const spiralMaze = ref<any>();
 const spiralMazeHeight = computed(() => {
-  return tableContainer.value?.clientHeight - 300;
+  return tableContainer.value?.clientHeight - 132;
 });
 const spiralMazeWidth = computed(() => {
-  return tableContainer.value?.clientWidth - 150;
+  return tableContainer.value?.clientWidth;
 });
 const currentSpiralMaze = ref<any>({})
 const getSetting = (newSpacing: number, newPerturbation: number) => {

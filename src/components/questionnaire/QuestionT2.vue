@@ -188,12 +188,12 @@ const playAudio = (index: number, type: string) => {
   if (type == "Diff") {
     if (AudioDiffRefs.value[index]) {
       AudioDiffRefs.value[index].play();
-      if (!isDev) canPlay.value = false;
+      if (!isDev.value) canPlay.value = false;
     }
   } else {
     if (AudioSameRefs.value[index]) {
       AudioSameRefs.value[index].play();
-      if (!isDev) canPlay.value = false;
+      if (!isDev.value) canPlay.value = false;
     }
   }
 }

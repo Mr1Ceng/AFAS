@@ -220,10 +220,10 @@ const perturbation = ref(15);
 const spiralMazeContainer = ref<any>();
 const spiralMaze = ref<any>();
 const spiralMazeHeight = computed(() => {
-  return spiralMazeContainer.value?.clientHeight - 150;
+  return spiralMazeContainer.value?.clientHeight;
 });
 const spiralMazeWidth = computed(() => {
-  return spiralMazeContainer.value?.clientWidth - 150;
+  return spiralMazeContainer.value?.clientWidth;
 });
 const handleCrossUpdate = (newCount: number) => {
   crossCount.value = newCount;
@@ -247,6 +247,8 @@ const finished = (count: number) => {
   Completed();
 }
 // #endregion
+
+const smVisible = ref<boolean>(false);
 </script>
 
 <template>
@@ -260,7 +262,7 @@ const finished = (count: number) => {
   <a-flex v-show="modalVisible && stepIndex == 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <div ref="spiralMazeContainer" class="w-full flex-auto">
+      <div ref="spiralMazeContainer" class="w-3/4 flex-auto">
 
       </div>
       <div class="w-full" style="height: 100px;">
@@ -273,25 +275,34 @@ const finished = (count: number) => {
   <a-flex v-show="stepIndex >= 1" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
-      <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
-        <template #expandIcon="{ isActive }">
-          <caret-right-outlined :rotate="isActive ? 90 : 0" />
-        </template>
-        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
-          <span class="text-base">
-            <div v-html="getTipInfo"></div>
-          </span>
-        </a-collapse-panel>
-      </a-collapse>
-      <div v-show="stepIndex == 1" class="w-full flex-auto flex flex-col justify-center items-center">
-        <SpiralMaze ref="spiralMaze" :initial-spacing="spacing" :initial-perturbation="perturbation"
-          :width="spiralMazeWidth" :height="spiralMazeHeight" :is-dark-theme="globalStore.isDarkTheme"
-          @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
-          @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
+      <div class="w-full flex-auto flex flex-row">
+        <div class="w-1/4 h-full">
+          <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
+            <template #expandIcon="{ isActive }">
+              <caret-right-outlined :rotate="isActive ? 90 : 0" />
+            </template>
+            <a-collapse-panel key="1" header="指导语"
+              :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+              <span class="text-base">
+                <div v-html="getTipInfo"></div>
+              </span>
+            </a-collapse-panel>
+          </a-collapse>
+        </div>
+        <div class="w-3/4 h-full flex justify-center items-center">
+          <div v-show="stepIndex == 1" class="w-full h-full">
+            <SpiralMaze ref="spiralMaze" :initial-spacing="spacing" :initial-perturbation="perturbation"
+              :width="spiralMazeWidth" :height="spiralMazeHeight" :is-dark-theme="globalStore.isDarkTheme"
+              @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
+              @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
+            <!-- <a-button @click="() => { smVisible = true; }"></a-button> -->
+          </div>
+          <div class="w-full h-full">
+            <img v-show="stepIndex > 1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
+          </div>
+        </div>
       </div>
-      <div class="w-full flex-auto flex justify-center items-center">
-        <img v-show="stepIndex > 1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
-      </div>
+
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
         <div class="text-base">注意事项：</div>
         <span class="text-base">
@@ -339,6 +350,20 @@ const finished = (count: number) => {
     @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false"
     :cancel-button-props="stepIndex == 0 ? {} : { style: { display: 'none' } }">
     <div v-html="getModalInfo"></div>
+  </a-modal>
+  <a-modal v-model:open="smVisible" width="100%" wrap-class-name="full-modal" @ok="" ok-text="关闭" :maskClosable="false"
+    :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
+    <SpiralMaze ref="spiralMaze" :initial-spacing="spacing" :initial-perturbation="perturbation"
+      :width="spiralMazeWidth" :height="spiralMazeHeight" :is-dark-theme="globalStore.isDarkTheme"
+      @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
+      @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
+    <template #footer>
+      <div class="w-full h-12 flex items-center justify-center">
+        <a-space :size="20">
+          <a-button key="close" @click="() => { smVisible = false }">关闭</a-button>
+        </a-space>
+      </div>
+    </template>
   </a-modal>
 </template>
 

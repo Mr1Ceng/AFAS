@@ -1,8 +1,15 @@
 <template>
   <a-layout class="h-full">
     <a-layout-header class="header flex flex-row">
-      <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal" @select="changeMenu1"
-        :style="{ lineHeight: '64px' }">
+      <div class="flex items-center justify-end pr-12.5">
+        <img src="/favicon.ico" width="60px" height="60px">
+        <!-- <a-button type="primary" style="" @click="toggleCollapsed">
+          <MenuUnfoldOutlined v-if="collapsed" />
+          <MenuFoldOutlined v-else />
+        </a-button> -->
+      </div>
+      <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
+        @select="changeMenu1" :style="{ lineHeight: '64px' }">
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key" :disabled="!menu.show">{{ menu.label
           }}</a-menu-item>
       </a-menu>
@@ -34,7 +41,7 @@
       </div>
     </a-layout-header>
     <a-layout class="flex-1">
-      <a-layout-sider width="200">
+      <a-layout-sider width="200" v-model:collapsed="collapsed" collapsible>
         <a-menu v-model:selectedKeys="selectedKeys2" v-model:openKeys="openKeys" @select="changeMenu2"
           :items="menuList[selectedKeys1[0]].children" mode="inline" :style="{ height: '100%', borderRight: 0 }">
         </a-menu>
@@ -62,6 +69,8 @@ import { apiClient } from '@/utils/ApiClientHelper';
 import { useMenuStore } from '@/stores/menuStore';
 import PasswordEdit from '@/components/user/PasswordEdit.vue';
 import {
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
   MailOutlined,
   CalendarOutlined,
   AppstoreOutlined,
@@ -82,8 +91,14 @@ const store = useMenuStore()
 const selectedKeys1 = ref<number[]>([store._selectedKeys1]);
 const selectedKeys2 = ref<string[]>(store.getSelectedKeys2());
 let openKeys = ref<string[]>(store.getOpenKeys());
-const { _selectedKeys1,_selectedKeys2,_openKeys } = storeToRefs(store);
+const collapsed = ref(true);
+const { _selectedKeys1, _selectedKeys2, _openKeys } = storeToRefs(store);
+const toggleCollapsed = () => {
+  collapsed.value = !collapsed.value;
 
+  openKeys.value = collapsed.value ? [] : store.getOpenKeys();
+
+};
 //#region 菜单对象
 const menuList = ref([
   {
@@ -166,35 +181,36 @@ const menuList = ref([
 
 //#region 监听器
 
-watch(_selectedKeys1,async (newValue, oldValue) => {
+watch(_selectedKeys1, async (newValue, oldValue) => {
   // console.log("_selectedKeys1", newValue)
   // console.log("selectedKeys1",selectedKeys1.value)
   selectedKeys1.value = [newValue]
-},{ deep: true })
-watch(_selectedKeys2,async (newValue, oldValue) => {
+}, { deep: true })
+watch(_selectedKeys2, async (newValue, oldValue) => {
   // console.log("_selectedKeys2",newValue)
   // console.log("selectedKeys2",selectedKeys2.value)
   selectedKeys2.value = newValue[_selectedKeys1.value]
-},{ deep: true })
+}, { deep: true })
 
-watch(_openKeys,async (newValue, oldValue) => {
+watch(_openKeys, async (newValue, oldValue) => {
   // console.log("_openKeys",newValue)
   // console.log("openKeys",openKeys.value)
-  openKeys.value = newValue[_selectedKeys1.value]
-},{ deep: true })
+
+  openKeys.value = collapsed.value ? [] : newValue[_selectedKeys1.value];
+}, { deep: true })
 
 //#endregion
 
-const changeMenu1 = ({ key, selectedKeys }: { key: number; selectedKeys: number[] })=>{
+const changeMenu1 = ({ key, selectedKeys }: { key: number; selectedKeys: number[] }) => {
   // console.log(key)
   // console.log(selectedKeys)
   selectedKeys2.value = store.getSelectedKeys2(key)
-  openKeys.value = store.getOpenKeys(key)
+  openKeys.value = collapsed.value ? [] : store.getOpenKeys(key);
   store.setter(key, selectedKeys2.value, openKeys.value)
   router.push({ name: selectedKeys2.value[0], params: {} })
 }
 
-const changeMenu2 = ({ key, selectedKeys }: { key: string; selectedKeys: string[] })=>{
+const changeMenu2 = ({ key, selectedKeys }: { key: string; selectedKeys: string[] }) => {
   // console.log(key)
   // console.log(selectedKeys)
   store.setter(selectedKeys1.value[0], selectedKeys2.value, openKeys.value)

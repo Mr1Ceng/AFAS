@@ -317,7 +317,7 @@ const modalOkClick = () => {
     </a-button>
   </a-flex>
   <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
-    <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'"
+    <a-flex class="h-full w-[calc(100%-200px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'"
       :align="'flex-start'">
       <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
         <template #expandIcon="{ isActive }">
@@ -341,21 +341,21 @@ const modalOkClick = () => {
             <span class="text-xl">个数</span>
           </a-flex>
         </a-flex>
-        <a-flex class="w-full h-7" v-for="row in rowList" :key="row.rowId" :justify="'center'" :align="'flex-start'">
-          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
+        <a-flex class="w-full h-9" v-for="row in rowList" :key="row.rowId" :justify="'center'" :align="'flex-start'">
+          <a-flex class="h-9 w-20 border-1" :justify="'center'" :align="'center'">
             <span class="text-xl">{{ row.rowName }}</span>
           </a-flex>
-          <a-flex class="h-7 flex-auto border-1" :justify="'space-around'" :align="'center'">
-            <div class="flex justify-center text-xl hover:bg-sky-500 cursor-pointer" v-for="column in row.columns"
+          <a-flex class="h-9 flex-auto border-1" :justify="'space-around'" :align="'center'">
+            <div class="flex justify-center text-3xl hover:bg-sky-500 cursor-pointer" v-for="column in row.columns"
               @click="ClickGrid(row.rowId, column)"
-              :class="`w-1/${row.columns.length}` + (column.selected ? (column.isTrue ? ' bg-green-500' : ' bg-red-500') : '')">
+              :class="`w-1/39` + (column.selected ? (column.isTrue ? ' bg-green-500' : ' bg-red-500') : '')">
               <span>
                 {{ stepIndex == 0 ? '' : column.value }}
               </span>
             </div>
           </a-flex>
-          <a-flex class="h-7 w-20 border-1" :justify="'center'" :align="'center'">
-            <span class="text-xl">{{ row.succussCount ?? 0 }}</span>
+          <a-flex class="h-9 w-20 border-1" :justify="'center'" :align="'center'">
+            <span class="text-2xl">{{ row.succussCount ?? 0 }}</span>
           </a-flex>
         </a-flex>
       </a-flex>
@@ -372,11 +372,11 @@ const modalOkClick = () => {
         </span>
       </div>
     </a-flex>
-    <div class="h-full border-l-2 border-gray-300 p-4 flex flex-col" style="width: 400px;">
+    <div class="h-full border-l-2 border-gray-300 p-4 flex flex-col" style="width: 200px;">
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-9xl">{{ seconds }}</span>
       </div>
-      <div class="w-full h-20 pt-4 flex justify-around items-center">
+      <div class="w-full h-60 pt-4 flex flex-col justify-around items-center">
         <span class="text-xl">错误数
           <span class="text-3xl">{{ errorCount }}</span>
         </span>

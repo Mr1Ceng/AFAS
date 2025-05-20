@@ -194,19 +194,19 @@ const playAudio = (type: string) => {
     case "Number1":
       if (number1Audio.value) {
         number1Audio.value.play();
-        if (!isDev) canPlay.value = false;
+        if (!isDev.value) canPlay.value = false;
       }
       break;
     case "Number2":
       if (number2Audio.value) {
         number2Audio.value.play();
-        if (!isDev) canPlay.value = false;
+        if (!isDev.value) canPlay.value = false;
       }
       break;
     case "Story":
       if (storyAudio.value) {
         storyAudio.value.play();
-        if (!isDev) canPlay.value = false;
+        if (!isDev.value) canPlay.value = false;
       }
       break;
     default:
@@ -477,7 +477,7 @@ const openNotification = (message: string) => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-8xl">{{
           `${number1Question.timeConsume ?? 0}/${number2Question.timeConsume ?? 0}/${number3Question.timeConsume ?? 0}`
-        }}</span>
+          }}</span>
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-20">数字题一</span>

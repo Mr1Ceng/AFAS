@@ -16,6 +16,7 @@ const props = defineProps<{
 
 const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
 const isDev = inject<Ref<boolean>>("isDev", ref(false));
+console.log(isDev)
 const isComplete = ref(false);
 
 const answerStore = useAnswerStore();
@@ -206,7 +207,7 @@ const ClickGrid = (id: number) => {
   if (currentColumn == 25) {
     currentRow++;
     currentColumn = 0;
-    if (currentRow == (isDev ? 1 : 4)) {
+    if (currentRow == (isDev.value ? 1 : 4)) {
       timeConsume.value = maxMin * 60 - seconds.value;
       console.log(timeConsume.value)
       stopTimer();
