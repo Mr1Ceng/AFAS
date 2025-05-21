@@ -10,7 +10,8 @@ import { PlusOutlined } from '@ant-design/icons-vue';
 import type { UploadProps, UploadFile } from 'ant-design-vue';
 
 const props = defineProps<{
-  userId: string
+  userId?: string,
+  role?: string
 }>()
 const gerderList = EnumHelper.getEnumDescriptions(GerderDescription);
 const roleList = EnumHelper.getEnumDescriptions(RoleDescription);
@@ -24,13 +25,19 @@ const emit = defineEmits<{
 watch(() => props.userId, async (newValue, oldValue) => {
 
 })
+watch(() => props.role, async (newValue, oldValue) => {
+  console.log(newValue)
+  if (newValue && newValue != "") {
+    user.value.role = newValue
+  }
+}, { immediate: true })
 
 //#endregion
 
 //#region 获取信息
 
 const GetUserInfo = async () => {
-  if (props.userId == "") {
+  if (!props.userId || props.userId == "") {
     return;
   }
   try {
@@ -190,7 +197,8 @@ const loading = ref<boolean>(false);
         <a-input v-model:value="user.mobile" size="large" />
       </a-form-item>
       <a-form-item label="角色">
-        <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.role">
+        <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.role"
+          :disabled="props.role && props.role != ''">
           <a-radio-button :style="{ width: '50%' }" v-for="item in roleList" :value="item.value">{{ item.description
             }}</a-radio-button>
         </a-radio-group>

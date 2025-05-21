@@ -18,6 +18,7 @@ const props = defineProps<{
 const canChanges = inject<Ref<boolean>>("canChanges", ref(false));
 const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const isComplete = ref(false);
+const loading = ref<boolean>(false);
 
 const answerStore = useAnswerStore();
 const accountStore = useAccountStore();
@@ -47,8 +48,7 @@ GetQuestionS4();
 const spiralMazeSetting = ref<any>({});
 const GetSpiralMazeSetting = async () => {
   try {
-    console.log(accountStore.user)
-    const response = await apiClient.post('/SpiralMaze/GetSpiralMaze/' + accountStore.user.age)
+    const response = await apiClient.post('/SpiralMaze/GetSpiralMaze/' + answerStore._user.age)
     console.log('响应:', response)
     if (response.status == 1) {
       spiralMazeSetting.value = response.data
@@ -67,20 +67,13 @@ GetSpiralMazeSetting();
 
 const SaveAnswerS4 = async () => {
   if (!isComplete.value) {
+    loading.value = true;
     message.info("请先完成题目，再提交！")
-    return;
-  }
-  if (accountStore.user.userId == "") {
-    message.error("用户登录错误，请重新登录");
-    return;
-  }
-  if (accountStore.user.isStaff) {
-    message.error("请用学生账号登录");
     return;
   }
   try {
     const data = {
-      answerId: answerStore.getAnswerId(),
+      answerId: answerStore._answerId,
       questionId: questionInfo.value.questionId,
       timeConsume: timeConsume.value,
       questionImage: questionImage.value,
@@ -90,7 +83,7 @@ const SaveAnswerS4 = async () => {
       remark: remark.value
     }
     console.log(data)
-    const response = await apiClient.post('/Questionnaire/SaveAnswerS4/' + accountStore.user.userId, data)
+    const response = await apiClient.post('/Questionnaire/SaveAnswerS4/' + answerStore._user.userId, data)
     console.log('响应:', response)
     if (response.status == 1 && response.data != "") {
       answerStore.setAnswerId(response.data);
@@ -102,6 +95,7 @@ const SaveAnswerS4 = async () => {
   } catch (error) {
     console.error('请求失败:', error)
   }
+  loading.value = false;
 }
 
 // #endregion
@@ -306,7 +300,6 @@ const smVisible = ref<boolean>(false);
       <div class="w-full border-t-2 border-gray-300" style="height: 100px;">
         <div class="text-base">注意事项：</div>
         <span class="text-base">
-          <!-- <div v-html="formattedText(questionInfo?.precautions)"></div> -->
           {{ questionInfo?.precautions }}
         </span>
       </div>
@@ -340,7 +333,7 @@ const smVisible = ref<boolean>(false);
         <a-textarea class="inputWidth" v-model:value="remark" :rows="4" />
       </div>
       <div class="w-full flex flex-row justify-end items-center pt-8">
-        <a-button @click="SaveAnswerS4()" type="primary">
+        <a-button :loading="loading" @click="SaveAnswerS4()" type="primary">
           提交
         </a-button>
       </div>

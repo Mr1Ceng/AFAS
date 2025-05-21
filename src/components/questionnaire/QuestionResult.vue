@@ -66,7 +66,7 @@ const GetTeacherList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/TEACHER')
     console.log('响应:', response)
     teacherList.value = response.data
-    if (teacherList.value.find(x => x.userId == accountStore.user.userId && !testResult.value.teacherId)) {
+    if (accountStore.user.isStaff && !testResult.value.teacherId) {
       testResult.value.teacherId = accountStore.user.userId;
     }
   } catch (error) {
@@ -78,7 +78,7 @@ const GetStudentList = async () => {
     const response = await apiClient.post('/Basic/GetUserListByRole/STUDENT')
     console.log('响应:', response)
     studentList.value = response.data
-    if (studentList.value.find(x => x.userId == accountStore.user.userId && !testResult.value.userId)) {
+    if (!accountStore.user.isStaff && !testResult.value.userId) {
       testResult.value.userId = accountStore.user.userId;
     }
   } catch (error) {
@@ -418,7 +418,7 @@ const loading = ref<boolean>(false);
       <a-form ref="formRef" :model="testResult" :layout="'horizontal'"
         :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
         <a-form-item label="测评编码">
-          <a-input style="width: 100%;" size="large" v-model:value="testResult.answerId" disabled/>
+          <a-input style="width: 100%;" size="large" v-model:value="testResult.answerId" disabled />
         </a-form-item>
         <a-form-item label="日期">
           <a-date-picker style="width: 100%;" v-model:value="testResult.questionnaireDate" size="large" />
@@ -432,7 +432,7 @@ const loading = ref<boolean>(false);
         <a-form-item label="性别">
           <a-radio-group style="width: 100%;" size="large" v-model:value="student.gender" disabled>
             <a-radio-button style="width: 50%;" v-for="item in sexList" :value="item.value">{{ item.description
-            }}</a-radio-button>
+              }}</a-radio-button>
           </a-radio-group>
         </a-form-item>
         <a-form-item label="年龄">
@@ -465,13 +465,13 @@ const loading = ref<boolean>(false);
                     <a-textarea style="width: 100%;" v-model:value="testResult.tResult" :rows="4" />
                   </a-form-item> -->
         <a-form-item label="弱势">
-          <a-textarea style="width: 100%;" v-model:value="testResult.weak" :rows="3" />
+          <a-textarea style="width: 100%;" v-model:value="testResult.weak" :rows="2" />
         </a-form-item>
         <a-form-item label="优势">
-          <a-textarea style="width: 100%;" v-model:value="testResult.advantage" :rows="3" />
+          <a-textarea style="width: 100%;" v-model:value="testResult.advantage" :rows="2" />
         </a-form-item>
         <a-form-item label="备注">
-          <a-textarea style="width: 100%;" v-model:value="testResult.remark" :rows="4" />
+          <a-textarea style="width: 100%;" v-model:value="testResult.remark" :rows="2" />
         </a-form-item>
         <a-form-item :span="24" style="text-align: right">
           <a-button type="primary" @click="SaveTestResult()" :loading="loading">

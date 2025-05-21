@@ -11,7 +11,7 @@
       <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
         @select="changeMenu1" :style="{ lineHeight: '64px' }">
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key" :disabled="!menu.show">{{ menu.label
-          }}</a-menu-item>
+        }}</a-menu-item>
       </a-menu>
       <div class="flex items-center justify-end">
         <a-popover placement="bottomRight">
@@ -91,7 +91,7 @@ const store = useMenuStore()
 const selectedKeys1 = ref<number[]>([store._selectedKeys1]);
 const selectedKeys2 = ref<string[]>(store.getSelectedKeys2());
 let openKeys = ref<string[]>(store.getOpenKeys());
-const collapsed = ref(true);
+const collapsed = ref(false);
 const { _selectedKeys1, _selectedKeys2, _openKeys } = storeToRefs(store);
 const toggleCollapsed = () => {
   collapsed.value = !collapsed.value;

@@ -4,10 +4,15 @@
       <a-card class="w-161" title="信息确认">
         <a-form ref="formRef" :layout="'horizontal'" :label-col="{ style: { width: '100px', paddingRight: '20px' } }">
           <a-form-item label="姓&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;名">
-            <a-select :style="{ width: '100%' }" v-model:value="student.userId" size="large" disabled>
-              <a-select-option v-for="student in studentList" :value="student.userId">{{
-                student.userName }}</a-select-option>
-            </a-select>
+            <div class="w-full flex justify-between">
+              <a-select :style="{ width: '70%' }" show-search v-model:value="currStudentId" size="large"
+                :filter-option="filterOption" placeholder="请选择测试对象" :disabled="!accountStore.user.isStaff">
+                <a-select-option v-for="item in studentList" :value="item.userId" :label="item.userName">{{
+                  item.userName }}</a-select-option>
+              </a-select>
+              <a-button :style="{ width: '28%' }" class="" size="large" type="primary"
+                :disabled="!accountStore.user.isStaff" @click="() => { setDrawerVisible(true); }">新增测评对象</a-button>
+            </div>
           </a-form-item>
           <a-form-item label="性&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;别">
             <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="student.gender" disabled>
@@ -30,7 +35,7 @@
             <a-alert message="请确认当前登录匹配的信息是否正确，若信息不正确将影响测试结果，请联系测试老师修改信息！" type="error" />
           </a-form-item>
           <a-form-item :span="24" style="text-align: right">
-            <a-button size="large" type="primary" @click="GetQuestionList()">
+            <a-button size="large" type="primary" @click="startTest">
               进入测试
             </a-button>
           </a-form-item>
@@ -49,7 +54,7 @@
       </a-tab-pane>
       <template #leftExtra>
         <a-select :style="{ marginRight: '16px' }" size="large" ref="select" v-model:value="selectedQuestionnaire"
-          @change="()=>{GetQuestionList();}">
+          @change="() => { GetQuestionList(); }">
           <a-select-option v-for="(questionnaire, index) in questionnaireList" :value="questionnaire.questionnaireId">{{
             questionnaire.questionnaireName + "—" +
             questionnaire.versionName }}</a-select-option>
@@ -58,11 +63,11 @@
       <template #rightExtra>
         <a-space :size="20">
           <span class="text-xl">
-            {{ `测评编码：${answerStore._answerId}`}}
+            {{ `测评编码：${answerStore._answerId}` }}
           </span>
           <a-select :style="{ marginLeft: '16px' }" v-model:value="student.userId" size="large" disabled>
-            <a-select-option v-for="student in studentList" :value="student.userId">{{
-              student.userName }}</a-select-option>
+            <a-select-option v-for="item in studentList" :value="item.userId">{{
+              item.userName }}</a-select-option>
           </a-select>
           <a-button size="large" type="primary" @click="() => { showResetConfirm(); }">
             重新测评
@@ -71,14 +76,11 @@
       </template>
     </a-tabs>
   </div>
-  <!-- <a-modal v-model:open="modalVisible" title="评估版本选择" centered @ok="() => { GetQuestionList(); modalVisible = false; }"
-    ok-text="确认" :maskClosable="false" :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
-    <a-radio-group v-model:value="selectedQuestionnaire">
-      <a-radio v-for="(questionnaire, index) in questionnaireList" :style="radioStyle"
-        :value="questionnaire.questionnaireId">{{ questionnaire.questionnaireName + "——" +
-          questionnaire.versionName }}</a-radio>
-    </a-radio-group>
-  </a-modal> -->
+  <a-drawer title="用户编辑" placement="right" :open="drawerVisible" :destroyOnClose="true"
+    @close="() => { setDrawerVisible(false); }" :width="600">
+    <UserEdit :role="RoleEnum.STUDENT" @save-success="(userId) => { setDrawerVisible(false); currStudentId = userId }">
+    </UserEdit>
+  </a-drawer>
 </template>
 
 <script lang="ts" setup>
@@ -96,6 +98,8 @@ import QuestionResult from '@/components/questionnaire/QuestionResult.vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { message, Modal } from 'ant-design-vue';
 import { apiClient } from '@/utils/ApiClientHelper'
+import { filterOption } from '@/utils/AntdHelper'
+import UserEdit from '@/components/user/UserEdit.vue';
 defineOptions({
   name: 'Q_Test'
 });
@@ -135,33 +139,43 @@ watch(selectedQuestionnaire, (newvalue, oldValue) => {
 import { useAccountStore } from "@/stores/accountStore";
 import { EnumHelper } from '@/utils/EnumHelper';
 import { GerderDescription } from '@/enums/GerderEnum';
+import { RoleEnum } from '@/enums/RoleEnum';
 const accountStore = useAccountStore();
 
 const sexList = EnumHelper.getEnumDescriptions(GerderDescription);
-const studentList = ref<any[]>([]);
+const studentList = ref<any>([]);
 const GetStudentList = async () => {
   try {
     const response = await apiClient.post('/Basic/GetUserListByRole/STUDENT')
     console.log('响应:', response)
     studentList.value = response.data
+    if (!accountStore.user.isStaff) {
+      currStudentId.value = accountStore.user.userId
+    }
   } catch (error) {
     console.error('请求失败:', error)
   }
 }
-GetStudentList();
-const student = computed(() => {
-  return studentList.value.find(x => x.userId == accountStore.user.userId) ?? {}
+const currStudentId = ref<string>("");
+watch(currStudentId, (newValuw, oldValue) => {
+  console.log(newValuw)
+  answerStore.setUser(student);
 })
-//#region 弹框
-const modalVisible = ref<boolean>(false);
-const setModalVisible = (open: boolean) => {
-  modalVisible.value = open;
-};
+const student = computed(() => {
+  return studentList.value.find((x: { userId: string; }) => x.userId == currStudentId.value) ?? {}
+})
 
+const startTest = () => {
+  if (currStudentId.value == "") {
+    message.warn("请先选择测试对象，再进入测试");
+    return;
+  }
+  GetQuestionList();
+}
 
 onMounted(() => {
+  GetStudentList();
   console.log("onMounted");
-  //setModalVisible(true);
 });
 //#endregion
 
@@ -215,6 +229,15 @@ const showResetConfirm = () => {
       canChanges.value = true;
     }
   });
+};
+
+
+const drawerVisible = ref<boolean>(false);
+const setDrawerVisible = (open: boolean) => {
+  drawerVisible.value = open;
+  if (!open) {
+    GetStudentList();
+  }
 };
 </script>
 
