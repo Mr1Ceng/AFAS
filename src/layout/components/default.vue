@@ -11,7 +11,7 @@
       <a-menu class="w-[calc(100%-60px)]" v-model:selectedKeys="selectedKeys1" theme="dark" mode="horizontal"
         @select="changeMenu1" :style="{ lineHeight: '64px' }">
         <a-menu-item v-for="(menu, index) in menuList" :key="menu.key" :disabled="!menu.show">{{ menu.label
-        }}</a-menu-item>
+          }}</a-menu-item>
       </a-menu>
       <div class="flex items-center justify-end">
         <a-popover placement="bottomRight">
@@ -156,11 +156,11 @@ const menuList = ref([
       label: '测评管理',
       title: '测评管理',
       children: [
-        // {
-        //   key: 'S_Questionnaire',
-        //   label: '测评试卷管理',
-        //   title: '测评试卷管理',
-        // },
+        {
+          key: 'S_Questionnaire',
+          label: '测评试卷管理',
+          title: '测评试卷管理',
+        },
         {
           key: 'S_SpiralMaze',
           label: '漩涡迷宫配置管理',
