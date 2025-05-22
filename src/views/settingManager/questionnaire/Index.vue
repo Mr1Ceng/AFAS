@@ -202,7 +202,7 @@ const pagination = computed(() => {
 });
 //#endregion
 
-//详情抽屉
+//编辑抽屉
 const drawerVisible = ref<boolean>(false);
 const setDrawerVisible = (open: boolean, data: any = {}) => {
   drawerVisible.value = open;
@@ -213,7 +213,7 @@ const setDrawerVisible = (open: boolean, data: any = {}) => {
   }
 };
 
-//编辑抽屉
+//详情抽屉
 const drawerVisible1 = ref<boolean>(false);
 const setDrawerVisible1 = (open: boolean, data: any = {}) => {
   drawerVisible1.value = open;

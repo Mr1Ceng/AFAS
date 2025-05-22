@@ -8,13 +8,18 @@
           <a-button size="small" danger type="text" @click="() => { showDeleteConfirm(record); }">
             删除
           </a-button>
-          <a-button size="small" type="link" @click="ShowDetail(record)">
+          <a-button size="small" type="link" @click="setDrawerVisible(true, record)">
             详情
           </a-button>
         </template>
       </template>
     </a-table>
   </div>
+  <a-drawer :title="`测评试卷详情${currentQuestion.questionCode}编辑`" placement="right" :open="drawerVisible"
+    :destroyOnClose="true" @close="() => { setDrawerVisible(false); }" width="100%">
+    <component :is="GetComponent(currentQuestion.questionCode)" :question-id="currentQuestion.questionId"
+      :question-code="currentQuestion.questionCode" @save-success="() => { setDrawerVisible(false); }" />
+  </a-drawer>
 </template>
 
 
@@ -27,7 +32,30 @@ import _ from "lodash";
 import { message, Modal } from 'ant-design-vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { useGlobalStore } from "@/stores/globalStore";
+import QuestionEdit from './QuestionS1Edit.vue';
 
+import QuestionS1Edit from '@/components/questionnaireSetting/QuestionS1Edit.vue'
+import QuestionS2Edit from '@/components/questionnaireSetting/QuestionS2Edit.vue'
+import QuestionS3Edit from '@/components/questionnaireSetting/QuestionS3Edit.vue'
+import QuestionS4Edit from '@/components/questionnaireSetting/QuestionS4Edit.vue'
+import QuestionS5Edit from '@/components/questionnaireSetting/QuestionS5Edit.vue'
+import QuestionT1Edit from '@/components/questionnaireSetting/QuestionT1Edit.vue'
+import QuestionT2Edit from '@/components/questionnaireSetting/QuestionT2Edit.vue'
+import QuestionT3Edit from '@/components/questionnaireSetting/QuestionT3Edit.vue'
+const GetComponent = (questionCode: string) => {
+  switch (questionCode) {
+    case 'S1': return QuestionS1Edit
+    case 'S2': return QuestionS2Edit
+    case 'S3': return QuestionS3Edit
+    case 'S4': return QuestionS4Edit
+    case 'S5': return QuestionS5Edit
+    case 'T1': return QuestionT1Edit
+    case 'T2': return QuestionT2Edit
+    case 'T3': return QuestionT3Edit
+    default:
+      return null
+  }
+}
 const props = defineProps<{
   questionnaireId: string,
 }>()
@@ -59,25 +87,6 @@ const GetQuestionList = async () => {
 }
 //#endregion
 
-//#region 保存
-const SaveQuestion = async () => {
-  if (!currentQuestion.value || !currentQuestion.value.questionnaireId) {
-    return;
-  }
-  try {
-    const response = await apiClient.post('/Question/SaveQuestion', currentQuestion.value)
-    console.log('响应:', response)
-    if (response.status == 1) {
-      message.success("保存成功！")
-      GetQuestionList()
-    }
-  } catch (error) {
-    console.error('请求失败:', error)
-  }
-}
-
-//#endregion
-
 //#region 删除
 const RemoveQuestion = async (questionnaireId: number) => {
   try {
@@ -105,9 +114,6 @@ const showDeleteConfirm = (data: any) => {
 };
 //#endregion
 
-const ShowDetail = (data: QuestionRow) => {
-
-}
 onMounted(() => {
   GetQuestionList();
 })
@@ -162,6 +168,16 @@ const pagination = computed(() => {
 });
 //#endregion
 
+//编辑抽屉
+const drawerVisible = ref<boolean>(false);
+const setDrawerVisible = (open: boolean, data: any = {}) => {
+  drawerVisible.value = open;
+  if (open) {
+    currentQuestion.value = data;
+  } else {
+    GetQuestionList();
+  }
+};
 </script>
 
 <style scoped>
