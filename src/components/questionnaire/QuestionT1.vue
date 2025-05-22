@@ -369,7 +369,20 @@ const openNotification = (message: string) => {
         <template #expandIcon="{ isActive }">
           <caret-right-outlined :rotate="isActive ? 90 : 0" />
         </template>
-        <a-collapse-panel key="1" header="指导语" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+        <a-collapse-panel key="1" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <template #header>
+            <a-space :size="10">
+              <span>
+                指导语
+              </span>
+              <span>
+                ——
+              </span>
+              <span class="text-2xl text-blue-500">
+                {{ stepIndex == 1 ? "数字题1" : (stepIndex == 2 ? "数字题2" : (stepIndex == 3 ? "故事题（本题有四小题）" : "")) }}
+              </span>
+            </a-space>
+          </template>
           <span class="text-base">
             <div v-html="getTipInfo"></div>
           </span>
@@ -471,7 +484,7 @@ const openNotification = (message: string) => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-8xl">{{
           `${seconds ?? 0}`
-        }}</span>
+          }}</span>
       </div>
       <div class="w-full flex flex-row justify-center items-center pt-4">
         <span class="text-lg w-20">答题耗时</span>
@@ -522,9 +535,24 @@ const openNotification = (message: string) => {
       </div>
     </div>
   </a-flex>
-  <a-modal v-model:open="modalVisible" title="指导语" centered @ok="modalOkClick" ok-text="确认"
-    @cancel="setModalVisible(false)" cancel-text="取消" :maskClosable="false" :closable="false"
+  <a-modal v-model:open="modalVisible" centered @ok="modalOkClick" ok-text="确认" @cancel="setModalVisible(false)"
+    cancel-text="取消" :maskClosable="false" :closable="false"
     :cancel-button-props="stepIndex == 0 ? {} : { style: { display: 'none' } }">
+    <template #title>
+      <div class="flex flex-row items-center">
+        <a-space :size="10">
+          <span>
+            指导语
+          </span>
+          <span>
+            ——
+          </span>
+          <span class="text-2xl text-blue-500">
+            {{ stepIndex == 0 ? "数字题1" : (stepIndex == 1 ? "数字题2" : (stepIndex == 2 ? "故事题（本题有四小题）" : "")) }}
+          </span>
+        </a-space>
+      </div>
+    </template>
     <div v-html="getModalInfo"></div>
   </a-modal>
 </template>
