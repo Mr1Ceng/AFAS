@@ -1,18 +1,21 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch, inject, type Ref } from 'vue';
 import { message } from 'ant-design-vue';
 import { apiClient } from '@/utils/ApiClientHelper'
 import _ from "lodash";
 import { QuestionS1Model } from '@/models/question/QuestionS1Model';
 import QuestionEdit from './QuestionEdit.vue';
 import { C_BQuestionS1 } from '@/entitys/question/BQuestionS1';
-import { S1GridTypeEnum, S1GridTypeDescription } from "@/enums/S1GridTypeEnum"
+import { S1GridTypeDescription } from "@/enums/S1GridTypeEnum"
 import { EnumHelper } from '@/utils/EnumHelper';
+import { QuestionCodeDescription, QuestionCodeEnum } from '@/enums/QuestionCodeEnum';
 
 const props = defineProps<{
   questionId?: string,
+  questionnaireId: string,
   questionCode: string
 }>()
+const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const question = ref<QuestionS1Model>(new QuestionS1Model())
 const emit = defineEmits<{
   (event: 'saveSuccess', value: string): void;
@@ -26,8 +29,20 @@ watch(() => props.questionId, async (newValue, oldValue) => {
 
 //#region 获取信息
 
-const GetQuestionnaireInfo = async () => {
+const GetQuestionInfo = async () => {
   if (!props.questionId || props.questionId == "") {
+    question.value.questionInfo.questionCode = props.questionCode;
+    question.value.questionInfo.questionnaireId = props.questionnaireId;
+    question.value.questionInfo.questionName = EnumHelper.getDescriptionByValue(QuestionCodeDescription, QuestionCodeEnum.S1);
+    _.forEach(gridTypes, gridType => {
+      _.times(25, gridSort => {
+        question.value.questionList.push(new C_BQuestionS1({
+          gridType: gridType.value,
+          gridSort: gridSort + 1,
+          gridValue: isDev.value ? gridSort + 1 : 0,
+        }))
+      })
+    })
     return;
   }
   try {
@@ -47,7 +62,6 @@ const SaveQuestion = async () => {
   loading.value = true;
   try {
     await Promise.all(formRef.value.map(async (x: { validate: () => any }) => x.validate()));
-    //await formRef.value.validate();
     console.log("表单验证通过！");
   } catch (error) {
     console.log("表单验证失败:", error);
@@ -55,12 +69,12 @@ const SaveQuestion = async () => {
     return;
   }
   try {
-    // const response = await apiClient.post('/Questionnaire/SaveQuestionS1', question.value)
-    // console.log('响应:', response)
-    // if (response.status == 1) {
-    //   message.success("保存成功！");
-    //   emit("saveSuccess", response.data)
-    // }
+    const response = await apiClient.post('/Questionnaire/SaveQuestionS1', question.value)
+    console.log('响应:', response)
+    if (response.status == 1) {
+      message.success("保存成功！");
+      emit("saveSuccess", response.data)
+    }
   } catch (error) {
     console.error('请求失败:', error)
   }
@@ -68,11 +82,13 @@ const SaveQuestion = async () => {
 }
 
 onMounted(() => {
-  GetQuestionnaireInfo();
+  GetQuestionInfo();
 })
 
 //#endregion
 const gridTypes = EnumHelper.getEnumDescriptions(S1GridTypeDescription);
+const filteredQuestions = (gridType: string) => question.value.questionList.filter(x => x.gridType === gridType);
+
 const getGrid = (colIndex: number, rowIndex: number, gridType: string) => {
   let gridSort = (colIndex - 1) * 5 + rowIndex;
   let currGrid = question.value.questionList.find(x => x.gridSort == gridSort && x.gridType == gridType);
@@ -98,7 +114,7 @@ const checkValueSame = (gridType: string, gridSort: number, value: number) => {
 }
 const validateEmpty = (fieldName: string, gridType: string, gridSort: number) => {
   return async (_rule: any, value: any) => {
-    if (!value) {
+    if (!value && value !== 0) {
       return Promise.reject(new Error(`${fieldName} 不能为空`));
     }
     if (typeof value == "number" && value === 0) {
@@ -126,12 +142,13 @@ const validateEmpty = (fieldName: string, gridType: string, gridSort: number) =>
       <div class="w-full flex-auto flex felx-row items-center">
         <div class="w-1/2 h-full flex flex-col items-center justify-center" v-for="gridType in gridTypes">
           <a-card :title="gridType.description" style="width: 98%">
-            <a-form ref="formRef" :model="question.questionList.filter(x => x.gridType === gridType.value)"
-              :layout="'horizontal'" :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
+            <a-form ref="formRef" :model="{ questionList: filteredQuestions(gridType.value) }" :layout="'horizontal'"
+              :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
               <a-row :gutter="0" v-for="colIndex in 5" :key="colIndex">
                 <template v-for="rowIndex in 5" :key="rowIndex">
                   <a-col :flex="1" class="flex justify-center items-center">
-                    <a-form-item label="" :name="[getGridIndex(colIndex, rowIndex, gridType.value), 'gridValue']"
+                    <a-form-item v-if="getGridIndex(colIndex, rowIndex, gridType.value) >= 0" label=""
+                      :name="['questionList', getGridIndex(colIndex, rowIndex, gridType.value), 'gridValue']"
                       :rules="[{ required: true, type: 'number', validator: validateEmpty(`${gridType.description}格子${getGrid(colIndex, rowIndex, gridType.value)?.gridSort}`, gridType.value, getGrid(colIndex, rowIndex, gridType.value)?.gridSort) }]">
                       <a-input-number :value="getGrid(colIndex, rowIndex, gridType.value)?.gridValue"
                         @change="(value: number) => (setGrid(colIndex, rowIndex, gridType.value, value))" size="large"

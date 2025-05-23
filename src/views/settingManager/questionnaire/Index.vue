@@ -42,8 +42,10 @@
       @save-success="() => { setDrawerVisible(false); }">
     </QuestionnaireEdit>
   </a-drawer>
-  <a-drawer title="测评试卷详情" placement="right" :open="drawerVisible1" :destroyOnClose="true"
-    @close="() => { setDrawerVisible1(false); }" width="100%">
+  <a-drawer
+    :title="`【${currentQuestionnaire.questionnaireId}】${currentQuestionnaire.questionnaireName} ${currentQuestionnaire.versionName}——测评题目`"
+    placement="right" :open="drawerVisible1" :destroyOnClose="true" @close="() => { setDrawerVisible1(false); }"
+    width="100%">
     <QuestionQuery :questionnaire-id="currentQuestionnaire.questionnaireId">
     </QuestionQuery>
   </a-drawer>
@@ -125,8 +127,9 @@ const RemoveQuestionnaire = async (questionnaireId: number) => {
 }
 const showDeleteConfirm = (data: any) => {
   Modal.confirm({
-    title: `确认删除测评试卷配置【${data.questionnaireId}】AFAS注意力评估	小学版(A)?`,
+    title: `删除测评试卷配置`,
     icon: createVNode(ExclamationCircleOutlined),
+    content: `请确认删除【${data.questionnaireId}】AFAS注意力评估	小学版(A)?`,
     okText: '确认',
     okType: 'danger',
     cancelText: '取消',

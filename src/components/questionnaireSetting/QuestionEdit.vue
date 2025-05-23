@@ -8,7 +8,6 @@ const props = defineProps<{
 }>()
 watch(() => props._questionInfo, () => {
   questionInfo.value = props._questionInfo;
-  console.log(props._questionInfo);
 })
 const emit = defineEmits<{
   (event: 'changed', value: C_BQuestion): void;
@@ -27,13 +26,13 @@ watch(questionInfo, (newValue) => {
         <a-input v-model:value="questionInfo.questionId" size="large" disabled />
       </a-form-item>
       <a-form-item label="试卷编码" name="questionnaireId">
-        <a-input v-model:value="questionInfo.questionnaireId" size="large" />
+        <a-input v-model:value="questionInfo.questionnaireId" size="large" disabled />
       </a-form-item>
       <a-form-item label="题目名称" name="questionName" :rules="[{ required: true, validator: validateEmpty('题目名称') }]">
         <a-input v-model:value="questionInfo.questionName" size="large" />
       </a-form-item>
       <a-form-item label="题目类型" name="questionCode" :rules="[{ required: true, validator: validateEmpty('题目类型') }]">
-        <a-input v-model:value="questionInfo.questionCode" size="large" />
+        <a-input v-model:value="questionInfo.questionCode" size="large" disabled />
       </a-form-item>
       <a-form-item label="注意事项" name="precautions" :rules="[{ required: true, validator: validateEmpty('注意事项') }]">
         <a-textarea v-model:value="questionInfo.precautions" size="large" :rows="3" />

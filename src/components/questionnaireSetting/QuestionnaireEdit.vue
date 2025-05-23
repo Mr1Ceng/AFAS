@@ -65,20 +65,8 @@ onMounted(() => {
 })
 
 //#endregion
-const validateEmpty = (fieldName: string) => {
-  return async (_rule: any, value: string) => {
-    if (!value) {
-      return Promise.reject(new Error(`${fieldName} 不能为空`));
-    }
-    if (typeof value == "number" && value === 0) {
-      return Promise.reject(new Error(`${fieldName} 不能为零`));
-    }
-    else if (typeof value == "string" && value.trim() === "") {
-      return Promise.reject(new Error(`${fieldName} 不能为空`));
-    }
-    return Promise.resolve();
-  };
-};
+
+import { validateEmpty } from '@/utils/AntdHelper';
 const loading = ref<boolean>(false);
 </script>
 

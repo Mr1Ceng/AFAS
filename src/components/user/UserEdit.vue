@@ -144,21 +144,8 @@ const handleChange = async (info: any) => {
 };
 //#endregion
 
-const validateEmpty = (fieldName: string) => {
-  return async (_rule: any, value: string) => {
-    console.log(value)
-    if (!value) {
-      return Promise.reject(new Error(`${fieldName} 不能为空`));
-    }
-    if (typeof value == "number" && value === 0) {
-      return Promise.reject(new Error(`${fieldName} 不能为零`));
-    }
-    else if (typeof value == "string" && value.trim() === "") {
-      return Promise.reject(new Error(`${fieldName} 不能为空`));
-    }
-    return Promise.resolve();
-  };
-};
+
+import { validateEmpty } from '@/utils/AntdHelper';
 const loading = ref<boolean>(false);
 </script>
 
@@ -187,7 +174,7 @@ const loading = ref<boolean>(false);
       <a-form-item label="性别">
         <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.gender">
           <a-radio-button :style="{ width: '50%' }" v-for="item in gerderList" :value="item.value">{{ item.description
-            }}</a-radio-button>
+          }}</a-radio-button>
         </a-radio-group>
       </a-form-item>
       <a-form-item label="年龄" name="age" :rules="[{ required: true, validator: validateEmpty('年龄') }]">
@@ -200,7 +187,7 @@ const loading = ref<boolean>(false);
         <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.role"
           :disabled="props.role && props.role != ''">
           <a-radio-button :style="{ width: '50%' }" v-for="item in roleList" :value="item.value">{{ item.description
-            }}</a-radio-button>
+          }}</a-radio-button>
         </a-radio-group>
       </a-form-item>
       <a-form-item :span="24" style="text-align: right">
