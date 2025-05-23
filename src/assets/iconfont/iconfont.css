@@ -1,9 +1,9 @@
 @font-face {
-  font-family: 'iconfont'; /* Project id 4304832 */
+  font-family: 'iconfont'; /* Project id 4930437 */
   src:
-    url('iconfont.woff2?t=1745479018077') format('woff2'),
-    url('iconfont.woff?t=1745479018077') format('woff'),
-    url('iconfont.ttf?t=1745479018077') format('truetype');
+    url('iconfont.woff2?t=1747993714738') format('woff2'),
+    url('iconfont.woff?t=1747993714738') format('woff'),
+    url('iconfont.ttf?t=1747993714738') format('truetype');
 }
 
 .iconfont {
@@ -14,74 +14,62 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-QS0203_4:before {
-  content: '\e8b3';
-}
-
-.icon-QS0203_1:before {
-  content: '\e8aa';
-}
-
-.icon-QS0203_7:before {
-  content: '\e8b0';
-}
-
-.icon-QS0203_8:before {
-  content: '\e8b1';
-}
-
-.icon-QS0203_2:before {
-  content: '\e8ab';
-}
-
-.icon-QS0203_3:before {
-  content: '\e8ac';
-}
-
-.icon-QS0103_5:before {
-  content: '\e86e';
-}
-
-.icon-QS0103_3:before {
-  content: '\e86f';
-}
-
-.icon-QS0203_9:before {
-  content: '\e8b2';
-}
-
-.icon-QS0103_9:before {
-  content: '\e870';
-}
-
-.icon-QS0103_8:before {
-  content: '\e871';
-}
-
-.icon-QS0103_7:before {
-  content: '\e872';
-}
-
-.icon-QS0203_5:before {
-  content: '\e8ae';
-}
-
-.icon-QS0203_6:before {
-  content: '\e8af';
-}
-
-.icon-QS0103_6:before {
+.icon-S3_6:before {
   content: '\e86a';
 }
 
-.icon-QS0103_1:before {
-  content: '\e86b';
-}
-
-.icon-QS0103_2:before {
+.icon-S3_2:before {
   content: '\e86c';
 }
 
-.icon-QS0103_4:before {
+.icon-S3_4:before {
   content: '\e86d';
+}
+
+.icon-S3_3:before {
+  content: '\e86f';
+}
+
+.icon-S3_9:before {
+  content: '\e870';
+}
+
+.icon-S3_8:before {
+  content: '\e871';
+}
+
+.icon-S3_7:before {
+  content: '\e872';
+}
+
+.icon-S3_10:before {
+  content: '\e8aa';
+}
+
+.icon-S3_11:before {
+  content: '\e8ab';
+}
+
+.icon-S3_12:before {
+  content: '\e8ac';
+}
+
+.icon-S3_1:before {
+  content: '\e8ae';
+}
+
+.icon-S3_5:before {
+  content: '\e8af';
+}
+
+.icon-S3_15:before {
+  content: '\e8b0';
+}
+
+.icon-S3_16:before {
+  content: '\e8b1';
+}
+
+.icon-S3_13:before {
+  content: '\e8b3';
 }

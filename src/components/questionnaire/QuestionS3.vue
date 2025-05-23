@@ -257,8 +257,7 @@ const modalOkClick = () => {
           <a-flex class="h-24 w-18/25 border-1" :vertical="true" :justify="'center'" :align="'center'">
             <div class="w-full h-16 flex flex-row justify-around items-center border-b-1">
               <div class="w-1/9 flex justify-center items-center" v-for="icon in 9">
-                <span class="iconfont text-4xl"
-                  :class="`icon-${props.questionId}_${(icon + randomNumber) % 9 + 1}`"></span>
+                <span class="iconfont text-4xl" :class="`icon-S3_${(icon + randomNumber) % 9 + 1}`"></span>
               </div>
             </div>
             <div class="w-full h-8 flex flex-row justify-around items-center">
@@ -275,8 +274,7 @@ const modalOkClick = () => {
           :align="'flex-start'">
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1" v-for="column in 25">
-              <span class="iconfont text-4xl"
-                :class="`icon-${props.questionId}_${Math.floor(Math.random() * 10 % 8) + 1}`"></span>
+              <span class="iconfont text-4xl" :class="`icon-S3_${Math.floor(Math.random() * 10 % 8) + 1}`"></span>
             </div>
           </a-flex>
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
@@ -317,7 +315,7 @@ const modalOkClick = () => {
           <a-flex class="h-24 w-18/25 border-1" :vertical="true" :justify="'center'" :align="'center'">
             <div class="w-full h-16 flex flex-row justify-around items-center border-b-1">
               <div class="w-1/9 flex justify-center items-center" v-for="icon in 9">
-                <span class="iconfont text-4xl" :class="`icon-${props.questionId}_${icon}`"></span>
+                <span class="iconfont text-4xl" :class="`icon-S3_${icon}`"></span>
               </div>
             </div>
             <div class="w-full h-8 flex flex-row justify-around items-center">
@@ -334,7 +332,7 @@ const modalOkClick = () => {
           :justify="'center'" :align="'flex-start'">
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1"
-              v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? `iconfont icon-${props.questionId}_${column.value}` : '')
+              v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? `iconfont icon-S3_${column.value}` : '')
                 + (column.answerValue > 0 && !(rowIndex == 0 && columnIndex < 10) ? (column.answerValue == column.value ? ' bg-green-500' : ' bg-red-500') : '')
                 + (rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')"></div>
           </a-flex>
