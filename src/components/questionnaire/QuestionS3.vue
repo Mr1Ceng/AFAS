@@ -29,6 +29,7 @@ console.log(answerStore)
 
 const questionInfo = ref<any>({});
 const questionList = ref<any>([]);
+const questionS3AList = ref<any>([]);
 const rowList = ref<any>([]);
 import { apiClient } from '@/utils/ApiClientHelper'
 console.log(props.questionId)
@@ -39,6 +40,7 @@ const GetQuestionS3 = async () => {
     if (response.status == 1 && response.data.questionList.length > 0) {
       questionInfo.value = response.data.questionInfo
       questionList.value = response.data.questionList
+      questionS3AList.value = response.data.bQuestionS3AList
       if (questionList.value.length > 0) {
         rowList.value = _.map(_.groupBy(questionList.value, "gridRow"), (items, gridRow) => {
           return {
@@ -242,7 +244,12 @@ const modalOkClick = () => {
 }
 
 // #endregion
-
+const getGridIcon = (value:number)=>{
+  if(!questionS3AList.value || questionS3AList.value.length==0){
+    return "icon-S3_1";
+  }
+  return `icon-S3_${questionS3AList.value.find((x: { gridValue: number; })=>x.gridValue == value).gridIcon}`//
+}
 </script>
 
 <template>
@@ -257,7 +264,7 @@ const modalOkClick = () => {
           <a-flex class="h-24 w-18/25 border-1" :vertical="true" :justify="'center'" :align="'center'">
             <div class="w-full h-16 flex flex-row justify-around items-center border-b-1">
               <div class="w-1/9 flex justify-center items-center" v-for="icon in 9">
-                <span class="iconfont text-4xl" :class="`icon-S3_${(icon + randomNumber) % 9 + 1}`"></span>
+                <span class="iconfont text-4xl" :class="getGridIcon((icon + randomNumber) % 9 + 1)"></span>
               </div>
             </div>
             <div class="w-full h-8 flex flex-row justify-around items-center">
@@ -274,7 +281,7 @@ const modalOkClick = () => {
           :align="'flex-start'">
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1" v-for="column in 25">
-              <span class="iconfont text-4xl" :class="`icon-S3_${Math.floor(Math.random() * 10 % 8) + 1}`"></span>
+              <span class="iconfont text-4xl" :class="getGridIcon(Math.floor(Math.random() * 10 % 8) + 1)"></span>
             </div>
           </a-flex>
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
@@ -315,7 +322,7 @@ const modalOkClick = () => {
           <a-flex class="h-24 w-18/25 border-1" :vertical="true" :justify="'center'" :align="'center'">
             <div class="w-full h-16 flex flex-row justify-around items-center border-b-1">
               <div class="w-1/9 flex justify-center items-center" v-for="icon in 9">
-                <span class="iconfont text-4xl" :class="`icon-S3_${icon}`"></span>
+                <span class="iconfont text-4xl" :class="getGridIcon(icon)"></span>
               </div>
             </div>
             <div class="w-full h-8 flex flex-row justify-around items-center">
@@ -332,7 +339,7 @@ const modalOkClick = () => {
           :justify="'center'" :align="'flex-start'">
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1"
-              v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? `iconfont icon-S3_${column.value}` : '')
+              v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? `iconfont ${getGridIcon(column.value)}` : '')
                 + (column.answerValue > 0 && !(rowIndex == 0 && columnIndex < 10) ? (column.answerValue == column.value ? ' bg-green-500' : ' bg-red-500') : '')
                 + (rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')"></div>
           </a-flex>

@@ -139,8 +139,8 @@ const validateEmpty = (fieldName: string, gridType: string, gridSort: number) =>
       </QuestionEdit>
     </div>
     <div class="w-2/3 h-full flex flex-col">
-      <div class="w-full flex-auto flex felx-row items-center">
-        <div class="w-1/2 h-full flex flex-col items-center justify-center" v-for="gridType in gridTypes">
+      <div class="w-full flex-auto flex felx-row items-start flex-wrap pl-8">
+        <div class="w-1/2 flex flex-col items-center justify-start" v-for="gridType in gridTypes">
           <a-card :title="gridType.description" style="width: 98%">
             <a-form ref="formRef" :model="{ questionList: filteredQuestions(gridType.value) }" :layout="'horizontal'"
               :label-col="{ style: { width: '90px', paddingRight: '10px' } }">

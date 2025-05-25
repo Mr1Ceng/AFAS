@@ -133,8 +133,8 @@ const validateEmpty = (fieldName: string, field: string = "") => {
       </QuestionEdit>
     </div>
     <div class="w-2/3 h-full flex flex-col">
-      <div class="w-full flex-auto flex felx-row items-center">
-        <div class="w-full h-full flex flex-col items-center justify-center pl-8">
+      <div class="w-full flex-auto">
+        <div class="w-full h-full flex items-start justify-center pl-8">
           <a-form ref="formRef" :model="questionForm" :layout="'horizontal'"
             :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
             <a-row :gutter="24">
