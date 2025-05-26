@@ -244,11 +244,11 @@ const modalOkClick = () => {
 }
 
 // #endregion
-const getGridIcon = (value:number)=>{
-  if(!questionS3AList.value || questionS3AList.value.length==0){
+const getGridIcon = (value: number) => {
+  if (!questionS3AList.value || questionS3AList.value.length == 0) {
     return "icon-S3_1";
   }
-  return `icon-S3_${questionS3AList.value.find((x: { gridValue: number; })=>x.gridValue == value).gridIcon}`//
+  return `icon-S3_${questionS3AList.value.find((x: { gridValue: number; }) => x.gridValue == value).gridIcon}`//
 }
 </script>
 

@@ -75,7 +75,6 @@ const SaveQuestion = async () => {
   console.log(question.value)
   loading.value = true;
   try {
-    //await Promise.all(formRef.value.map(async (x: { validate: () => any }) => x.validate()));
     await formRef.value.validate();
     console.log("表单验证通过！");
   } catch (error) {
