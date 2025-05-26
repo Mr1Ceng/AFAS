@@ -14,6 +14,7 @@
         </a-select>
       </a-space>
       <a-space :size="20">
+        <a-button @click="download">下载模板</a-button>
         <a-button type="primary" @click="setModalVisible(true)">导入测评结果</a-button>
       </a-space>
     </div>
@@ -336,6 +337,25 @@ const beforeUpload: UploadProps['beforeUpload'] = file => {
 // 处理文件上传
 const handleChange = async (info: any) => {
   fileList.value = [...fileList.value, ...info.fileList]; // 更新文件列表
+};
+// 下载模板
+const download = async (): Promise<void> => {
+  try {
+    const response: Response = await fetch(`${baseURL}/Static/Template/测评数据导入模板.xlsx`);
+    const blob: Blob = await response.blob();
+    const url: string = URL.createObjectURL(blob);
+    const a: HTMLAnchorElement = document.createElement("a");
+    a.href = url;
+    a.download = '测评数据导入模板.xlsx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    message.success('下载测评数据导入模板完成');
+  } catch (error) {
+    console.error('下载测评数据导入模板失败', error);
+    message.error('下载测评数据导入模板失败');
+  }
 };
 //#endregion
 
