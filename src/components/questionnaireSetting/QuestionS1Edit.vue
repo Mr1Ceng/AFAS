@@ -28,20 +28,23 @@ watch(() => props.questionId, async (newValue, oldValue) => {
 //#endregion
 
 //#region 获取信息
-
+const CreateRandom = (gridType: string) => {
+  let icons = _.shuffle(_.range(1, 26)); // 生成 1-25 并打乱顺序
+  _.times(25, column => {
+    question.value.questionList[gridTypes.findIndex(x => x.value == gridType) * 25 + column] = new C_BQuestionS1({
+      gridType: gridType,
+      gridSort: column + 1,
+      gridValue: icons[column],
+    })
+  })
+}
 const GetQuestionInfo = async () => {
   if (!props.questionId || props.questionId == "") {
     question.value.questionInfo.questionCode = props.questionCode;
     question.value.questionInfo.questionnaireId = props.questionnaireId;
     question.value.questionInfo.questionName = EnumHelper.getDescriptionByValue(QuestionCodeDescription, QuestionCodeEnum.S1);
     _.forEach(gridTypes, gridType => {
-      _.times(25, gridSort => {
-        question.value.questionList.push(new C_BQuestionS1({
-          gridType: gridType.value,
-          gridSort: gridSort + 1,
-          gridValue: isDev.value ? gridSort + 1 : 0,
-        }))
-      })
+      CreateRandom(gridType.value)
     })
     return;
   }
@@ -142,6 +145,9 @@ const validateEmpty = (fieldName: string, gridType: string, gridSort: number) =>
       <div class="w-full flex-auto flex felx-row items-start flex-wrap pl-8">
         <div class="w-1/2 flex flex-col items-center justify-start pb-" v-for="gridType in gridTypes">
           <a-card :title="gridType.description" style="width: 98%" :bodyStyle="{ paddingBottom: 0 }">
+            <template #extra>
+              <a-button type="primary" size="large" @click="CreateRandom(gridType.value)">题目自动随机生成</a-button>
+            </template>
             <a-form ref="formRef" :model="{ questionList: filteredQuestions(gridType.value) }" :layout="'horizontal'"
               :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
               <a-row :gutter="0" v-for="colIndex in 5" :key="colIndex">

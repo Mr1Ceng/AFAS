@@ -273,11 +273,11 @@ const Completed = () => {
 
 const stepIndex = ref<number>(0);
 const getModalInfo = computed(() => {
-  const column: string = (stepIndex.value == 0 ? 'instruction' : 'instruction' + (stepIndex.value + 1)).toString();
+  const column: string = (stepIndex.value <= 0 ? 'instruction' : 'instruction' + (stepIndex.value + 1)).toString();
   return formattedText(questionInfo.value[column])
 })
 const getTipInfo = computed(() => {
-  const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
+  const column: string = ((stepIndex.value - 1) <= 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
 
@@ -319,57 +319,19 @@ const openNotification = (message: string) => {
 </script>
 
 <template>
-  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
-    <a-flex class="w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
-      <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-10 border-b-1 border-gray-300 rounded-xl"
-        :class="stepIndex == 1 ? 'row-striped' : ''">
-        <div class="h-10 w-80 text-xl flex items-center">
-          1: 数字“X”出现的次数？
-        </div>
-        <div class="h-10 w-30">
-          <a-input-number addon-after="次" size="large" :min="0" />
-        </div>
-        <div class="h-14 w-70 pl-4">
-          <audio class="w-66" :src="GetAudioUrl('听觉集中-数字题.mp3')" controls
-            controlsList="nodownload noplaybackrate"></audio>
-        </div>
-        <div class="h-10 w-40 pl-4">
-          <a-button size="large">
-            下一题
-          </a-button>
-        </div>
-      </div>
-      <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-30 border-b-1 border-gray-300 rounded-xl"
-        :class="stepIndex == 1 ? 'row-striped' : ''">
-        <div class="h-10 w-80 text-xl flex items-center">
-          2: 数字“Y”出现的次数？
-        </div>
-        <div class="h-10 w-30">
-          <a-input-number addon-after="次" size="large" :min="0" />
-        </div>
-        <div class="h-14 w-70 pl-4">
-          <audio class="w-66" :src="GetAudioUrl('听觉集中-数字题.mp3')" controls
-            controlsList="nodownload noplaybackrate"></audio>
-        </div>
-        <div class="h-10 w-40 pl-4">
-          <a-button size="large">
-            下一题
-          </a-button>
-        </div>
-      </div>
-    </a-flex>
-    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
-    <a-button type="primary" @click="modalOkClick">
-      确认
-    </a-button>
-  </a-flex>
-  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
       <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
         <template #expandIcon="{ isActive }">
           <caret-right-outlined :rotate="isActive ? 90 : 0" />
         </template>
         <a-collapse-panel key="1" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <template #extra>
+            <a-button v-show="stepIndex == 0" type="primary"
+              @click="(event: MouseEvent) => { modalOkClick(); event.stopPropagation(); }">
+              确认
+            </a-button>
+          </template>
           <template #header>
             <a-space :size="10">
               <span>
@@ -379,8 +341,7 @@ const openNotification = (message: string) => {
                 ——
               </span>
               <span class="text-2xl text-blue-500">
-                {{ stepIndex == 1 ? "数字题1" : (stepIndex == 2 ? "数字题2" : (stepIndex == 3 ? "故事题（本题有四小题）" : "")) }}
-              </span>
+                {{ stepIndex <= 1 ? "数字题1" : (stepIndex == 2 ? "数字题2" : (stepIndex == 3 ? "故事题（本题有四小题）" : "")) }} </span>
             </a-space>
           </template>
           <span class="text-base">

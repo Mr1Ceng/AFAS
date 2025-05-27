@@ -32,7 +32,7 @@
 
 <script lang="ts" setup>
 import _ from "lodash";
-import { ref, onMounted, watch, defineProps } from "vue";
+import { ref, onMounted, watch } from "vue";
 const props = defineProps({
   initialSpacing: { type: Number, default: 5 },
   initialPerturbation: { type: Number, default: 10 },

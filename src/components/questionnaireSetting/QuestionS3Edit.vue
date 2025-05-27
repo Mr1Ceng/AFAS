@@ -6,7 +6,6 @@ import _ from "lodash";
 import { QuestionS3Model } from '@/models/question/QuestionS3Model';
 import QuestionEdit from './QuestionEdit.vue';
 import { C_BQuestionS3 } from '@/entitys/question/BQuestionS3';
-//import { QuestionS3Form } from '@/models/question/QuestionS3Form';
 import { EnumHelper } from '@/utils/EnumHelper';
 import { QuestionCodeDescription, QuestionCodeEnum } from '@/enums/QuestionCodeEnum';
 import Nzh from "nzh";
@@ -21,7 +20,6 @@ const props = defineProps<{
 }>()
 const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const question = ref<QuestionS3Model>(new QuestionS3Model())
-//const questionForm = ref<QuestionS3Form>(new QuestionS3Form())
 const emit = defineEmits<{
   (event: 'saveSuccess', value: string): void;
 }>();
@@ -29,10 +27,6 @@ const emit = defineEmits<{
 watch(() => props.questionId, async (newValue, oldValue) => {
 
 })
-// watch(questionForm, async (newValue, oldValue) => {
-
-// }, { deep: true })
-//#endregion
 
 //#region 获取信息
 const CreateRandom = () => {
@@ -43,13 +37,19 @@ const CreateRandom = () => {
       gridIcon: icons[row].toString()
     })
   })
+  let previousValue = 1;
   _.times(4, row => {
     _.times(25, column => {
+      let newValue;
+      do {
+        newValue = Math.floor(Math.random() * 9) + 1;
+      } while (newValue === previousValue); // 确保不与上一个值重复
+      previousValue = newValue; // 更新上一个值
       question.value.questionList[row * 25 + column] = new C_BQuestionS3({
         gridRow: row + 1,
         gridColumn: column + 1,
-        gridValue: (Math.floor(Math.random() * 9) + 1)
-      })
+        gridValue: newValue
+      });
     })
   })
 }
@@ -66,10 +66,6 @@ const GetQuestionInfo = async () => {
     console.log('响应:', response)
     if (response.status == 1) {
       question.value = response.data;
-      // questionForm.value.answer = question.value.questionList.find(x => x.isTrue)?.gridValue ?? 0
-      // questionForm.value.questionRowList = _.map(_.groupBy(_.orderBy(question.value.questionList, 'gridRow'), "gridRow"), (items) => {
-      //   return _.map(_.orderBy(items, 'gridColumn'), (x) => x.gridValue).join("");
-      // });
     }
   } catch (error) {
     console.error('请求失败:', error)

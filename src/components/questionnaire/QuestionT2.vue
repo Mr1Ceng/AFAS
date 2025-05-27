@@ -219,7 +219,7 @@ const getModalInfo = computed(() => {
   return formattedText(questionInfo.value[column])
 })
 const getTipInfo = computed(() => {
-  const column: string = ((stepIndex.value - 1) == 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
+  const column: string = ((stepIndex.value - 1) <= 0 ? 'instruction' : 'instruction' + (stepIndex.value)).toString();
   return formattedText(questionInfo.value[column])
 })
 
@@ -261,75 +261,19 @@ const openNotification = (message: string) => {
 </script>
 
 <template>
-  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
-    <div class="w-full flex flex-col justify-start items-center pb-4">
-      <div class="w-3/4 flex flex-col justify-between p-4">
-        <div class="w-full text-xl flex items-start pb-2 border-b-1 border-gray-300">
-          找不同
-        </div>
-        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
-          v-for="(question, questionIndex) in 2">
-          <div class="h-14 w-80 text-xl flex items-center">
-            <span class="pr-4">{{ `${question}:` }}</span>
-            <audio class="w-66" :src="GetAudioUrl(question + 1 + '.mp3')" controls
-              controlsList="nodownload noplaybackrate"></audio>
-          </div>
-          <div class="h-14 w-160 flex justify-between">
-            <a-checkbox-group button-style="solid">
-              <div class="h-full w-36 text-xl flex items-start" v-for="answer in 4">
-                <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2">
-                  <a-checkbox class="text-xl" :value="answer">
-                    {{ `${answer}: XXXXXXX` }}</a-checkbox>
-                </div>
-              </div>
-            </a-checkbox-group>
-          </div>
-          <div class="h-14 w-40 pl-4 flex items-center">
-            <a-button size="large">
-              下一题
-            </a-button>
-          </div>
-        </div>
-        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300">
-          找相同
-        </div>
-        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
-          v-for="(question, questionIndex) in 2">
-          <div class="h-14 w-80 text-xl flex items-center">
-            <span class="pr-4">{{ `${question}:` }}</span>
-            <audio class="w-66" :src="GetAudioUrl(question + 1 + '.mp3')" controls
-              controlsList="nodownload noplaybackrate"></audio>
-          </div>
-          <div class="h-14 w-160 flex justify-between">
-            <a-checkbox-group button-style="solid">
-              <div class="h-full w-36 text-xl flex items-start" v-for="answer in 4">
-                <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2">
-                  <a-checkbox class="text-xl" :value="answer">
-                    {{ `${answer}: XXXXXXX` }}</a-checkbox>
-                </div>
-              </div>
-            </a-checkbox-group>
-          </div>
-          <div class="h-14 w-40 pl-4 flex items-center">
-            <a-button size="large">
-              下一题
-            </a-button>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
-    <a-button type="primary" @click="modalOkClick">
-      确认
-    </a-button>
-  </a-flex>
-  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
       <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
         <template #expandIcon="{ isActive }">
           <caret-right-outlined :rotate="isActive ? 90 : 0" />
         </template>
         <a-collapse-panel key="1" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
+          <template #extra>
+            <a-button v-show="stepIndex == 0" type="primary"
+              @click="(event: MouseEvent) => { modalOkClick(); event.stopPropagation(); }">
+              确认
+            </a-button>
+          </template>
           <span class="text-base">
             <div v-html="getTipInfo"></div>
           </span>
@@ -342,8 +286,7 @@ const openNotification = (message: string) => {
                 ——
               </span>
               <span class="text-2xl text-blue-500">
-                {{ stepIndex == 1 ? "找不同" : (stepIndex == 2 ? "找相同" : "") }}
-              </span>
+                {{ stepIndex <= 1 ? "找不同" : (stepIndex == 2 ? "找相同" : "") }} </span>
             </a-space>
           </template>
         </a-collapse-panel>

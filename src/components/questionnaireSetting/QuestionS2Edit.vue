@@ -43,7 +43,30 @@ watch(questionForm, async (newValue, oldValue) => {
 //#endregion
 
 //#region 获取信息
-
+const CreateRandom = () => {
+  questionForm.value.answer = Math.floor(Math.random() * 10);
+  let trueCount = 0;
+  _.times(21, row => {
+    let rowValue = "";
+    _.times(39, column => {
+      let newValue;
+      do {
+        let rand = Math.floor(Math.random() * 6);
+        newValue = (rand == 1) ? questionForm.value.answer.toString() : (Math.floor(Math.random() * 10)).toString();
+      } while (newValue === _.last(rowValue)
+        || (trueCount == 160 && questionForm.value.answer.toString() === newValue)); // 确保不与上一个值重复,并且答案不能超过160个
+      if (questionForm.value.answer.toString() === newValue) {
+        trueCount++;
+      }
+      rowValue += newValue
+    })
+    questionForm.value.questionRowList[row] = rowValue;
+  })
+  console.log(trueCount)
+  if (trueCount !== 160) {
+    CreateRandom()
+  }
+}
 const GetQuestionInfo = async () => {
   if (!props.questionId || props.questionId == "") {
     question.value.questionInfo.questionCode = props.questionCode;
@@ -140,7 +163,10 @@ const validateEmpty = (fieldName: string, field: string = "") => {
               <a-col :span="12">
                 <a-form-item label="答案" :name="['answer']"
                   :rules="[{ required: true, type: 'number', validator: validateEmpty(`答案`, 'answer') }]">
-                  <a-input-number v-model:value="questionForm.answer" size="large" />
+                  <a-space :size="24">
+                    <a-input-number v-model:value="questionForm.answer" size="large" />
+                    <a-button type="primary" size="large" @click="CreateRandom">题目自动随机生成</a-button>
+                  </a-space>
                 </a-form-item>
               </a-col>
             </a-row>
