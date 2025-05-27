@@ -30,6 +30,8 @@ export interface I_BQuestion {
   /** 指导语4  */
   instruction4: string;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -63,6 +65,8 @@ export class C_BQuestion implements I_BQuestion {
 
   /** 指导语4  */
   instruction4: string = "";
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestion>) {
     Object.assign(this, init);

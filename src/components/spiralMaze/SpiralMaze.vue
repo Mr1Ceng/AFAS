@@ -8,22 +8,25 @@
           <label for="spacing">漩涡间距:</label>
         </a-col>
         <a-col :span="12">
-          <a-slider v-model:value="spacing" :min="20" :max="Math.floor(props.height / 20)" :step="1" />
+          <a-slider :value="spacing" :min="20" :max="props.height == 0 ? 50 : Math.floor(props.height / 20)"
+            @change="$emit('update:spacing', $event)" :step="1" />
+          <!-- -->
         </a-col>
         <a-col :span="4">
-          <a-input-number v-model:value="spacing" :min="20" :max="Math.floor(props.height / 20)"
-            style="margin-left: 16px" disabled />
+          <a-input-number :value="spacing" :min="20" :max="props.height == 0 ? 50 : Math.floor(props.height / 20)"
+            @change="$emit('update:spacing', $event)" style="margin-left: 16px" disabled />
         </a-col>
       </a-row>
       <a-row :justify="'center'">
         <a-col :span="4">
-          <label for="spacing">波动基准程度:</label>
+          <label for="perturbation">波动基准程度:</label>
         </a-col>
         <a-col :span="12">
-          <a-slider v-model:value="perturbation" :min="0" :max="30" :step="1" />
+          <a-slider :value="perturbation" @change="$emit('update:perturbation', $event)" :min="0" :max="30" :step="1" />
         </a-col>
         <a-col :span="4">
-          <a-input-number v-model:value="perturbation" :min="0" :max="30" style="margin-left: 16px" disabled />
+          <a-input-number :value="perturbation" @change="$emit('update:perturbation', $event)" :min="0" :max="30"
+            style="margin-left: 16px" disabled />
         </a-col>
       </a-row>
     </div>
@@ -34,8 +37,8 @@
 import _ from "lodash";
 import { ref, onMounted, watch } from "vue";
 const props = defineProps({
-  initialSpacing: { type: Number, default: 5 },
-  initialPerturbation: { type: Number, default: 10 },
+  spacing: { type: Number, default: 0 },
+  perturbation: { type: Number, default: 10 },
   showControl: { type: Boolean, default: false },
   showCount: { type: Boolean, default: false },
   width: { type: Number, default: 800 },
@@ -50,21 +53,20 @@ const emit = defineEmits([
   "finished",
   "getQuestionImage",
   "getAnswerImage",
-  "getSetting",
+  "update:spacing",
+  "update:perturbation"
 ]);
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
 const questionImage = ref<string>("");
 const answerImage = ref<string>("");
-const spacing = ref(props.initialSpacing);
-const perturbation = ref(props.initialPerturbation);
 const crossCount = ref(0);
 const errorCount = ref(0);
 let isDrawing = false;
 let mousePath: { x: number; y: number }[] = [];
 let hasTouched = false; // 用于防止重复计数
 const layers = 10; // 固定漩涡层数为10层
-const spiral = ref({ a: 1, b: spacing.value * 0.1 + 2 }); // 螺旋间距参数
+const spiral = ref({ a: 1, b: props.spacing * 0.1 + 2 }); // 螺旋间距参数
 const startCircle = { x: props.width / 2, y: props.height / 2, r: 15 }; // 起始位置圆
 const endCircle = { x: 0, y: 0, r: 15 }; // 结束位置圆（动态生成）
 let spiralPath: { x: number; y: number }[] = []; // 用于存储生成的光滑漩涡路径
@@ -83,7 +85,7 @@ const generateSmoothSpiralPath = () => {
   for (let theta = 0; theta < Math.PI * layers * 2; theta += 0.1) {
     // 增强波动范围，且随着距离增大而增强
     const distanceFactor = theta / (layers * 2 * Math.PI); // 距离增大因子
-    const randomPerturbation = (Math.random() * perturbation.value - perturbation.value / 2) * distanceFactor * 1.5; // 调节波动范围
+    const randomPerturbation = (Math.random() * props.perturbation - props.perturbation / 2) * distanceFactor * 1.5; // 调节波动范围
     const r = spiral.value.a + spiral.value.b * theta + randomPerturbation;
     const x = props.width / 2 + r * Math.cos(theta);
     const y = props.height / 2 + r * Math.sin(theta);
@@ -184,11 +186,14 @@ const onMouseUp = (event: MouseEvent) => {
 const reDraw = () => {
   generateSmoothSpiralPath();
   const ctx = canvasRef.value!.getContext("2d")!;
+  if (!ctx) {
+    console.error("Canvas context 获取失败");
+    return;
+  }
   drawMaze(ctx);
 }
 
-onMounted(() => {
-  reDraw();
+onMounted(async () => {
   canvasRef.value!.addEventListener("mousedown", onMouseDown);
   canvasRef.value!.addEventListener("mousemove", onMouseMove);
   canvasRef.value!.addEventListener("mouseup", onMouseUp);
@@ -196,25 +201,25 @@ onMounted(() => {
     questionImage.value = canvasRef.value.toDataURL('image/png');
     emit("getQuestionImage", questionImage.value)
   }
-});
-
-watch([spacing, perturbation], () => {
-  spiral.value.b = spacing.value * 0.1 + 2;
   reDraw();
-  emit("getSetting", spacing.value, perturbation.value);
 });
 
-watch(() => props.initialSpacing, (newValue, oldValue) => {
-  spacing.value = Math.min(newValue, Math.floor(props.height / 20))
-  console.log(spacing.value)
-  console.log(newValue)
+watch(() => [props.spacing, props.perturbation], (newValue) => {
+  spiral.value.b = props.spacing * 0.1 + 2;
+  if (newValue[0] != 0 && props.height != 0) {
+    reDraw();
+  }
 });
 
-watch(() => props.initialPerturbation, (newValue, oldValue) => {
-  perturbation.value = newValue
+watch(() => props.height, (newValue) => {
+  if (newValue != 0 && props.spacing != 0) {
+    setTimeout(() => {
+      reDraw();
+    }, 50);
+  }
 });
 
-watch(() => props.isDarkTheme, (newValue, oldValue) => {
+watch(() => props.isDarkTheme, (newValue) => {
   console.log("isDarkTheme", newValue)
 }, { immediate: true });
 

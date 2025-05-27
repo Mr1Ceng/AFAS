@@ -62,7 +62,9 @@ const formRef = ref();
 const SaveUser = async () => {
   loading.value = true;
   try {
-    await formRef.value.validate();
+    if (formRef.value) {
+      await formRef.value.validate();
+    }
     console.log("表单验证通过！");
   } catch (error) {
     console.log("表单验证失败:", error);
@@ -174,7 +176,7 @@ const loading = ref<boolean>(false);
       <a-form-item label="性别">
         <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.gender">
           <a-radio-button :style="{ width: '50%' }" v-for="item in gerderList" :value="item.value">{{ item.description
-          }}</a-radio-button>
+            }}</a-radio-button>
         </a-radio-group>
       </a-form-item>
       <a-form-item label="年龄" name="age" :rules="[{ required: true, validator: validateEmpty('年龄') }]">
@@ -187,7 +189,7 @@ const loading = ref<boolean>(false);
         <a-radio-group :style="{ width: '100%' }" size="large" v-model:value="user.role"
           :disabled="props.role && props.role != ''">
           <a-radio-button :style="{ width: '50%' }" v-for="item in roleList" :value="item.value">{{ item.description
-          }}</a-radio-button>
+            }}</a-radio-button>
         </a-radio-group>
       </a-form-item>
       <a-form-item :span="24" style="text-align: right">

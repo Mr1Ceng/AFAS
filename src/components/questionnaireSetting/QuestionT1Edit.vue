@@ -43,7 +43,9 @@ const formRef = ref();
 const SaveQuestionnaire = async () => {
   loading.value = true;
   try {
-    await formRef.value.validate();
+    if (formRef.value) {
+      await formRef.value.validate();
+    }
     console.log("表单验证通过！");
   } catch (error) {
     console.log("表单验证失败:", error);

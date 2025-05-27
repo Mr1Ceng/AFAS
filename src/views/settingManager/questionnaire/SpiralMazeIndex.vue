@@ -40,9 +40,9 @@
             </a-form-item>
           </a-form>
         </div>
-        <SpiralMaze ref="spiralMaze" :initialSpacing="spacing" :initialPerturbation="perturbation"
-          :width="spiralMazeWidth" :height="spiralMazeHeight" :show-control="true"
-          :is-dark-theme="globalStore.isDarkTheme" @get-setting="getSetting" />
+        <SpiralMaze ref="spiralMaze" v-model:spacing="currentSpiralMaze.spacing"
+          v-model:perturbation="currentSpiralMaze.perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight"
+          :show-control="true" :is-dark-theme="globalStore.isDarkTheme" />
       </div>
     </div>
 
@@ -60,6 +60,7 @@ import _ from "lodash";
 import { message, Modal } from 'ant-design-vue';
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { useGlobalStore } from "@/stores/globalStore";
+import { C_BSpiralMaze, type I_BSpiralMaze } from '@/entitys/question/BSpiralMaze';
 
 const globalStore = useGlobalStore();
 const tableContainer = ref<any>();
@@ -100,8 +101,6 @@ const SaveSpiralMaze = async () => {
 
 const ShowDetail = (data: SpiralMazeRow) => {
   currentSpiralMaze.value = _.cloneDeep(data);
-  spacing.value = data.spacing;
-  perturbation.value = data.perturbation;
   if (spiralMaze.value) {
     spiralMaze.value.reDraw();
   }
@@ -181,31 +180,20 @@ const pagination = computed(() => {
 });
 //#endregion
 
+onMounted(() => {
+  setTimeout(() => {
+    spiralMazeHeight.value = tableContainer.value?.clientHeight - 132;
+    spiralMazeWidth.value = tableContainer.value?.clientWidth;
+  }, 50);
+})
 // #region 漩涡
-const spacing = ref(30);
-const perturbation = ref(20);
 const spiralMaze = ref<any>();
-const spiralMazeHeight = computed(() => {
-  return tableContainer.value?.clientHeight - 132;
-});
-const spiralMazeWidth = computed(() => {
-  return tableContainer.value?.clientWidth;
-});
-const currentSpiralMaze = ref<any>({})
-const getSetting = (newSpacing: number, newPerturbation: number) => {
-  currentSpiralMaze.value.spacing = newSpacing;
-  currentSpiralMaze.value.perturbation = newPerturbation;
-  spacing.value = newSpacing;
-  perturbation.value = newPerturbation;
-
-}
-watch(spacing, (newValue, oldValue) => {
-  console.log(newValue)
-});
-watch(perturbation, (newValue, oldValue) => {
-  console.log(newValue)
-});
-
+const spiralMazeHeight = ref(0);
+const spiralMazeWidth = ref(0);
+const currentSpiralMaze = ref<I_BSpiralMaze>(new C_BSpiralMaze({
+  spacing: 30,
+  perturbation: 20
+}))
 // #endregion
 </script>
 

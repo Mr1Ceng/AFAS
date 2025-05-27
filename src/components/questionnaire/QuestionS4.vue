@@ -26,9 +26,12 @@ const globalStore = useGlobalStore();
 console.log(answerStore)
 // #region 接口
 
-const questionInfo = ref<any>({});
-const questionList = ref<any>([]);
+const questionInfo = ref<I_BQuestion>(new C_BQuestion());
+const questionList = ref<I_BQuestionS4>(new C_BQuestionS4());
 import { apiClient } from '@/utils/ApiClientHelper'
+import { C_BSpiralMaze, type I_BSpiralMaze } from '@/entitys/question/BSpiralMaze';
+import { C_BQuestionS4, type I_BQuestionS4 } from '@/entitys/question/BQuestionS4';
+import { C_BQuestion, type I_BQuestion } from '@/entitys/question/BQuestion';
 console.log(props.questionId)
 const GetQuestionS4 = async () => {
   try {
@@ -45,19 +48,22 @@ const GetQuestionS4 = async () => {
   }
 }
 GetQuestionS4();
-const spiralMazeSetting = ref<any>({});
+const spiralMazeSetting = ref<I_BSpiralMaze>(new C_BSpiralMaze({
+  spacing: 30,
+  perturbation: 20
+}))
 const GetSpiralMazeSetting = async () => {
   try {
     const response = await apiClient.post('/SpiralMaze/GetSpiralMaze/' + answerStore._user.age)
     console.log('响应:', response)
     if (response.status == 1) {
       spiralMazeSetting.value = response.data
-      if (spiralMazeSetting.value.age != 0) {
-        spacing.value = spiralMazeSetting.value.spacing;
-        perturbation.value = spiralMazeSetting.value.perturbation;
-      }
-    } else {
-      message.error(`获取题目信息失败，请联系工作人员！`);
+    }
+    else {
+      //如果没有配置年龄取题目的默认配置
+      spiralMazeSetting.value.perturbation = questionList.value.perturbation
+      spiralMazeSetting.value.spacing = questionList.value.spacing
+      spiralMazeSetting.value.ringNumber = questionList.value.ringNumber
     }
   } catch (error) {
     console.error('请求失败:', error)
@@ -209,8 +215,6 @@ const modalOkClick = () => {
 // #endregion
 
 // #region 漩涡
-const spacing = ref(25);
-const perturbation = ref(15);
 const spiralMazeContainer = ref<any>();
 const spiralMaze = ref<any>();
 const spiralMazeHeight = computed(() => {
@@ -285,11 +289,11 @@ const smVisible = ref<boolean>(false);
         </div>
         <div class="w-3/4 h-full flex justify-center items-center">
           <div v-show="stepIndex == 1" class="w-full h-full">
-            <SpiralMaze ref="spiralMaze" :initial-spacing="spacing" :initial-perturbation="perturbation"
-              :width="spiralMazeWidth" :height="spiralMazeHeight" :is-dark-theme="globalStore.isDarkTheme"
-              @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
-              @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
-            <!-- <a-button @click="() => { smVisible = true; }"></a-button> -->
+            <SpiralMaze ref="spiralMaze" v-model:spacing="spiralMazeSetting.spacing"
+              v-model:perturbation="spiralMazeSetting.perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight"
+              :is-dark-theme="globalStore.isDarkTheme" @update-cross-count="handleCrossUpdate"
+              @update-error-count="handleErrorUpdate" @started="started" @finished="finished"
+              @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
           </div>
           <div class="w-full h-full">
             <img v-show="stepIndex > 1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">
@@ -346,10 +350,11 @@ const smVisible = ref<boolean>(false);
   </a-modal>
   <a-modal v-model:open="smVisible" width="100%" wrap-class-name="full-modal" @ok="" ok-text="关闭" :maskClosable="false"
     :closable="false" :cancel-button-props="{ style: { display: 'none' } }">
-    <SpiralMaze ref="spiralMaze" :initial-spacing="spacing" :initial-perturbation="perturbation"
-      :width="spiralMazeWidth" :height="spiralMazeHeight" :is-dark-theme="globalStore.isDarkTheme"
-      @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
-      @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
+    <SpiralMaze ref="spiralMaze" v-model:spacing="spiralMazeSetting.spacing"
+      v-model:perturbation="spiralMazeSetting.perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight"
+      :is-dark-theme="globalStore.isDarkTheme" @update-cross-count="handleCrossUpdate"
+      @update-error-count="handleErrorUpdate" @started="started" @finished="finished"
+      @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
     <template #footer>
       <div class="w-full h-12 flex items-center justify-center">
         <a-space :size="20">
