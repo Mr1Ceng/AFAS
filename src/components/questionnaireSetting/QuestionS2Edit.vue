@@ -72,10 +72,7 @@ const GetQuestionInfo = async () => {
     question.value.questionInfo.questionCode = props.questionCode;
     question.value.questionInfo.questionnaireId = props.questionnaireId;
     question.value.questionInfo.questionName = EnumHelper.getDescriptionByValue(QuestionCodeDescription, QuestionCodeEnum.S2);
-    questionForm.value.answer = 0;
-    _.times(21, row => {
-      questionForm.value.questionRowList[row] = "000000000000000000000000000000000000000"
-    })
+    CreateRandom()
     return;
   }
   try {
@@ -190,7 +187,7 @@ const validateEmpty = (fieldName: string, field: string = "") => {
       </div>
       <div class="w-full h-20 flex felx-row items-center justify-end">
         <a-space>
-          <a-button type="primary" @click="SaveQuestion">保存</a-button>
+          <a-button type="primary" size="large" @click="SaveQuestion">保存</a-button>
         </a-space>
       </div>
     </div>

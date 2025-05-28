@@ -10,7 +10,6 @@ import { QuestionCodeDescription, QuestionCodeEnum } from '@/enums/QuestionCodeE
 import Nzh from "nzh";
 import SpiralMaze from '@/components/spiralMaze/SpiralMaze.vue'
 import { useGlobalStore } from "@/stores/globalStore";
-import { number } from 'echarts';
 const nzhcn = Nzh.cn;
 
 const props = defineProps<{
@@ -35,8 +34,8 @@ const GetQuestionInfo = async () => {
     question.value.questionInfo.questionCode = props.questionCode;
     question.value.questionInfo.questionnaireId = props.questionnaireId;
     question.value.questionInfo.questionName = EnumHelper.getDescriptionByValue(QuestionCodeDescription, QuestionCodeEnum.S4);
-    question.value.questionList.spacing = 0;
-    question.value.questionList.perturbation = 0;
+    question.value.questionList.spacing = 30;
+    question.value.questionList.perturbation = 20;
     return;
   }
   try {

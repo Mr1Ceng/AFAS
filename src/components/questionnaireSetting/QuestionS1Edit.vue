@@ -168,9 +168,8 @@ const validateEmpty = (fieldName: string, gridType: string, gridSort: number) =>
         </div>
       </div>
       <div class="w-full h-20 flex felx-row items-center justify-end">
-
         <a-space>
-          <a-button type="primary" @click="SaveQuestion">保存</a-button>
+          <a-button type="primary" size="large" @click="SaveQuestion">保存</a-button>
         </a-space>
       </div>
     </div>
