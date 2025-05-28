@@ -15,6 +15,8 @@ export interface I_BQuestionT2 {
   /** 听相同题目数  */
   number2: number;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -33,6 +35,8 @@ export class C_BQuestionT2 implements I_BQuestionT2 {
 
   /** 听相同题目数  */
   number2: number = 0;
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestionT2>) {
     Object.assign(this, init);

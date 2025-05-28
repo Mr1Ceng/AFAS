@@ -12,6 +12,8 @@ export interface I_BQuestionS5 {
   /** 图片Base64  */
   image: string;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -27,6 +29,8 @@ export class C_BQuestionS5 implements I_BQuestionS5 {
 
   /** 图片Base64  */
   image: string = "";
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestionS5>) {
     Object.assign(this, init);

@@ -18,6 +18,8 @@ export interface I_BQuestionS2 {
   /** 是否为正确答案  */
   isTrue: boolean;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -39,6 +41,8 @@ export class C_BQuestionS2 implements I_BQuestionS2 {
 
   /** 是否为正确答案  */
   isTrue: boolean = false;
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestionS2>) {
     Object.assign(this, init);

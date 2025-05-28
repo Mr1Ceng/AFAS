@@ -10,7 +10,7 @@
         <a-range-picker v-model:value="dateRange" />
         <a-select style="width: 120px" v-model:value="status">
           <a-select-option v-for="item in dataStatusList" :value="item.value">{{ item.description
-            }}</a-select-option>
+          }}</a-select-option>
         </a-select>
       </a-space>
       <a-space :size="20">
@@ -104,8 +104,9 @@
       </a-table>
     </div>
   </div>
-  <a-modal v-model:open="modalVisible" width="500px" title="导入测评结果" centered @ok="() => { TestResultImport() }" :confirm-loading="loading"
-    ok-text="导入" @cancel="() => { setModalVisible(false) }" cancel-text="取消" :maskClosable="false" :closable="false">
+  <a-modal v-model:open="modalVisible" width="500px" title="导入测评结果" centered @ok="() => { TestResultImport() }"
+    :confirm-loading="loading" ok-text="导入" @cancel="() => { setModalVisible(false) }" cancel-text="取消"
+    :maskClosable="false" :closable="false">
     <a-form ref="formRef" :layout="'horizontal'" :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
       <a-form-item>
         <a-upload-dragger :file-list="fileList" :maxCount="1" :before-upload="beforeUpload" @remove="handleRemove"

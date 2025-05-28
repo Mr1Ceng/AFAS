@@ -12,6 +12,8 @@ export interface I_BQuestionS3A {
   /** 格子图标  */
   gridIcon: string;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -27,6 +29,8 @@ export class C_BQuestionS3A implements I_BQuestionS3A {
 
   /** 格子图标  */
   gridIcon: string = "";
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestionS3A>) {
     Object.assign(this, init);

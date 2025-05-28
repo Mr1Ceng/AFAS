@@ -15,6 +15,8 @@ export interface I_BQuestionS1 {
   /** 格子排序  */
   gridSort: number;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -33,6 +35,8 @@ export class C_BQuestionS1 implements I_BQuestionS1 {
 
   /** 格子排序  */
   gridSort: number = 0;
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestionS1>) {
     Object.assign(this, init);

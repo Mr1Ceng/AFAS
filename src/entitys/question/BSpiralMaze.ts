@@ -15,6 +15,8 @@ export interface I_BSpiralMaze {
   /** 圈数  */
   ringNumber: number;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -33,6 +35,8 @@ export class C_BSpiralMaze implements I_BSpiralMaze {
 
   /** 圈数  */
   ringNumber: number = 0;
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BSpiralMaze>) {
     Object.assign(this, init);

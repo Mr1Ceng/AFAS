@@ -15,6 +15,8 @@ export interface I_BQuestionS3 {
   /** 格子值  */
   gridValue: number;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -33,6 +35,8 @@ export class C_BQuestionS3 implements I_BQuestionS3 {
 
   /** 格子值  */
   gridValue: number = 0;
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestionS3>) {
     Object.assign(this, init);

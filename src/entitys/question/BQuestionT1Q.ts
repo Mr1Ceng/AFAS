@@ -15,6 +15,8 @@ export interface I_BQuestionT1Q {
   /** 问题  */
   questionQ: string;
 
+  [key: string]: any; // 允许任意属性
+
 }
 
 
@@ -33,6 +35,8 @@ export class C_BQuestionT1Q implements I_BQuestionT1Q {
 
   /** 问题  */
   questionQ: string = "";
+
+  [key: string]: any; // 允许任意属性
 
   constructor(init?: Partial<I_BQuestionT1Q>) {
     Object.assign(this, init);
