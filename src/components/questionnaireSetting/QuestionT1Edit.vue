@@ -20,6 +20,7 @@ const props = defineProps<{
   questionnaireId: string,
   questionCode: string
 }>()
+const baseURL = import.meta.env.VITE_API_BASE_URL;
 const globalStore = useGlobalStore();
 const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const question = ref<QuestionT1Model>(new QuestionT1Model())
@@ -85,13 +86,15 @@ const SaveQuestion = async () => {
     return;
   }
   try {
+    const data: any = {};
+    fileList.value.flat().forEach((file, index) => {
+      data[file.fileName ?? "file"] = file.originFileObj;
+    });
     const response = await apiClient.post('/Questionnaire/SaveQuestionT1', question.value)
     console.log('响应:', response)
     if (response.status == 1) {
       message.success("保存成功！");
-      const response1 = await apiClient.postForm('/Questionnaire/SaveQuestionT1Audio/' + response.data, {
-        files: fileList.value.flat(),
-      })
+      const response1 = await apiClient.postForm('/Questionnaire/SaveQuestionAudio/' + response.data, data)
       console.log('响应:', response)
       if (response1.status == 1) {
         emit("saveSuccess", response.data)
@@ -104,7 +107,14 @@ const SaveQuestion = async () => {
 }
 
 onMounted(() => {
-  GetQuestionInfo();
+  GetQuestionInfo().then(() => {
+    checkAudioUrlExists(numberAudioText).then((exists) => {
+      hasNumberAudio.value = exists;
+    })
+    checkAudioUrlExists(storyAudioText).then((exists) => {
+      hasStoryAudio.value = exists;
+    })
+  });
 })
 
 //#endregion
@@ -118,6 +128,19 @@ const handleRemove = (file: any, questionIndex: number) => {
   const newFileList = fileList.value[questionIndex].slice();
   newFileList.splice(index, 1);
   fileList.value[questionIndex] = newFileList;
+  if (questionIndex < 2) {
+    if (numberAudio.value) {
+      numberAudio.value[0].src = GetAudioUrl(numberAudioText);
+      numberAudio.value[0].load(); // 重新加载新的音频
+      isUploadNumberAudio.value = false;
+    }
+  } else {
+    if (storyAudio.value) {
+      storyAudio.value[0].src = GetAudioUrl(storyAudioText);
+      storyAudio.value[0].load(); // 重新加载新的音频
+      isUploadStoryAudio.value = false;
+    }
+  }
 };
 
 // 文件验证
@@ -132,8 +155,45 @@ const beforeUpload: UploadProps['beforeUpload'] = file => {
 
 // 处理文件上传
 const handleChange = async (file: any, questionIndex: number) => {
+  if (questionIndex < 2) {
+    file.fileList[0].fileName = numberAudioText
+    if (numberAudio.value) {
+      let fileURL = URL.createObjectURL(file.fileList[0].originFileObj);
+      numberAudio.value[0].src = fileURL;
+      numberAudio.value[0].load(); // 重新加载新的音频
+      isUploadNumberAudio.value = true;
+    }
+  } else {
+    file.fileList[0].fileName = storyAudioText
+    if (storyAudio.value) {
+      let fileURL = URL.createObjectURL(file.fileList[0].originFileObj);
+      storyAudio.value[0].src = fileURL;
+      storyAudio.value[0].load(); // 重新加载新的音频
+      isUploadStoryAudio.value = true;
+    }
+  }
   fileList.value[questionIndex] = [...fileList.value[questionIndex], ...file.fileList]; // 更新文件列表
 };
+const GetAudioUrl = (fileName: string) => {
+  return `${baseURL}/Static/Audios/${props.questionId}/${fileName}`
+}
+const checkAudioUrlExists = async (fileName: string): Promise<boolean> => {
+  const url = GetAudioUrl(fileName);
+  try {
+    const response = await fetch(url, { method: 'HEAD' });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+};
+const numberAudioText = "听觉集中-数字题.mp3";
+const storyAudioText = "听觉集中-文字题.mp3";
+const hasNumberAudio = ref(false)
+const hasStoryAudio = ref(false)
+const isUploadNumberAudio = ref(false)
+const isUploadStoryAudio = ref(false)
+const numberAudio = ref<any>(null);
+const storyAudio = ref<any>(null);
 </script>
 
 <template>
@@ -149,7 +209,7 @@ const handleChange = async (file: any, questionIndex: number) => {
             :label-col="{ style: { width: '90px', paddingRight: '10px' } }">
             <template v-for="(qusetionItem, questionIndex) in question.bQuestionT1QList">
               <a-row v-if="qusetionItem.questionType !== 'Story'">
-                <a-col :span="12">
+                <a-col :span="8">
                   <a-form-item :label="`题目 ${qusetionItem.questionSort}`">
                     <a-input v-model:value="qusetionItem.questionQ" size="large" />
                   </a-form-item>
@@ -160,16 +220,40 @@ const handleChange = async (file: any, questionIndex: number) => {
                       size="large" />
                   </a-form-item>
                 </a-col>
-                <a-col v-if="qusetionItem.questionSort == 1 || qusetionItem.questionSort == 3" :span="8">
+                <a-col v-if="qusetionItem.questionSort == 1" :span="12">
                   <a-form-item :label="`音频文件`">
-                    <a-upload :file-list="fileList[questionIndex]" :maxCount="1" :before-upload="beforeUpload"
-                      @remove="(file: any) => { handleRemove(file, questionIndex) }"
-                      @change="(file: any) => { handleChange(file, questionIndex) }">
-                      <a-button size="large" style="display: flex; align-items: center;">
-                        <upload-outlined></upload-outlined>
-                        点击上传
-                      </a-button>
-                    </a-upload>
+                    <a-space :size="20">
+                      <a-upload :file-list="fileList[questionIndex]" :maxCount="1" :before-upload="beforeUpload"
+                        @remove="(file: any) => { handleRemove(file, questionIndex) }"
+                        @change="(file: any) => { handleChange(file, questionIndex) }">
+                        <a-button v-if="fileList[questionIndex].length < 1" size="large"
+                          style="display: flex; align-items: center;">
+                          <upload-outlined></upload-outlined>
+                          点击上传
+                        </a-button>
+                      </a-upload>
+                      <audio v-show="qusetionItem.questionSort == 1 && (hasNumberAudio || isUploadNumberAudio)"
+                        class="w-66" ref="numberAudio" :src="GetAudioUrl(numberAudioText)" controls
+                        controlsList="nodownload noplaybackrate"></audio>
+                    </a-space>
+                  </a-form-item>
+                </a-col>
+                <a-col v-if="qusetionItem.questionSort == 3" :span="12">
+                  <a-form-item :label="`音频文件`">
+                    <a-space :size="20">
+                      <a-upload :file-list="fileList[questionIndex]" :maxCount="1" :before-upload="beforeUpload"
+                        @remove="(file: any) => { handleRemove(file, questionIndex) }"
+                        @change="(file: any) => { handleChange(file, questionIndex) }">
+                        <a-button v-if="fileList[questionIndex].length < 1" size="large"
+                          style="display: flex; align-items: center;">
+                          <upload-outlined></upload-outlined>
+                          点击上传
+                        </a-button>
+                      </a-upload>
+                      <audio v-show="qusetionItem.questionSort == 3 && (hasStoryAudio || isUploadStoryAudio)"
+                        class="w-66" ref="storyAudio" :src="GetAudioUrl(storyAudioText)" controls
+                        controlsList="nodownload noplaybackrate"></audio>
+                    </a-space>
                   </a-form-item>
                 </a-col>
               </a-row>
