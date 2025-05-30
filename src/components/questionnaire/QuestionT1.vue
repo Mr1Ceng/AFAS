@@ -7,7 +7,7 @@ import _ from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
 import { useAccountStore } from "@/stores/accountStore";
-import { CaretRightOutlined } from '@ant-design/icons-vue';
+import { CaretRightOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -180,6 +180,8 @@ const resetTimer = (): void => {
 // #region 答题方法
 
 const canPlay = ref(true)
+const playStatus = ref<string[]>(['', '', ''])
+const playCount = ref<number[]>([0, 0, 0])
 const number1Audio = ref<HTMLAudioElement | null>(null);
 const number2Audio = ref<HTMLAudioElement | null>(null);
 const storyAudio = ref<HTMLAudioElement | null>(null);
@@ -189,19 +191,50 @@ const playAudio = (type: string) => {
     case "Number1":
       if (number1Audio.value) {
         number1Audio.value.play();
-        if (!isDev.value) canPlay.value = false;
+        canPlay.value = false;
+        if (playCount.value[0] == 0) {
+          startTimer();
+        }
       }
       break;
     case "Number2":
       if (number2Audio.value) {
         number2Audio.value.play();
-        if (!isDev.value) canPlay.value = false;
+        canPlay.value = false;
+        if (playCount.value[1] == 0) {
+          startTimer();
+        }
       }
       break;
     case "Story":
       if (storyAudio.value) {
         storyAudio.value.play();
-        if (!isDev.value) canPlay.value = false;
+        canPlay.value = false;
+        if (playCount.value[2] == 0) {
+          startTimer();
+        }
+      }
+      break;
+    default:
+      break;
+  }
+}
+
+const pauseAudio = (type: string) => {
+  switch (type) {
+    case "Number1":
+      if (number1Audio.value) {
+        number1Audio.value.pause();
+      }
+      break;
+    case "Number2":
+      if (number2Audio.value) {
+        number2Audio.value.pause();
+      }
+      break;
+    case "Story":
+      if (storyAudio.value) {
+        storyAudio.value.pause();
       }
       break;
     default:
@@ -213,17 +246,62 @@ const onAudioEnd = (type: string) => {
   switch (type) {
     case "Number1":
       openNotification("播放完毕，请开始答题！");
+      playCount.value[0]++;
+      playStatus.value[0] = 'Ended';
       canPlay.value = true;
-      startTimer();
       break;
     case "Number2":
       openNotification("播放完毕，请开始答题！");
+      playCount.value[0]++;
+      playStatus.value[0] = 'Ended';
       canPlay.value = true;
-      startTimer();
       break;
     case "Story":
       openNotification("播放完毕，请开始答题！");
-      startTimer();
+      playCount.value[0]++;
+      playStatus.value[0] = 'Ended';
+      break;
+    default:
+      break;
+  }
+}
+
+const onAudioPlay = (type: string) => {
+  switch (type) {
+    case "Number1":
+      if (playCount.value[0] != 0 && playStatus.value[0] == 'Ended') {
+        message.info(`第${playCount.value[0] + 1}次播放`);
+      }
+      playStatus.value[0] = "Playing";
+      canChanges.value = false;
+      break;
+    case "Number2":
+      if (playCount.value[1] != 0 && playStatus.value[1] == 'Ended') {
+        message.info(`第${playCount.value[1] + 1}次播放`);
+      }
+      playStatus.value[1] = "Playing";
+      break;
+    case "Story":
+      if (playCount.value[2] != 0 && playStatus.value[2] == 'Ended') {
+        message.info(`第${playCount.value[2] + 1}次播放`);
+      }
+      playStatus.value[2] = "Playing";
+      break;
+    default:
+      break;
+  }
+}
+
+const onAudioPause = (type: string) => {
+  switch (type) {
+    case "Number1":
+      playStatus.value[0] = "Paused";
+      break;
+    case "Number2":
+      playStatus.value[1] = "Paused";
+      break;
+    case "Story":
+      playStatus.value[2] = "Paused";
       break;
     default:
       break;
@@ -237,15 +315,15 @@ const getAnswerList = (questionSort: number) => {
 const nextClick = () => {
   switch (stepIndex.value) {
     case 1:
-      if (!canPlay.value || !number1Question.value.questionA) {
-        message.info("请先完成答题！")
+      if ((!canPlay.value || !number1Question.value.questionA || playCount.value[0] == 0) && !isDev.value) {
+        message.info("请先完成第一小题答题！")
         return;
       }
       number1Question.value.timeConsume = seconds.value;
       break;
     case 2:
-      if (!canPlay.value || !number2Question.value.questionA) {
-        message.info("请先完成答题！")
+      if ((!canPlay.value || !number2Question.value.questionA || playCount.value[1] == 0) && !isDev.value) {
+        message.info("请先完成第二小题答题！")
         return;
       }
       number2Question.value.timeConsume = seconds.value;
@@ -258,8 +336,8 @@ const nextClick = () => {
 }
 
 const Completed = () => {
-  if (!number3Question.value?.questionA || (storyQuestion.value.some((item: any) => !("questionA" in item)))) {
-    message.info("请先完成答题！");
+  if ((!number3Question.value?.questionA || (storyQuestion.value.some((item: any) => !("questionA" in item))) || playCount.value[2] == 0) && !isDev.value) {
+    message.info("请先完成第三小题答题！");
     return;
   }
   console.log(bQuestionT1QList)
@@ -289,20 +367,6 @@ const setModalVisible = (open: boolean) => {
 setModalVisible(true);
 
 const modalOkClick = () => {
-  switch (stepIndex.value) {
-    case 0:
-      playAudio("Number1");
-      canChanges.value = false;
-      break;
-    case 1:
-      playAudio("Number2");
-      break;
-    case 2:
-      playAudio("Story");
-      break;
-    default:
-      break;
-  }
   stepIndex.value++;
   setModalVisible(false);
 }
@@ -319,19 +383,57 @@ const openNotification = (message: string) => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <a-flex class="w-[calc(100%-400px)] pl-4 pr-4" :vertical="true" :justify="'space-between'" :align="'center'">
+      <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-10 border-b-1 border-gray-300 rounded-xl"
+        :class="stepIndex == 1 ? 'row-striped' : ''">
+        <div class="h-10 w-80 text-xl flex items-center">
+          1: 数字“X”出现的次数？
+        </div>
+        <div class="h-10 w-30">
+          <a-input-number addon-after="次" size="large" :min="0" />
+        </div>
+        <div class="h-14 w-70 pl-4">
+          <audio class="w-66" :src="GetAudioUrl('听觉集中-数字题.mp3')" controls
+            controlsList="nodownload noplaybackrate"></audio>
+        </div>
+        <div class="h-10 w-40 pl-4">
+          <a-button size="large">
+            下一题
+          </a-button>
+        </div>
+      </div>
+      <div class="w-full flex felx-row items-center pl-4 pr-4 pt-2 pb-2 mb-30 border-b-1 border-gray-300 rounded-xl"
+        :class="stepIndex == 1 ? 'row-striped' : ''">
+        <div class="h-10 w-80 text-xl flex items-center">
+          2: 数字“Y”出现的次数？
+        </div>
+        <div class="h-10 w-30">
+          <a-input-number addon-after="次" size="large" :min="0" />
+        </div>
+        <div class="h-14 w-70 pl-4">
+          <audio class="w-66" :src="GetAudioUrl('听觉集中-数字题.mp3')" controls
+            controlsList="nodownload noplaybackrate"></audio>
+        </div>
+        <div class="h-10 w-40 pl-4">
+          <a-button size="large">
+            下一题
+          </a-button>
+        </div>
+      </div>
+    </a-flex>
+    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
       <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
         <template #expandIcon="{ isActive }">
           <caret-right-outlined :rotate="isActive ? 90 : 0" />
         </template>
         <a-collapse-panel key="1" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
-          <template #extra>
-            <a-button v-show="stepIndex == 0" type="primary"
-              @click="(event: MouseEvent) => { modalOkClick(); event.stopPropagation(); }">
-              确认
-            </a-button>
-          </template>
           <template #header>
             <a-space :size="10">
               <span>
@@ -361,7 +463,13 @@ const openNotification = (message: string) => {
           </div>
           <div class="h-14 w-70 pl-4">
             <audio class="w-66" ref="number1Audio" :src="GetAudioUrl('听觉集中-数字题.mp3')" @ended="onAudioEnd('Number1')"
-              controls controlsList="nodownload noplaybackrate"></audio>
+              @play="onAudioPlay('Number1')" @pause="onAudioPause('Number1')" controls></audio>
+          </div>
+          <div class="h-10 w-20 pl-4 pr-4 flex items-center justify-center">
+            <PlayCircleOutlined class="text-3xl" v-show="stepIndex == 1 && playStatus[0] != 'Playing'"
+              @click="playAudio('Number1')" />
+            <PauseCircleOutlined class="text-3xl" v-show="stepIndex == 1 && playStatus[0] == 'Playing'"
+              @click="pauseAudio('Number1')" />
           </div>
           <div class="h-10 w-40 pl-4">
             <a-button :disabled="stepIndex != 1" size="large" @click="() => { nextClick() }">
@@ -380,7 +488,13 @@ const openNotification = (message: string) => {
           </div>
           <div class="h-14 w-70 pl-4">
             <audio class="w-66" ref="number2Audio" :src="GetAudioUrl('听觉集中-数字题.mp3')" @ended="onAudioEnd('Number2')"
-              controls controlsList="nodownload noplaybackrate"></audio>
+              @play="onAudioPlay('Number2')" @pause="onAudioPause('Number2')" controls></audio>
+          </div>
+          <div class="h-10 w-20 pl-4 pr-4 flex items-center justify-center">
+            <PlayCircleOutlined class="text-3xl" v-show="stepIndex == 2 && playStatus[1] != 'Playing'"
+              @click="playAudio('Number2')" />
+            <PauseCircleOutlined class="text-3xl" v-show="stepIndex == 2 && playStatus[1] == 'Playing'"
+              @click="pauseAudio('Number2')" />
           </div>
           <div class="h-10 w-40 pl-4">
             <a-button :disabled="stepIndex != 2" size="large" @click="() => { nextClick() }">
@@ -398,7 +512,13 @@ const openNotification = (message: string) => {
           </div>
           <div class="h-14 w-70 pl-4">
             <audio class="w-66" ref="storyAudio" :src="GetAudioUrl('听觉集中-文字题.mp3')" @ended="onAudioEnd('Story')"
-              controls controlsList="nodownload noplaybackrate"></audio>
+              @play="onAudioPlay('Story')" @pause="onAudioPause('Story')" controls></audio>
+          </div>
+          <div class="h-10 w-20 pl-4 pr-4 flex items-center justify-center">
+            <PlayCircleOutlined class="text-3xl" v-show="stepIndex == 3 && playStatus[2] != 'Playing'"
+              @click="playAudio('Story')" />
+            <PauseCircleOutlined class="text-3xl" v-show="stepIndex == 3 && playStatus[2] == 'Playing'"
+              @click="pauseAudio('Story')" />
           </div>
         </div>
         <div class="w-full flex felx-row items-start p-4 border-b-1 border-gray-300 rounded-b-xl"
@@ -445,12 +565,16 @@ const openNotification = (message: string) => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-8xl">{{
           `${seconds ?? 0}`
-          }}</span>
+        }}</span>
       </div>
       <div class="w-full flex flex-row justify-center items-center pt-4">
         <span class="text-lg w-20">答题耗时</span>
         <a-input disabled class="inputWidth"
           :value="`${number1Question.timeConsume ?? 0}—${number2Question.timeConsume ?? 0}—${number3Question.timeConsume ?? 0}`" />
+      </div>
+      <div class="w-full flex flex-row justify-center items-center pt-4">
+        <span class="text-lg w-20">播放次数</span>
+        <a-input disabled class="inputWidth" :value="`${playCount[0]}—${playCount[1]}—${playCount[2]}`" />
       </div>
       <div class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-20">数字题一</span>

@@ -7,7 +7,7 @@ import _, { forEach } from "lodash";
 import { useAnswerStore } from '@/stores/answerStore';
 import { useGlobalStore } from "@/stores/globalStore";
 import { useAccountStore } from "@/stores/accountStore";
-import { CaretRightOutlined } from '@ant-design/icons-vue';
+import { CaretRightOutlined, PlayCircleOutlined, PauseCircleOutlined } from '@ant-design/icons-vue';
 const props = defineProps<{
   questionId: string,
   isCurrent: boolean,
@@ -172,35 +172,109 @@ const resetTimer = (): void => {
 
 // #region 答题方法
 
-const CurrQuestionSort = ref(0)
-const canPlay = ref(true)
+const CurrQuestionSort = ref(1)
+const canPlay = ref(true);
+const playDiffStatus = ref<string[]>([])
+const playSameStatus = ref<string[]>([])
+const playDiffCount = ref<number[]>([0, 0, 0, 0, 0])
+const playSameCount = ref<number[]>([0, 0, 0])
 const AudioDiffRefs = ref<HTMLAudioElement[]>([]);
 const AudioSameRefs = ref<HTMLAudioElement[]>([]);
 
 const playAudio = (index: number, type: string) => {
   if (!canPlay.value) return;
-  CurrQuestionSort.value++;
   if (type == "Diff") {
     if (AudioDiffRefs.value[index]) {
       AudioDiffRefs.value[index].play();
-      if (!isDev.value) canPlay.value = false;
+      canPlay.value = false;
+    }
+    if (playDiffCount.value[index] == 0) {
+      startTimer();
     }
   } else {
     if (AudioSameRefs.value[index]) {
       AudioSameRefs.value[index].play();
-      if (!isDev.value) canPlay.value = false;
+      canPlay.value = false;
+    }
+    if (playSameCount.value[index] == 0) {
+      startTimer();
     }
   }
 }
 
-const onAudioEnd = (index: number) => {
+const pauseAudio = (index: number, type: string) => {
+  if (type == "Diff") {
+    if (AudioDiffRefs.value[index]) {
+      AudioDiffRefs.value[index].pause();
+    }
+  } else {
+    if (AudioSameRefs.value[index]) {
+      AudioSameRefs.value[index].pause();
+    }
+  }
+}
+
+const onAudioEnd = (index: number, type: string) => {
+  if (type == "Diff") {
+    playDiffCount.value[index]++;
+    playDiffStatus.value[index] = 'Ended';
+  } else {
+    playSameCount.value[index]++;
+    playSameStatus.value[index] = 'Ended';
+  }
   openNotification("播放完毕，请开始答题！");
   canPlay.value = true;
-  startTimer();
 }
+
+const onAudioPlay = (index: number, type: string) => {
+  if (type == "Diff") {
+    if (playDiffCount.value[index] != 0 && playDiffStatus.value[index] == 'Ended') {
+      message.info(`第${playDiffCount.value[index] + 1}次播放`);
+    }
+    playDiffStatus.value[index] = "Playing";
+    if (index == 0 && playDiffCount.value[index] == 0)
+      canChanges.value = false;
+  } else {
+    if (playSameCount.value[index] != 0 && playSameStatus.value[index] == 'Ended') {
+      message.info(`第${playSameCount.value[index] + 1}次播放`);
+    }
+    playSameStatus.value[index] = "Playing";
+  }
+}
+
+const onAudioPause = (index: number, type: string) => {
+  if (type == "Diff") {
+    playDiffStatus.value[index] = "Paused";
+  } else {
+    playSameStatus.value[index] = "Paused";
+  }
+}
+
 
 const getAnswerList = (questionSort: number) => {
   return _.filter(bQuestionT2AList.value, (x: { questionSort: number; }) => x.questionSort == questionSort);
+}
+
+const nextClick = (index: number, type: string) => {
+  if (type == "Diff") {
+    if ((!canPlay.value || !questionDiffList.value[index].questionA || playDiffCount.value[index] == 0)) {
+      message.info('请先完成答题！');
+      return;
+    }
+    if (index == questionDiffList.value.length - 1) {
+      setModalVisible(true);
+    }
+  } else {
+    if ((!canPlay.value || !questionSameList.value[index].questionA || playSameCount.value[index] == 0)) {
+      message.info('请先完成答题！');
+      return;
+    }
+    if (index == questionSameList.value.length - 1) {
+      setModalVisible(true);
+    }
+  }
+  CurrQuestionSort.value++;
+  resetTimer();
 }
 
 const Completed = () => {
@@ -233,11 +307,8 @@ setModalVisible(true);
 const modalOkClick = () => {
   switch (stepIndex.value) {
     case 0:
-      playAudio(0, "Diff");
-      canChanges.value = false;
       break;
     case 1:
-      playAudio(0, "Same");
       break;
     case 2:
       Completed();
@@ -261,19 +332,75 @@ const openNotification = (message: string) => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <div class="w-full flex flex-col justify-start items-center pb-4">
+      <div class="w-3/4 flex flex-col justify-between p-4">
+        <div class="w-full text-xl flex items-start pb-2 border-b-1 border-gray-300">
+          找不同
+        </div>
+        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
+          v-for="(question, questionIndex) in 2">
+          <div class="h-14 w-80 text-xl flex items-center">
+            <span class="pr-4">{{ `${question}:` }}</span>
+            <audio class="w-66" :src="GetAudioUrl(question + 1 + '.mp3')" controls
+              controlsList="nodownload noplaybackrate"></audio>
+          </div>
+          <div class="h-14 w-160 flex justify-between">
+            <a-checkbox-group button-style="solid">
+              <div class="h-full w-36 text-xl flex items-start" v-for="answer in 4">
+                <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2">
+                  <a-checkbox class="text-xl" :value="answer">
+                    {{ `${answer}: XXXXXXX` }}</a-checkbox>
+                </div>
+              </div>
+            </a-checkbox-group>
+          </div>
+          <div class="h-14 w-40 pl-4 flex items-center">
+            <a-button size="large">
+              下一题
+            </a-button>
+          </div>
+        </div>
+        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300">
+          找相同
+        </div>
+        <div class="w-full text-xl flex items-start pb-2 pt-2 border-b-1 border-gray-300  rounded-xl"
+          v-for="(question, questionIndex) in 2">
+          <div class="h-14 w-80 text-xl flex items-center">
+            <span class="pr-4">{{ `${question}:` }}</span>
+            <audio class="w-66" :src="GetAudioUrl(question + 1 + '.mp3')" controls
+              controlsList="nodownload noplaybackrate"></audio>
+          </div>
+          <div class="h-14 w-160 flex justify-between">
+            <a-checkbox-group button-style="solid">
+              <div class="h-full w-36 text-xl flex items-start" v-for="answer in 4">
+                <div class="h-full w-36 text-xl flex items-center rounded-lg cursor-pointer pl-2">
+                  <a-checkbox class="text-xl" :value="answer">
+                    {{ `${answer}: XXXXXXX` }}</a-checkbox>
+                </div>
+              </div>
+            </a-checkbox-group>
+          </div>
+          <div class="h-14 w-40 pl-4 flex items-center">
+            <a-button size="large">
+              下一题
+            </a-button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
       <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
         <template #expandIcon="{ isActive }">
           <caret-right-outlined :rotate="isActive ? 90 : 0" />
         </template>
         <a-collapse-panel key="1" :style="'padding-top:0px;border-radius: 4px;border: 0;overflow: hidden'">
-          <template #extra>
-            <a-button v-show="stepIndex == 0" type="primary"
-              @click="(event: MouseEvent) => { modalOkClick(); event.stopPropagation(); }">
-              确认
-            </a-button>
-          </template>
           <span class="text-base">
             <div v-html="getTipInfo"></div>
           </span>
@@ -282,7 +409,7 @@ const openNotification = (message: string) => {
               <span>
                 指导语
               </span>
-              <span>
+              <span v-show="stepIndex < 2">
                 ——
               </span>
               <span class="text-2xl text-blue-500">
@@ -302,7 +429,16 @@ const openNotification = (message: string) => {
             <div class="h-14 w-80 text-xl flex items-center">
               <span class="pr-4">{{ `${question.questionSort}:` }}</span>
               <audio class="w-66" ref="AudioDiffRefs" :src="GetAudioUrl(question.questionSort + '.mp3')"
-                @ended="onAudioEnd(question.questionSort)" controls controlsList="nodownload noplaybackrate"></audio>
+                @ended="onAudioEnd(questionIndex, 'Diff')" @play="onAudioPlay(questionIndex, 'Diff')"
+                @pause="onAudioPause(questionIndex, 'Diff')" controls controlsList="nodownload noplaybackrate"></audio>
+              <div class="h-10 w-20 pl-4 pr-4 flex items-center justify-center">
+                <PlayCircleOutlined class="text-3xl"
+                  v-show="CurrQuestionSort == question.questionSort && playDiffStatus[questionIndex] != 'Playing'"
+                  @click="playAudio(questionIndex, 'Diff')" />
+                <PauseCircleOutlined class="text-3xl"
+                  v-show="CurrQuestionSort == question.questionSort && playDiffStatus[questionIndex] == 'Playing'"
+                  @click="pauseAudio(questionIndex, 'Diff')" />
+              </div>
             </div>
             <div class="h-14 w-160 flex justify-between">
               <a-checkbox-group v-model:value="question.questionA" button-style="solid"
@@ -319,14 +455,9 @@ const openNotification = (message: string) => {
               </a-checkbox-group>
             </div>
             <div class="h-14 w-40 pl-4 flex items-center">
-              <a-button v-if="questionIndex + 1 == answerInfo.number1"
-                :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } setModalVisible(true) }">
-                完成
-              </a-button>
-              <a-button v-else :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } playAudio(questionIndex + 1, 'Diff') }">
-                下一题
+              <a-button :disabled="CurrQuestionSort != question.questionSort" size="large"
+                @click="nextClick(questionIndex, 'Diff')">
+                {{ questionIndex + 1 == answerInfo.number1 ? '完成' : '下一题' }}
               </a-button>
             </div>
           </div>
@@ -339,7 +470,16 @@ const openNotification = (message: string) => {
             <div class="h-14 w-80 text-xl flex items-center">
               <span class="pr-4">{{ `${question.questionSort}:` }}</span>
               <audio class="w-66" ref="AudioSameRefs" :src="GetAudioUrl(question.questionSort + '.mp3')"
-                @ended="onAudioEnd(question.questionSort)" controls controlsList="nodownload noplaybackrate"></audio>
+                @ended="onAudioEnd(questionIndex, 'Same')" @play="onAudioPlay(questionIndex, 'Same')"
+                @pause="onAudioPause(questionIndex, 'Same')" controls controlsList="nodownload noplaybackrate"></audio>
+              <div class="h-10 w-20 pl-4 pr-4 flex items-center justify-center">
+                <PlayCircleOutlined class="text-3xl"
+                  v-show="CurrQuestionSort == question.questionSort && playSameStatus[questionIndex] != 'Playing'"
+                  @click="playAudio(questionIndex, 'Same')" />
+                <PauseCircleOutlined class="text-3xl"
+                  v-show="CurrQuestionSort == question.questionSort && playSameStatus[questionIndex] == 'Playing'"
+                  @click="pauseAudio(questionIndex, 'Same')" />
+              </div>
             </div>
             <div class="h-14 w-160 flex justify-between">
               <a-checkbox-group v-model:value="question.questionA" button-style="solid"
@@ -355,14 +495,9 @@ const openNotification = (message: string) => {
               </a-checkbox-group>
             </div>
             <div class="h-14 w-40 pl-4 flex items-center">
-              <a-button v-if="questionIndex + 1 == answerInfo.number2"
-                :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } setModalVisible(true) }">
-                完成
-              </a-button>
-              <a-button v-else :disabled="CurrQuestionSort != question.questionSort" size="large"
-                @click="() => { if (!question.questionA) { message.info('请先完成答题！'); return; } playAudio(questionIndex + 1, 'Same') }">
-                下一题
+              <a-button :disabled="CurrQuestionSort != question.questionSort" size="large"
+                @click="nextClick(questionIndex, 'Same')">
+                {{ questionIndex + 1 == answerInfo.number2 ? '完成' : '下一题' }}
               </a-button>
             </div>
           </div>
@@ -419,7 +554,7 @@ const openNotification = (message: string) => {
           <span>
             指导语
           </span>
-          <span>
+          <span v-show="stepIndex < 2">
             ——
           </span>
           <span class="text-2xl text-blue-500">

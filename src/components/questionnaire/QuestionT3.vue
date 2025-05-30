@@ -325,7 +325,76 @@ const openNotification = (message: string) => {
 </script>
 
 <template>
-  <a-flex class="h-full" :justify="'space-between'" :align="'flex-start'">
+  <a-flex v-show="!modalVisible && stepIndex == 0" class="h-full flex-col" :justify="'center'" :align="'center'">
+    <div class="w-3/4 flex flex-row items-start pb-4">
+      <div class="w-1/2 flex flex-col p-4 pt-0 ">
+        <div class="w-full h-14 text-xl flex items-center pb-2 pt-2 border-b-1 border-gray-300">
+          <div class="w-20 text-xl flex items-center">
+            <span class="">级别</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex justify-around">
+            <span class="">顺背数测试1</span>
+            <span class="">顺背数测试2</span>
+          </div>
+        </div>
+        <div class="w-full h-14 text-xl flex items-center pb-1 pt-1 border-b-1 border-gray-300"
+          v-for="(questionLevel, questionLevelIndex) in 6">
+          <div class="w-20 text-xl flex items-center">
+            <span class="pl-4">{{ `${questionLevel}` }}</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex pb-1 pt-1 rounded-xl"
+            :class="(currQuestionType && currQuestionLevel == questionLevel ? 'row-striped' : '')">
+            <div class="w-1/2 h-full pl-2 pr-2" v-for="(question, questionIndex) in 2">
+              <div class="w-full h-full flex justify-center items-center rounded-2xl">
+                <div v-show="(currQuestionType && currQuestionLevel == questionLevel && currQuestionSort == question)"
+                  class="w-full h-full flex justify-center items-center">
+                  <audio class="w-full h-10" controls controlsList="nodownload noplaybackrate"></audio>
+                  <div style="margin-left: -40px!important;z-index: 999;">
+                    <PlayCircleOutlined :style="{ fontSize: '20px' }" class="cursor-pointer" />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="w-1/2 flex flex-col p-4 pt-0">
+        <div class="w-full h-14 text-xl flex items-center pb-2 pt-2 border-b-1 border-gray-300">
+          <div class="w-20 text-xl flex items-center">
+            <span class="">级别</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex justify-around">
+            <span class="">逆背数测试1</span>
+            <span class="">逆背数测试2</span>
+          </div>
+        </div>
+        <div class="w-full h-14 text-xl flex items-center pb-1 pt-1 border-b-1 border-gray-300"
+          v-for="(questionLevel, questionLevelIndex) in 4">
+          <div class="w-20 text-xl flex items-center">
+            <span class="pl-4">{{ `${questionLevel}` }}</span>
+          </div>
+          <div class="w-[calc(100%-80px)] flex pb-1 pt-1 rounded-xl">
+            <div class="w-1/2 h-full pl-2 pr-2" v-for="(question, questionIndex) in 2">
+              <div class="w-full h-full flex justify-center items-center rounded-2xl">
+                <div class="w-full h-full flex justify-center items-center">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="w-2/3 flex flex-row justify-around items-center mb-10" style="height: 50px;">
+      <a-button class="w-16" v-for="item in 9" type="primary" size="large">
+        {{ item }}
+      </a-button>
+    </div>
+    <div class="w-1/2 pb-4" v-html="getModalInfo"></div>
+    <a-button type="primary" @click="modalOkClick">
+      确认
+    </a-button>
+  </a-flex>
+  <a-flex v-show="stepIndex != 0" class="h-full" :justify="'space-between'" :align="'flex-start'">
     <a-flex class="h-full w-[calc(100%-400px)] pl-4 pr-4 overflow-y-scroll" :vertical="true" :justify="'space-between'">
       <a-collapse class="w-full" v-model:activeKey="activeKey" :bordered="false" style="">
         <template #expandIcon="{ isActive }">
