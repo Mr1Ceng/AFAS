@@ -107,9 +107,10 @@ const spiralMazeWidth = ref(0);
     <div class="w-2/3 h-full flex flex-col">
       <div class="w-full flex-auto">
         <div ref="tableContainer" class="w-full h-full flex flex-col pl-8">
-          <SpiralMaze ref="spiralMaze" v-model:spacing="question.questionList.spacing"
-            v-model:perturbation="question.questionList.perturbation" :width="spiralMazeWidth"
-            :height="spiralMazeHeight" :show-control="true" :is-dark-theme="globalStore.isDarkTheme" />
+          <SpiralMaze ref="spiralMaze" v-model:layer="question.questionList.ringNumber"
+            v-model:spacing="question.questionList.spacing" v-model:perturbation="question.questionList.perturbation"
+            :width="spiralMazeWidth" :height="spiralMazeHeight" :show-control="true"
+            :is-dark-theme="globalStore.isDarkTheme" />
         </div>
       </div>
       <div class="w-full h-20 flex felx-row items-center justify-end">

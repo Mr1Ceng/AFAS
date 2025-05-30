@@ -50,7 +50,8 @@ const GetQuestionS4 = async () => {
 GetQuestionS4();
 const spiralMazeSetting = ref<I_BSpiralMaze>(new C_BSpiralMaze({
   spacing: 30,
-  perturbation: 20
+  perturbation: 20,
+  ringNumber: 10
 }))
 const GetSpiralMazeSetting = async () => {
   try {
@@ -289,11 +290,11 @@ const smVisible = ref<boolean>(false);
         </div>
         <div class="w-3/4 h-full flex justify-center items-center">
           <div v-show="stepIndex == 1" class="w-full h-full">
-            <SpiralMaze ref="spiralMaze" v-model:spacing="spiralMazeSetting.spacing"
-              v-model:perturbation="spiralMazeSetting.perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight"
-              :is-dark-theme="globalStore.isDarkTheme" @update-cross-count="handleCrossUpdate"
-              @update-error-count="handleErrorUpdate" @started="started" @finished="finished"
-              @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
+            <SpiralMaze ref="spiralMaze" v-model:layer="spiralMazeSetting.ringNumber"
+              v-model:spacing="spiralMazeSetting.spacing" v-model:perturbation="spiralMazeSetting.perturbation"
+              :width="spiralMazeWidth" :height="spiralMazeHeight" :is-dark-theme="globalStore.isDarkTheme"
+              @update-cross-count="handleCrossUpdate" @update-error-count="handleErrorUpdate" @started="started"
+              @finished="finished" @get-question-image="getQuestionImage" @get-answer-image="getAnswerImage" />
           </div>
           <div class="w-full h-full">
             <img v-show="stepIndex > 1" :width="spiralMazeWidth" :height="spiralMazeHeight" :src="answerImage">

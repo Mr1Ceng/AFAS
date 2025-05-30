@@ -5,15 +5,28 @@
     <div class="w-full" :class="showControl ? '' : 'hidden'">
       <a-row :justify="'center'">
         <a-col :span="4">
+          <label for="layer">漩涡层数:</label>
+        </a-col>
+        <a-col :span="12">
+          <a-slider :value="layer" :min="3" :max="10" @change="$emit('update:layer', $event)" :step="1" />
+        </a-col>
+        <a-col :span="4">
+          <a-input-number :value="layer" :min="3" :max="10" @change="$emit('update:layer', $event)"
+            style="margin-left: 16px" disabled />
+        </a-col>
+      </a-row>
+      <a-row :justify="'center'">
+        <a-col :span="4">
           <label for="spacing">漩涡间距:</label>
         </a-col>
         <a-col :span="12">
-          <a-slider :value="spacing" :min="20" :max="props.height == 0 ? 50 : Math.floor(props.height / 20)"
+          <a-slider :value="spacing" :min="20"
+            :max="props.height == 0 ? 50 : Math.floor(props.height * (23 - props.layer) / (2 * props.layer * 14))"
             @change="$emit('update:spacing', $event)" :step="1" />
-          <!-- -->
         </a-col>
         <a-col :span="4">
-          <a-input-number :value="spacing" :min="20" :max="props.height == 0 ? 50 : Math.floor(props.height / 20)"
+          <a-input-number :value="spacing" :min="20"
+            :max="props.height == 0 ? 50 : Math.floor(props.height * (23 - props.layer) / (2 * props.layer * 14))"
             @change="$emit('update:spacing', $event)" style="margin-left: 16px" disabled />
         </a-col>
       </a-row>
@@ -39,6 +52,7 @@ import { ref, onMounted, watch } from "vue";
 const props = defineProps({
   spacing: { type: Number, default: 0 },
   perturbation: { type: Number, default: 10 },
+  layer: { type: Number, default: 10 },
   showControl: { type: Boolean, default: false },
   showCount: { type: Boolean, default: false },
   width: { type: Number, default: 800 },
@@ -54,7 +68,8 @@ const emit = defineEmits([
   "getQuestionImage",
   "getAnswerImage",
   "update:spacing",
-  "update:perturbation"
+  "update:perturbation",
+  "update:layer"
 ]);
 
 const canvasRef = ref<HTMLCanvasElement | null>(null);
@@ -65,13 +80,12 @@ const errorCount = ref(0);
 let isDrawing = false;
 let mousePath: { x: number; y: number }[] = [];
 let hasTouched = false; // 用于防止重复计数
-const layers = 10; // 固定漩涡层数为10层
 const spiral = ref({ a: 1, b: props.spacing * 0.1 + 2 }); // 螺旋间距参数
 const startCircle = { x: props.width / 2, y: props.height / 2, r: 15 }; // 起始位置圆
 const endCircle = { x: 0, y: 0, r: 15 }; // 结束位置圆（动态生成）
 let spiralPath: { x: number; y: number }[] = []; // 用于存储生成的光滑漩涡路径
 const updateEndCircle = () => {
-  const theta = Math.PI * layers * 2;
+  const theta = Math.PI * props.layer * 2;
   const r = spiral.value.a + spiral.value.b * theta;
   endCircle.x = props.width / 2 + r * Math.cos(theta);
   endCircle.y = props.height / 2 + r * Math.sin(theta);
@@ -82,9 +96,9 @@ const updateEndCircle = () => {
 //初始化动态波动的不规则漩涡路径
 const generateSmoothSpiralPath = () => {
   spiralPath = [];
-  for (let theta = 0; theta < Math.PI * layers * 2; theta += 0.1) {
+  for (let theta = 0; theta < Math.PI * props.layer * 2; theta += 0.1) {
     // 增强波动范围，且随着距离增大而增强
-    const distanceFactor = theta / (layers * 2 * Math.PI); // 距离增大因子
+    const distanceFactor = theta / (props.layer * 2 * Math.PI); // 距离增大因子
     const randomPerturbation = (Math.random() * props.perturbation - props.perturbation / 2) * distanceFactor * 1.5; // 调节波动范围
     const r = spiral.value.a + spiral.value.b * theta + randomPerturbation;
     const x = props.width / 2 + r * Math.cos(theta);
@@ -204,7 +218,7 @@ onMounted(async () => {
   reDraw();
 });
 
-watch(() => [props.spacing, props.perturbation], (newValue) => {
+watch(() => [props.spacing, props.perturbation, props.layer], (newValue) => {
   spiral.value.b = props.spacing * 0.1 + 2;
   if (newValue[0] != 0 && props.height != 0) {
     reDraw();

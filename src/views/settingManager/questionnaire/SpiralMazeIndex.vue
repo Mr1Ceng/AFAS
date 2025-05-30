@@ -24,14 +24,16 @@
         <div class="w-full h-16 p-4">
           <a-form layout="inline" :model="currentSpiralMaze">
             <a-form-item label="年龄">
-              <a-input-number v-model:value="currentSpiralMaze.age" :min="1" style="margin-left: 16px" />
+              <a-input-number v-model:value="currentSpiralMaze.age" :min="1" />
+            </a-form-item>
+            <a-form-item label="层数">
+              <a-input-number v-model:value="currentSpiralMaze.ringNumber" :min="3" :max="10" />
             </a-form-item>
             <a-form-item label="间距">
-              <a-input-number v-model:value="currentSpiralMaze.spacing" :min="20" :max="50" style="margin-left: 16px" />
+              <a-input-number v-model:value="currentSpiralMaze.spacing" :min="20" :max="50" />
             </a-form-item>
             <a-form-item label="波动程度">
-              <a-input-number v-model:value="currentSpiralMaze.perturbation" :min="0" :max="30"
-                style="margin-left: 16px" />
+              <a-input-number v-model:value="currentSpiralMaze.perturbation" :min="0" :max="30" />
             </a-form-item>
             <a-form-item>
               <a-button type="primary" @click="SaveSpiralMaze">
@@ -40,9 +42,10 @@
             </a-form-item>
           </a-form>
         </div>
-        <SpiralMaze ref="spiralMaze" v-model:spacing="currentSpiralMaze.spacing"
-          v-model:perturbation="currentSpiralMaze.perturbation" :width="spiralMazeWidth" :height="spiralMazeHeight"
-          :show-control="true" :is-dark-theme="globalStore.isDarkTheme" />
+        <SpiralMaze ref="spiralMaze" v-model:layer="currentSpiralMaze.ringNumber"
+          v-model:spacing="currentSpiralMaze.spacing" v-model:perturbation="currentSpiralMaze.perturbation"
+          :width="spiralMazeWidth" :height="spiralMazeHeight" :show-control="true"
+          :is-dark-theme="globalStore.isDarkTheme" />
       </div>
     </div>
 
@@ -182,7 +185,7 @@ const pagination = computed(() => {
 
 onMounted(() => {
   setTimeout(() => {
-    spiralMazeHeight.value = tableContainer.value?.clientHeight - 132;
+    spiralMazeHeight.value = tableContainer.value?.clientHeight - 176;
     spiralMazeWidth.value = tableContainer.value?.clientWidth;
   }, 50);
 })

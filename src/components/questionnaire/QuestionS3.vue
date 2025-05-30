@@ -340,14 +340,14 @@ const getGridIcon = (value: number) => {
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1"
               v-for="(column, columnIndex) in row.columns" :class="((rowIndex == 0 && columnIndex < 10) || stepIndex != 0 ? `iconfont ${getGridIcon(column.value)}` : '')
-                + (column.answerValue > 0 && !(rowIndex == 0 && columnIndex < 10) ? (column.answerValue == column.value ? ' bg-green-500' : ' bg-red-500') : '')
                 + (rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')"></div>
           </a-flex>
           <a-flex class="w-full h-16" :justify="'space-around'" :align="'center'">
             <div class="h-full w-1/25 flex justify-center items-center text-3xl border-1"
-              v-for="(column, columnIndex) in row.columns" :class="(column.answerValue > 0 ? (column.answerValue == column.value ? ' bg-green-500' : ' bg-red-500') : '') +
-                (rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')">{{ column.answerValue == 0 ? '' :
-                  column.answerValue }}
+              v-for="(column, columnIndex) in row.columns"
+              :class="(rowIndex == 0 && columnIndex < 10 ? ' bg-gray-400' : '')">
+              {{ column.answerValue == 0 ? '' :
+                column.answerValue }}
             </div>
           </a-flex>
         </a-flex>
@@ -373,12 +373,12 @@ const getGridIcon = (value: number) => {
         <a-input-number class="inputWidth" v-model:value="timeConsume" :disabled="true" addon-after="秒" size="large"
           :min="0" />
       </div>
-      <div class="w-full flex flex-row justify-start items-center pt-4">
+      <div v-show="isComplete" class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">正确数</span>
         <a-input-number class="inputWidth" v-model:value="rightCount" :disabled="true" addon-after="个" size="large"
           :min="0" />
       </div>
-      <div class="w-full flex flex-row justify-start items-center pt-4">
+      <div v-show="isComplete" class="w-full flex flex-row justify-start items-center pt-4">
         <span class="text-lg w-16">错误数</span>
         <a-input-number class="inputWidth" v-model:value="errorCount" :disabled="true" addon-after="个" size="large"
           :min="0" />
