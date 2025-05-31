@@ -252,14 +252,14 @@ const onAudioEnd = (type: string) => {
       break;
     case "Number2":
       openNotification("播放完毕，请开始答题！");
-      playCount.value[0]++;
-      playStatus.value[0] = 'Ended';
+      playCount.value[1]++;
+      playStatus.value[1] = 'Ended';
       canPlay.value = true;
       break;
     case "Story":
       openNotification("播放完毕，请开始答题！");
-      playCount.value[0]++;
-      playStatus.value[0] = 'Ended';
+      playCount.value[2]++;
+      playStatus.value[2] = 'Ended';
       break;
     default:
       break;
