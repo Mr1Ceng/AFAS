@@ -156,7 +156,7 @@ const handleChange = async (info: any) => {
 const previewVisible = ref(false);
 const previewImage = ref('');
 const previewTitle = ref('');
-const handlePreview = async (file: UploadProps['fileList'][number]) => {
+const handlePreview = async (file: any) => {
   if (!file.url && !file.preview) {
     file.preview = (await getBase64(file.originFileObj)) as string;
   }
