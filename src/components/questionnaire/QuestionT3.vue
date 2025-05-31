@@ -436,7 +436,7 @@ const openNotification = (message: string) => {
                   <div class="w-full h-full flex justify-center items-center"
                     v-show="(currQuestionType && currQuestionLevel == questionLevel.key && currQuestionSort == question.questionSort)">
                     <audio class="w-full h-10" ref="AudioForwardRefs"
-                      :src="GetAudioUrl(`${question.questionType ? 'True' : 'False'}_${question.questionSort}_${questionLevel.key}.aac`)"
+                      :src="GetAudioUrl(`${question.questionType ? '顺背数测试' : '倒背数测试'}${question.questionSort}（${questionLevel.key}级）.mp3`)"
                       @ended="onAudioEnd(question.questionSort)" controls
                       controlsList="nodownload noplaybackrate"></audio>
                     <div v-show="!question.played" style="margin-left: -40px!important;z-index: 999;">
@@ -481,7 +481,7 @@ const openNotification = (message: string) => {
                   <div class="w-full h-full flex justify-center items-center"
                     v-show="(!currQuestionType && currQuestionLevel == questionLevel.key && currQuestionSort == question.questionSort)">
                     <audio class="w-full h-10" ref="AudioBackwardRefs"
-                      :src="GetAudioUrl(`${question.questionType ? 'True' : 'False'}_${question.questionSort}_${questionLevel.key}.aac`)"
+                      :src="GetAudioUrl(`${question.questionType ? '顺背数测试' : '倒背数测试'}${question.questionSort}（${questionLevel.key}级）.mp3`)"
                       @ended="onAudioEnd(question.questionSort)" controls
                       controlsList="nodownload noplaybackrate"></audio>
                     <div v-show="!question.played" style="margin-left: -40px!important;z-index: 999;">

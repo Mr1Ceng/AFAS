@@ -446,12 +446,12 @@ const loading = ref<boolean>(false);
                 evaluationStandard.levelName }}</a-select-option>
           </a-select>
         </a-form-item>
-        <a-form-item label="建议课程">
+        <!-- <a-form-item label="建议课程">
           <a-select v-model:value="testResult.suggestedCourse" size="large">
             <a-select-option v-for="suggestedCourse in suggestedCourseList" :value="suggestedCourse.itemId">{{
               suggestedCourse.itemName }}</a-select-option>
           </a-select>
-        </a-form-item>
+        </a-form-item> -->
         <a-form-item label="评测老师">
           <a-select v-model:value="testResult.teacherId" size="large">
             <a-select-option v-for="teacher in teacherList" :value="teacher.userId">{{

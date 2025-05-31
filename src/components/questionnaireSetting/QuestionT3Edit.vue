@@ -99,18 +99,18 @@ const SaveQuestion = async () => {
 onMounted(() => {
   GetQuestionInfo().then(() => {
     _.times(10, (row) => {
-      checkAudioUrlExists(`True_1_${row + 1}.aac`).then((exists) => {
+      checkAudioUrlExists(`顺背数测试1（${row + 1}级）.mp3`).then((exists) => {
         hasAudio.value[row * 2] = exists;
       })
-      checkAudioUrlExists(`True_2_${row + 1}.aac`).then((exists) => {
+      checkAudioUrlExists(`顺背数测试2（${row + 1}级）.mp3`).then((exists) => {
         hasAudio.value[row * 2 + 1] = exists;
       })
     })
     _.times(7, (row) => {
-      checkAudioUrlExists(`False_1_${row + 1}.aac`).then((exists) => {
+      checkAudioUrlExists(`倒背数测试1（${row + 1}级）.mp3`).then((exists) => {
         hasAudio.value[20 + row * 2] = exists;
       })
-      checkAudioUrlExists(`False_2_${row + 1}.aac`).then((exists) => {
+      checkAudioUrlExists(`倒背数测试2（${row + 1}级）.mp3`).then((exists) => {
         hasAudio.value[20 + row * 2 + 1] = exists;
       })
     })
@@ -132,7 +132,7 @@ const handleRemove = (file: any, questionIndex: number, qusetionItem: C_BQuestio
   newFileList.splice(index, 1);
   fileList.value[questionIndex] = newFileList;
   if (audioList.value) {
-    audioList.value[questionIndex].src = GetAudioUrl(`${qusetionItem.questionType ? 'True' : 'False'}_${qusetionItem.questionSort}_${qusetionItem.level}.aac`);
+    audioList.value[questionIndex].src = GetAudioUrl(`${qusetionItem.questionType ? '顺背数测试' : '倒背数测试'}${qusetionItem.questionSort}（${qusetionItem.level}级）.mp3`);
     audioList.value[questionIndex].load(); // 重新加载新的音频
     isUploadAudio.value[questionIndex] = false;
   }
@@ -140,7 +140,7 @@ const handleRemove = (file: any, questionIndex: number, qusetionItem: C_BQuestio
 
 // 文件验证
 const beforeUpload: UploadProps['beforeUpload'] = file => {
-  const isAudio = file.type === 'audio/vnd.dlna.adts';
+  const isAudio = file.type === 'audio/mpeg';
   if (!isAudio) {
     message.error('请选择音频文件上传!');
     return;
@@ -156,7 +156,7 @@ const handleChange = async (file: any, questionIndex: number, qusetionItem: C_BQ
     audioList.value[questionIndex].load(); // 重新加载新的音频
     isUploadAudio.value[questionIndex] = true;
   }
-  file.fileList[0].fileName = `${qusetionItem.questionType ? 'True' : 'False'}_${qusetionItem.questionSort}_${qusetionItem.level}.aac`;
+  file.fileList[0].fileName = `${qusetionItem.questionType ? '顺背数测试' : '倒背数测试'}${qusetionItem.questionSort}（${qusetionItem.level}级）.mp3`;
   fileList.value[questionIndex] = [...fileList.value[questionIndex], ...file.fileList]; // 更新文件列表
 };
 const GetAudioUrl = (fileName: string) => {
@@ -211,7 +211,7 @@ const isUploadAudio = ref<Boolean[]>([])
                       </a-upload>
                       <audio v-show="isUploadAudio[questionIndex] || hasAudio[questionIndex]" class="w-66"
                         ref="audioList"
-                        :src="GetAudioUrl(`${qusetionItem.questionType ? 'True' : 'False'}_${qusetionItem.questionSort}_${qusetionItem.level}.aac`)"
+                        :src="GetAudioUrl(`${qusetionItem.questionType ? '顺背数测试' : '倒背数测试'}${qusetionItem.questionSort}（${qusetionItem.level}级）.mp3`)"
                         controls controlsList="nodownload noplaybackrate"></audio>
                     </a-space>
                   </a-form-item>

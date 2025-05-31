@@ -110,7 +110,7 @@ const menuList = ref([
       icon: () => h(MailOutlined),
       label: '测评',
       title: '测评',
-      disabled: accountStore.user.isStaff && !accountStore.user.isDeveloper
+      //disabled: accountStore.user.isStaff && !accountStore.user.isDeveloper
     },
     {
       key: 'Q_Result',
