@@ -10,7 +10,7 @@
         <a-range-picker v-model:value="dateRange" />
         <a-select style="width: 120px" v-model:value="status">
           <a-select-option v-for="item in dataStatusList" :value="item.value">{{ item.description
-          }}</a-select-option>
+            }}</a-select-option>
         </a-select>
       </a-space>
     </div>
@@ -124,6 +124,7 @@ import QuestionResult from '@/components/questionnaire/QuestionResult.vue'
 import { ExclamationCircleOutlined } from '@ant-design/icons-vue';
 import { message, Modal } from 'ant-design-vue';
 import { useAccountStore } from "@/stores/accountStore";
+import { useGlobalStore } from "@/stores/globalStore";
 import { DataStatusEnum } from '@/enums/common/DataStatus';
 import { GerderDescription } from '@/enums/GerderEnum'
 import { EnumHelper } from '@/utils/EnumHelper'
@@ -158,7 +159,8 @@ const dataStatusList = [
     description: "未完成"
   }
 ];
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+const globalStore = useGlobalStore();
+const baseURL = globalStore.config.baseURL;
 const accountStore = useAccountStore();
 const tableContainer = ref<any>();
 const tableHeight = computed(() => {

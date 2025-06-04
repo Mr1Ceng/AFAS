@@ -20,8 +20,8 @@ const props = defineProps<{
   questionnaireId: string,
   questionCode: string
 }>()
-const baseURL = import.meta.env.VITE_API_BASE_URL;
 const globalStore = useGlobalStore();
+const baseURL = globalStore.config.baseURL;
 const isDev = inject<Ref<boolean>>("isDev", ref(false));
 const question = ref<QuestionT1Model>(new QuestionT1Model())
 const emit = defineEmits<{

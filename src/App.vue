@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, RouterView } from 'vue-router'
 import { theme } from 'ant-design-vue';
-import { ref, watch, provide } from 'vue';
+import { ref, watch, provide, onMounted } from 'vue';
 import { useGlobalStore } from "@/stores/globalStore";
 import zhCN from 'ant-design-vue/es/locale/zh_CN';
 import dayjs from 'dayjs';
@@ -26,6 +26,8 @@ watch(() => globalStore.isDarkTheme, async (newValue, oldValue) => {
 const isDev = ref<boolean>(import.meta.env.MODE === "development");
 console.log("isDev", isDev.value)
 provide("isDev", isDev);
+onMounted(() => {
+})
 
 </script>
 

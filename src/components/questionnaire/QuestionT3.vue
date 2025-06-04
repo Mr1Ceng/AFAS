@@ -20,7 +20,7 @@ const loading = ref<boolean>(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+const baseURL = globalStore.config.baseURL;
 console.log(answerStore)
 // #region 接口
 

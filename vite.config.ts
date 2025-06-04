@@ -17,4 +17,12 @@ export default defineConfig(({ mode }) => ({
       '@': fileURLToPath(new URL('./src', import.meta.url)),
     },
   },
+  esbuild: {
+    supported: {
+      'top-level-await': true
+    }
+  },
+  build: {
+    target: 'esnext'
+  }
 }));

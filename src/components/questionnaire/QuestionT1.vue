@@ -1,6 +1,6 @@
 <script setup lang="ts">
 
-import { computed, ref, watch, inject, type Ref } from 'vue';
+import { computed, ref, watch, inject, type Ref, onMounted } from 'vue';
 import { message, notification } from 'ant-design-vue';
 import { formattedText } from '@/utils/CommonHelper'
 import _ from "lodash";
@@ -21,8 +21,10 @@ const loading = ref<boolean>(false);
 const answerStore = useAnswerStore();
 const globalStore = useGlobalStore();
 const accountStore = useAccountStore();
-const baseURL = import.meta.env.VITE_API_BASE_URL;
-console.log(answerStore)
+const baseURL = globalStore.config.baseURL;
+onMounted(() => {
+  GetQuestionT1();
+})
 // #region 接口
 
 const questionInfo = ref<any>({});
@@ -61,7 +63,6 @@ const GetQuestionT1 = async () => {
 const GetAudioUrl = (fileName: string) => {
   return `${baseURL}/Static/Audios/${props.questionId}/${fileName}`
 }
-GetQuestionT1();
 
 const SaveAnswerT1 = async () => {
   if (!isComplete.value) {
@@ -565,7 +566,7 @@ const openNotification = (message: string) => {
       <div class="w-full h-40 pt-4 flex justify-center items-center flex-col">
         <span class="text-8xl">{{
           `${seconds ?? 0}`
-        }}</span>
+          }}</span>
       </div>
       <div class="w-full flex flex-row justify-center items-center pt-4">
         <span class="text-lg w-20">答题耗时</span>

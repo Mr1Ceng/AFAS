@@ -1,4 +1,4 @@
-import axios, { type AxiosInstance, type AxiosResponse, type InternalAxiosRequestConfig } from 'axios'
+import axios, { type AxiosInstance, type AxiosResponse, type CreateAxiosDefaults, type InternalAxiosRequestConfig } from 'axios'
 import { message } from 'ant-design-vue';
 import router from '@/router';
 
@@ -7,7 +7,9 @@ import { processResponseData, processRequestData } from '@/utils/CommonHelper'
 
 
 let accountStore: any = null;
-const baseURL = import.meta.env.VITE_API_BASE_URL;
+let globalStore: any = null;
+
+let baseURL = "";
 
 // 创建 axios 实例
 const apiClient: AxiosInstance = axios.create({
@@ -26,7 +28,24 @@ const apiClientAny: AxiosInstance = axios.create({
   },
 })
 
+const loadConfig = async () => {
+  const response = await fetch('/config.json');
+  return await response.json();
+}
+
 const requestConfig = async (config: InternalAxiosRequestConfig) => {
+  if (!globalStore) {
+    globalStore = (await import("@/stores/globalStore")).useGlobalStore();
+  }
+  const localConfig = globalStore.config // 示例：获取 本地配置
+  if (localConfig.baseURL && localConfig.baseURL != '') {
+    config.baseURL = localConfig.baseURL; // 修改本次基本请求URL
+  } else {
+    const data = await loadConfig();
+    globalStore.setConfig(data);
+    config.baseURL = data.baseURL; // 修改本次基本请求URL
+  }
+
   // 延迟 apiClient 访问 store
   if (!accountStore) {
     accountStore = (await import("@/stores/accountStore")).useAccountStore();
@@ -59,7 +78,7 @@ const responseConfig = (response: AxiosResponse) => {
 
 // 请求拦截器
 apiClient.interceptors.request.use(
-  requestConfig,
+  async (config) => await requestConfig(config),
   error => {
     console.error('请求错误:', error)
     return Promise.reject(error)
